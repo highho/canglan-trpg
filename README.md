@@ -17,9 +17,10 @@
 
 ```
 ├── src/
-│   ├── GameCore/       # 游戏核心（无 UI 依赖）：标签/图/战斗/生存/存档/AI…
-│   ├── GameApp/        # Avalonia 桌面客户端（MVVM）
-│   └── GameDemo/       # 控制台演示（核心系统跑通示例）
+│   ├── GameCore/        # 游戏核心（无 UI 依赖）：标签/图/战斗/生存/存档/AI…
+│   ├── GameApp/         # Avalonia 客户端（MVVM，桌面/安卓共用）
+│   ├── GameApp.Android/ # 安卓入口（Activity + Assets 打包，不在 Test.sln 内）
+│   └── GameDemo/        # 控制台演示（核心系统跑通示例）
 ├── tests/
 │   ├── GameCore.Tests/ # 核心测试（75 项）
 │   └── UiSmoke/        # UI 冒烟（页面流程 + 空间化断言）
@@ -36,6 +37,12 @@ dotnet run --project src/GameApp
 # 测试
 dotnet run --project tests/GameCore.Tests   # 75 项核心测试
 dotnet run --project tests/UiSmoke          # UI 冒烟
+
+# 构建安卓 APK（Debug 签名，可直接安装）
+# 注意：aapt2 无法处理含 # 或中文的路径，需从纯 ASCII 路径的目录联接构建：
+#   New-Item -ItemType Junction C:\canglan-trpg -Target <本仓库路径>
+dotnet build C:\canglan-trpg\src\GameApp.Android -c Debug -f net8.0-android
+# 产物：src/GameApp.Android/bin/Debug/net8.0-android/com.canglan.trpg-Signed.apk
 
 # 发布 Windows 自包含版
 dotnet publish src/GameApp/GameApp.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64

@@ -1,0 +1,9 @@
+<Project>
+
+  <!-- 所有 android 目标：自动定位 VS 安装的 Android SDK（命令行构建必需） -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <_AndroidSdkRoot>$([System.Environment]::GetEnvironmentVariable('LOCALAPPDATA'))\Android\Sdk</_AndroidSdkRoot>
+    <AndroidSdkDirectory Condition="Exists('$(_AndroidSdkRoot)')">$(_AndroidSdkRoot)</AndroidSdkDirectory>
+  </PropertyGroup>
+
+</Project>

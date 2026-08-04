@@ -35,6 +35,8 @@ public sealed record NarrationLine(string Text, NarrationKind Kind);
 /// </summary>
 public sealed class MainViewModel : ViewModelBase
 {
+    /// <summary>数据/存档根目录。安卓端在 Activity 里拷完 Assets 后指向应用私有目录；桌面缺省程序目录。</summary>
+    public static string DataRoot { get; set; }
     // ==================== 核心世界 ====================
     public GameWorld World { get; private set; }
     private Unit _player;
@@ -192,8 +194,11 @@ public sealed class MainViewModel : ViewModelBase
     {
         try
         {
-            var saveDir = Path.Combine(AppContext.BaseDirectory, "saves");
-            World = GameWorld.Bootstrap(saveDir: saveDir, rng: new Random());
+            var root = string.IsNullOrEmpty(DataRoot) ? AppContext.BaseDirectory : DataRoot;
+            var saveDir = Path.Combine(root, "saves");
+            var dataDir = Path.Combine(root, "Data");
+            World = GameWorld.Bootstrap(dataDir: Directory.Exists(dataDir) ? dataDir : null,
+                saveDir: saveDir, rng: new Random());
             _guild = new AdventureGuild(World.QuestGraph, _reputation);
             FillStaticOptions();
             _ = InitAiAsync();   // 后台探测 AI 后端，避免阻塞 UI 线程启动

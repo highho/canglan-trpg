@@ -15,7 +15,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <!-- 安卓目标作为库被 GameApp.Android 引用，入口由 Activity 提供 -->
+    <OutputType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">Library</OutputType>
+    <TargetFrameworks>net8.0;net8.0-android</TargetFrameworks>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -34,6 +37,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameCore\GameCore.csproj" />
+  </ItemGroup>
+
+  <!-- 桌面入口仅桌面目标编译；安卓由 GameApp.Android 的 Activity 入口接管 -->
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <Compile Remove="Program.cs" />
   </ItemGroup>
 
   <!-- 数据文件随构建拷贝（与 GameDemo/Tests 保持一致） -->
