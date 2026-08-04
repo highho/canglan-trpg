@@ -1,0 +1,34 @@
+{
+  "shadow_set": {
+    "name": "暗影套装",
+    "bonuses": {
+      "2": {
+        "name": "暗影之力",
+        "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 10 } ]
+      },
+      "3": {
+        "name": "暗影主宰",
+        "effects": [
+          { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 10 },
+          { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.25 }
+        ]
+      }
+    }
+  },
+  "temple_set": {
+    "name": "圣殿套装",
+    "bonuses": {
+      "2": {
+        "name": "圣光庇佑",
+        "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 8 } ]
+      },
+      "3": {
+        "name": "圣殿守护者",
+        "effects": [
+          { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 10 },
+          { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 30 }
+        ]
+      }
+    }
+  }
+}

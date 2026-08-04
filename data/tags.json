@@ -1,0 +1,531 @@
+{
+  "火焰": {
+    "name": "火焰", "description": "火元素亲和", "category": "ELEMENT", "tier": 2,
+    "allowedSources": ["RACE", "CLASS", "QUEST", "TRAIT"],
+    "effects": [ { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.1 } ]
+  },
+  "寒冰": {
+    "name": "寒冰", "description": "冰元素亲和", "category": "ELEMENT", "tier": 2,
+    "allowedSources": ["RACE", "CLASS", "QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 3 } ]
+  },
+  "神圣": {
+    "name": "神圣", "description": "神圣之力", "category": "ELEMENT", "tier": 3,
+    "allowedSources": ["RACE", "QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 15 } ]
+  },
+  "光明": {
+    "name": "光明", "description": "光明眷顾", "category": "ELEMENT", "tier": 3,
+    "allowedSources": ["RACE", "QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 5 } ]
+  },
+  "黑暗": {
+    "name": "黑暗", "description": "黑暗之力", "category": "ELEMENT", "tier": 3,
+    "allowedSources": ["RACE", "CLASS", "QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 5 } ]
+  },
+  "雷电": {
+    "name": "雷电", "description": "雷元素亲和", "category": "ELEMENT", "tier": 2,
+    "allowedSources": ["RACE", "CLASS"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 3 } ]
+  },
+  "毒素": {
+    "name": "毒素", "description": "毒元素亲和", "category": "ELEMENT", "tier": 2,
+    "allowedSources": ["RACE", "CLASS"],
+    "effects": [ { "type": "DAMAGE_MOD", "operator": "ADD", "value": 2 } ]
+  },
+  "自然": {
+    "name": "自然", "description": "自然之力亲和", "category": "ELEMENT", "tier": 2,
+    "allowedSources": ["RACE", "CLASS", "QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 8 } ]
+  },
+  "圣光": {
+    "name": "圣光", "description": "圣光的眷顾", "category": "ELEMENT", "tier": 3,
+    "allowedSources": ["CLASS", "QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ]
+  },
+
+  "人类": {
+    "name": "人类", "description": "平凡而充满可能性的种族", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 5 } ]
+  },
+  "天使": {
+    "name": "天使", "description": "光明的使者", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ]
+  },
+  "堕天使": {
+    "name": "堕天使", "description": "堕入黑暗的天使", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 5 },
+      { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 2 }
+    ]
+  },
+  "恶魔": {
+    "name": "恶魔", "description": "黑暗的化身", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "MULTIPLY", "value": 1.2 } ]
+  },
+  "龙裔": {
+    "name": "龙裔", "description": "拥有龙族血脉", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["RACE", "QUEST"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 30 },
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 8 }
+    ]
+  },
+  "精灵": {
+    "name": "精灵", "description": "森林的长子，长寿而优雅", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 3 } ]
+  },
+  "高等精灵": {
+    "name": "高等精灵", "description": "觉醒自然之力的精灵", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "MATK", "operator": "ADD", "value": 8 },
+      { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 3 }
+    ]
+  },
+  "兽人": {
+    "name": "兽人", "description": "荒原上的强悍部族", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 4 } ]
+  },
+  "兽人战士": {
+    "name": "兽人战士", "description": "经百战磨砺的兽人精锐", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 8 },
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 20 }
+    ]
+  },
+  "矮人": {
+    "name": "矮人", "description": "山脉之下的工匠之民", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 4 } ]
+  },
+  "山丘之王": {
+    "name": "山丘之王", "description": "受群山认可的矮人领袖", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 10 },
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 30 }
+    ]
+  },
+  "亡灵": {
+    "name": "亡灵", "description": "徘徊于生死之间的存在", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 2 } ]
+  },
+  "野兽": {
+    "name": "野兽", "description": "凭本能行动的兽类", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 2 } ]
+  },
+  "构装": {
+    "name": "构装", "description": "被赋予行动力的造物", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["RACE"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 6 } ]
+  },
+  "矿工": {
+    "name": "矿工", "description": "采矿效率+1", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"]
+  },
+  "草药师": {
+    "name": "草药师", "description": "采药效率+1", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"]
+  },
+  "铁匠": {
+    "name": "铁匠", "description": "锻造从业者", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"]
+  },
+  "商人": {
+    "name": "商人", "description": "交易从业者", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"],
+    "behaviorWeights": { "social": [ { "option": "trade", "weight": 30 } ] }
+  },
+  "贵族": {
+    "name": "贵族", "description": "出身高贵", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "佣兵": {
+    "name": "佣兵", "description": "为金钱而战的战士", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "CLASS"]
+  },
+  "冒险者": {
+    "name": "冒险者", "description": "公会注册的冒险者", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "猎人": {
+    "name": "猎人", "description": "以弓箭与陷阱为生", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"]
+  },
+  "祭司": {
+    "name": "祭司", "description": "侍奉圣光的神职者", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"]
+  },
+  "圣骑士": {
+    "name": "圣骑士", "description": "誓约护佑的圣殿骑士", "category": "IDENTITY", "tier": 2,
+    "allowedSources": ["CLASS", "QUEST"]
+  },
+  "渔夫": {
+    "name": "渔夫", "description": "靠水吃水的捕鱼人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT"]
+  },
+  "学者": {
+    "name": "学者", "description": "追寻古代知识的人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "守卫": {
+    "name": "守卫", "description": "村镇的守护者", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "厨师": {
+    "name": "厨师", "description": "掌勺的人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT"]
+  },
+  "盗贼": {
+    "name": "盗贼", "description": "行走于阴影中的人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "驯兽师": {
+    "name": "驯兽师", "description": "与野兽沟通的人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "村长": {
+    "name": "村长", "description": "村庄的主事人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "酒保": {
+    "name": "酒保", "description": "酒馆里消息最灵通的人", "category": "IDENTITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+
+  "勇敢": {
+    "name": "勇敢", "description": "无所畏惧", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"],
+    "behaviorWeights": {
+      "combat": [ { "option": "attack", "weight": 20 }, { "option": "flee", "weight": -10 } ]
+    }
+  },
+  "懦弱": {
+    "name": "懦弱", "description": "胆小怕事", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": {
+      "combat": [ { "option": "flee", "weight": 30 }, { "option": "surrender", "weight": 20 } ]
+    }
+  },
+  "狡猾": {
+    "name": "狡猾", "description": "精于算计", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "social": [ { "option": "accept_bribe", "weight": 20 } ] }
+  },
+  "正直": {
+    "name": "正直", "description": "刚正不阿", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "social": [ { "option": "report", "weight": 20 } ] }
+  },
+  "贪婪": {
+    "name": "贪婪", "description": "贪得无厌", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "social": [ { "option": "accept_bribe", "weight": 30 } ] }
+  },
+  "正义": {
+    "name": "正义", "description": "嫉恶如仇", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "冷酷": {
+    "name": "冷酷", "description": "冷酷无情", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"],
+    "behaviorWeights": { "combat": [ { "option": "attack", "weight": 15 } ] }
+  },
+  "狂热": {
+    "name": "狂热", "description": "狂热的信仰者", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "残忍": {
+    "name": "残忍", "description": "以杀戮为乐", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "combat": [ { "option": "attack", "weight": 25 } ] }
+  },
+  "温和": {
+    "name": "温和", "description": "与人为善", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "social": [ { "option": "trade", "weight": 15 } ] }
+  },
+  "傲慢": {
+    "name": "傲慢", "description": "目中无人", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "combat": [ { "option": "attack", "weight": 10 } ] }
+  },
+  "多疑": {
+    "name": "多疑", "description": "难以信任他人", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "combat": [ { "option": "defend", "weight": 20 } ] }
+  },
+  "忠诚": {
+    "name": "忠诚", "description": "誓死追随", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"],
+    "behaviorWeights": { "combat": [ { "option": "defend", "weight": 15 } ] }
+  },
+  "谨慎": {
+    "name": "谨慎", "description": "三思而后行", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "combat": [ { "option": "defend", "weight": 25 }, { "option": "flee", "weight": 10 } ] }
+  },
+  "乐观": {
+    "name": "乐观", "description": "永远看到好的一面", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"]
+  },
+  "悲观": {
+    "name": "悲观", "description": "总是做最坏的打算", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "behaviorWeights": { "combat": [ { "option": "flee", "weight": 15 } ] }
+  },
+  "暴躁": {
+    "name": "暴躁", "description": "一点就着，极易暴怒", "category": "PERSONALITY", "tier": 1,
+    "allowedSources": ["TRAIT", "RACE"],
+    "behaviorWeights": { "combat": [ { "option": "attack", "weight": 20 } ] }
+  },
+
+  "恐惧": {
+    "name": "恐惧", "description": "强烈的恐惧感", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "behaviorWeights": { "combat": [ { "option": "flee", "weight": 40 } ] }
+  },
+  "愤怒": {
+    "name": "愤怒", "description": "怒火中烧", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 5 } ],
+    "behaviorWeights": { "combat": [ { "option": "attack", "weight": 30 } ] }
+  },
+  "悲伤": {
+    "name": "悲伤", "description": "悲痛欲绝", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": -3 } ]
+  },
+  "喜悦": {
+    "name": "喜悦", "description": "心情愉悦", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 2 } ]
+  },
+  "安宁": {
+    "name": "安宁", "description": "内心平静", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 5 } ]
+  },
+  "饥饿": {
+    "name": "饥饿", "description": "饱食度过低", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "MULTIPLY", "value": 0.9 } ]
+  },
+  "干渴": {
+    "name": "干渴", "description": "水分过低", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "MULTIPLY", "value": 0.9 } ]
+  },
+  "冻伤": {
+    "name": "冻伤", "description": "体温过低", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "MULTIPLY", "value": 0.9 } ]
+  },
+
+  "堕落之印": {
+    "name": "堕落之印", "description": "堕落之路的印记（不可逆）", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 8 } ]
+  },
+  "屠龙者": {
+    "name": "屠龙者", "description": "斩杀巨龙的荣耀", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 20 } ]
+  },
+  "光明誓约": {
+    "name": "光明誓约", "description": "与光明立下的誓约", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"]
+  },
+  "公会成员": {
+    "name": "公会成员", "description": "冒险者公会正式成员", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"]
+  },
+  "龙血觉醒": {
+    "name": "龙血觉醒", "description": "龙族血脉觉醒", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 25 } ]
+  },
+  "猎狼人": {
+    "name": "猎狼人", "description": "清剿狼群的猎人", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 2 } ]
+  },
+  "瘟疫克星": {
+    "name": "瘟疫克星", "description": "阻止瘟疫蔓延的英雄", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 15 } ]
+  },
+  "森林之友": {
+    "name": "森林之友", "description": "获得森林认可的旅人", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 3 } ]
+  },
+  "古城探索者": {
+    "name": "古城探索者", "description": "深入古代遗迹的探险家", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "MATK", "operator": "ADD", "value": 5 } ]
+  },
+  "王国信使": {
+    "name": "王国信使", "description": "承担王国密信的使者", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 4 } ]
+  },
+  "矿脉守望者": {
+    "name": "矿脉守望者", "description": "守护矮人矿脉的战士", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 6 } ]
+  },
+  "圣殿骑士": {
+    "name": "圣殿骑士", "description": "通过圣殿试炼的骑士", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 5 },
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 15 }
+    ]
+  },
+  "暗影行者": {
+    "name": "暗影行者", "description": "签下暗影契约的刺客", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "CRIT", "operator": "ADD", "value": 0.1 } ]
+  },
+  "渔王": {
+    "name": "渔王", "description": "钓鱼大赛的冠军", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"]
+  },
+  "美食家": {
+    "name": "美食家", "description": "尝遍百味的食客", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"]
+  },
+  "驯兽大师": {
+    "name": "驯兽大师", "description": "通过驯兽试炼的大师", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"]
+  },
+  "屠兽者": {
+    "name": "屠兽者", "description": "猎杀巨兽的勇士", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 6 } ]
+  },
+  "王国友人": {
+    "name": "王国友人", "description": "受王国认可的朋友", "category": "QUEST_MARK", "tier": 1,
+    "allowedSources": ["QUEST"]
+  },
+
+  "近战": {
+    "name": "近战", "description": "近战专精", "category": "SKILL", "tier": 1,
+    "allowedSources": ["CLASS"],
+    "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 3 } ]
+  },
+  "魔能": {
+    "name": "魔能", "description": "魔法能量亲和", "category": "SKILL", "tier": 1,
+    "allowedSources": ["CLASS"],
+    "effects": [ { "type": "STAT_MOD", "target": "MATK", "operator": "ADD", "value": 5 } ]
+  },
+  "暗杀": {
+    "name": "暗杀", "description": "暗杀专精", "category": "SKILL", "tier": 2,
+    "allowedSources": ["CLASS"],
+    "effects": [ { "type": "STAT_MOD", "target": "CRIT", "operator": "ADD", "value": 0.15 } ]
+  },
+  "潜行": {
+    "name": "潜行", "description": "潜行能力", "category": "SKILL", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 2 } ]
+  },
+  "狂暴": {
+    "name": "狂暴", "description": "狂暴战斗技巧", "category": "SKILL", "tier": 2,
+    "allowedSources": ["CLASS", "QUEST"]
+  },
+  "锻造": {
+    "name": "锻造", "description": "锻造技艺（tier=熟练度）", "category": "SKILL", "tier": 3,
+    "allowedSources": ["TRAIT", "CLASS", "QUEST"]
+  },
+  "采集": {
+    "name": "采集", "description": "采集技艺（tier=熟练度）", "category": "SKILL", "tier": 2,
+    "allowedSources": ["TRAIT", "CLASS"]
+  },
+  "炼金": {
+    "name": "炼金", "description": "炼金技艺", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT", "CLASS"]
+  },
+  "夜视": {
+    "name": "夜视", "description": "黑暗中视物，视野+2", "category": "SKILL", "tier": 1,
+    "allowedSources": ["RACE", "TRAIT", "EQUIP"],
+    "effects": [ { "type": "STAT_MOD", "target": "VISION", "operator": "ADD", "value": 2 } ]
+  },
+  "鹰眼": {
+    "name": "鹰眼", "description": "极目远眺，视野+3", "category": "SKILL", "tier": 2,
+    "allowedSources": ["TRAIT", "EQUIP"],
+    "effects": [ { "type": "STAT_MOD", "target": "VISION", "operator": "ADD", "value": 3 } ]
+  },
+  "幸运": {
+    "name": "幸运", "description": "掉落概率×1.5", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT"],
+    "effects": [ { "type": "STAT_MOD", "target": "LUCK", "operator": "ADD", "value": 1 } ]
+  },
+  "弓术": {
+    "name": "弓术", "description": "弓箭技艺", "category": "SKILL", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"],
+    "effects": [ { "type": "STAT_MOD", "target": "CRIT", "operator": "ADD", "value": 0.05 } ]
+  },
+  "圣光术": {
+    "name": "圣光术", "description": "圣光法术", "category": "SKILL", "tier": 2,
+    "allowedSources": ["CLASS", "TRAIT"],
+    "effects": [ { "type": "STAT_MOD", "target": "MATK", "operator": "ADD", "value": 3 } ]
+  },
+  "盾防": {
+    "name": "盾防", "description": "盾牌防御技巧", "category": "SKILL", "tier": 1,
+    "allowedSources": ["CLASS"],
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 4 } ]
+  },
+  "烹饪": {
+    "name": "烹饪", "description": "烹饪技艺", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT", "CLASS"]
+  },
+  "钓鱼": {
+    "name": "钓鱼", "description": "垂钓技艺", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT"]
+  },
+  "制革": {
+    "name": "制革", "description": "皮革加工技艺", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT", "CLASS"]
+  },
+  "医术": {
+    "name": "医术", "description": "疗伤医术", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "考古": {
+    "name": "考古", "description": "古代遗迹研究", "category": "SKILL", "tier": 2,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "驯兽": {
+    "name": "驯兽", "description": "驯服野兽的技巧", "category": "SKILL", "tier": 2,
+    "allowedSources": ["TRAIT", "QUEST"]
+  },
+  "闪避": {
+    "name": "闪避", "description": "灵活的身法", "category": "SKILL", "tier": 1,
+    "allowedSources": ["CLASS", "TRAIT"],
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 3 } ]
+  },
+  "家园Lv1": {
+    "name": "家园Lv1", "description": "家园等级1", "category": "SKILL", "tier": 1,
+    "allowedSources": ["TRAIT"]
+  },
+  "家园Lv2": {
+    "name": "家园Lv2", "description": "家园等级2", "category": "SKILL", "tier": 2,
+    "allowedSources": ["TRAIT"]
+  },
+  "家园Lv3": {
+    "name": "家园Lv3", "description": "家园等级3", "category": "SKILL", "tier": 3,
+    "allowedSources": ["TRAIT"]
+  }
+}

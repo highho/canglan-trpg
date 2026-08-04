@@ -1,0 +1,251 @@
+{
+  "giant_rat": {
+    "name": "巨鼠",
+    "baseStats": { "HP": 25, "ATK": 5, "DEF": 1, "SPD": 10 },
+    "raceTagIds": ["野兽"],
+    "personalityTagIds": ["懦弱"],
+    "behaviorPool": ["attack", "flee"],
+    "drops": [
+      { "itemId": "rat_tail", "chance": 0.9, "min": 1, "max": 2 }
+    ],
+    "expReward": 10,
+    "combatRole": "MELEE"
+  },
+  "slime": {
+    "name": "史莱姆",
+    "baseStats": { "HP": 35, "ATK": 4, "DEF": 6, "SPD": 4 },
+    "raceTagIds": [],
+    "personalityTagIds": ["温和"],
+    "behaviorPool": ["attack", "defend"],
+    "drops": [
+      { "itemId": "slime_gel", "chance": 0.8, "min": 1, "max": 2 }
+    ],
+    "expReward": 12,
+    "combatRole": "MELEE"
+  },
+  "goblin": {
+    "name": "哥布林",
+    "baseStats": { "HP": 40, "ATK": 8, "DEF": 3, "SPD": 8 },
+    "raceTagIds": [],
+    "personalityTagIds": ["懦弱", "贪婪"],
+    "behaviorPool": ["attack", "flee", "call_help"],
+    "drops": [
+      { "itemId": "goblin_fang", "chance": 0.8, "min": 1, "max": 2 },
+      { "itemId": "healing_potion", "chance": 0.1, "min": 1, "max": 1 }
+    ],
+    "expReward": 20,
+    "combatRole": "MELEE"
+  },
+  "wild_boar": {
+    "name": "野猪",
+    "baseStats": { "HP": 70, "ATK": 11, "DEF": 6, "SPD": 9 },
+    "raceTagIds": ["野兽"],
+    "personalityTagIds": ["暴躁" ]
+    ,
+    "behaviorPool": ["attack", "defend"],
+    "drops": [
+      { "itemId": "boar_meat", "chance": 0.9, "min": 1, "max": 2 },
+      { "itemId": "leather", "chance": 0.3, "min": 1, "max": 1 }
+    ],
+    "expReward": 25,
+    "combatRole": "MELEE"
+  },
+  "wolf": {
+    "name": "野狼",
+    "baseStats": { "HP": 60, "ATK": 12, "DEF": 5, "SPD": 12 },
+    "raceTagIds": ["野兽"],
+    "personalityTagIds": ["残忍"],
+    "behaviorPool": ["attack", "flee"],
+    "drops": [
+      { "itemId": "wolf_pelt", "chance": 0.6, "min": 1, "max": 2 },
+      "cooked_meat"
+    ],
+    "expReward": 30,
+    "combatRole": "MELEE"
+  },
+  "frost_wolf": {
+    "name": "霜狼",
+    "baseStats": { "HP": 85, "ATK": 15, "DEF": 7, "SPD": 13 },
+    "raceTagIds": ["野兽", "寒冰"],
+    "personalityTagIds": ["残忍", "谨慎"],
+    "behaviorPool": ["attack", "defend", "flee"],
+    "drops": [
+      { "itemId": "wolf_pelt", "chance": 0.8, "min": 1, "max": 3 },
+      { "itemId": "ice_crystal", "chance": 0.25, "min": 1, "max": 1 }
+    ],
+    "expReward": 45,
+    "combatRole": "MELEE"
+  },
+  "forest_spider": {
+    "name": "森林巨蛛",
+    "baseStats": { "HP": 55, "ATK": 10, "DEF": 4, "SPD": 11 },
+    "raceTagIds": ["野兽", "毒素"],
+    "personalityTagIds": ["冷酷"],
+    "behaviorPool": ["attack", "defend"],
+    "drops": [
+      { "itemId": "spider_silk", "chance": 0.7, "min": 1, "max": 2 }
+    ],
+    "expReward": 28,
+    "combatRole": "MELEE"
+  },
+  "cave_bat": {
+    "name": "洞穴蝙蝠",
+    "baseStats": { "HP": 30, "ATK": 7, "DEF": 2, "SPD": 16 },
+    "raceTagIds": ["野兽"],
+    "personalityTagIds": ["懦弱"],
+    "behaviorPool": ["attack", "flee"],
+    "drops": [
+      { "itemId": "bat_wing", "chance": 0.8, "min": 1, "max": 2 }
+    ],
+    "expReward": 15,
+    "combatRole": "MELEE"
+  },
+  "bandit": {
+    "name": "强盗",
+    "baseStats": { "HP": 65, "ATK": 13, "DEF": 6, "SPD": 10 },
+    "raceTagIds": [],
+    "personalityTagIds": ["贪婪", "狡猾"],
+    "behaviorPool": ["attack", "flee", "call_help"],
+    "drops": [
+      { "itemId": "iron_sword", "chance": 0.15, "min": 1, "max": 1 },
+      { "itemId": "travel_rations", "chance": 0.5, "min": 1, "max": 2 }
+    ],
+    "expReward": 35,
+    "combatRole": "MELEE"
+  },
+  "skeleton_soldier": {
+    "name": "骷髅兵",
+    "baseStats": { "HP": 50, "ATK": 10, "DEF": 8, "SPD": 6 },
+    "raceTagIds": ["亡灵"],
+    "personalityTagIds": ["冷酷"],
+    "behaviorPool": ["attack", "defend"],
+    "drops": [
+      { "itemId": "bone_fragment", "chance": 0.8, "min": 1, "max": 2 },
+      { "itemId": "ancient_coin", "chance": 0.2, "min": 1, "max": 1 }
+    ],
+    "expReward": 30,
+    "combatRole": "MELEE"
+  },
+  "skeleton_mage": {
+    "name": "骷髅法师",
+    "baseStats": { "HP": 55, "ATK": 6, "DEF": 4, "SPD": 7, "MATK": 18 },
+    "raceTagIds": ["亡灵", "黑暗"],
+    "personalityTagIds": ["冷酷"],
+    "behaviorPool": ["attack", "defend"],
+    "drops": [
+      { "itemId": "magic_crystal", "chance": 0.3, "min": 1, "max": 1 },
+      "stone"
+    ],
+    "expReward": 50,
+    "combatRole": "RANGED",
+    "specialSkills": { "fireball": 1, "ice_arrow": 1 }
+  },
+  "plague_zombie": {
+    "name": "瘟疫僵尸",
+    "baseStats": { "HP": 90, "ATK": 12, "DEF": 5, "SPD": 4 },
+    "raceTagIds": ["亡灵", "毒素"],
+    "personalityTagIds": ["狂热"],
+    "behaviorPool": ["attack"],
+    "drops": [
+      { "itemId": "plague_sample", "chance": 0.6, "min": 1, "max": 1 },
+      { "itemId": "bone_fragment", "chance": 0.5, "min": 1, "max": 1 }
+    ],
+    "expReward": 40,
+    "combatRole": "MELEE"
+  },
+  "dark_cultist": {
+    "name": "黑暗教徒",
+    "baseStats": { "HP": 60, "ATK": 8, "DEF": 5, "SPD": 9, "MATK": 16 },
+    "raceTagIds": ["黑暗"],
+    "personalityTagIds": ["狂热", "冷酷"],
+    "behaviorPool": ["attack", "defend", "call_help"],
+    "drops": [
+      { "itemId": "cultist_robe", "chance": 0.7, "min": 1, "max": 1 },
+      { "itemId": "magic_crystal", "chance": 0.2, "min": 1, "max": 1 }
+    ],
+    "expReward": 45,
+    "combatRole": "RANGED",
+    "specialSkills": { "fireball": 1 }
+  },
+  "ogre": {
+    "name": "食人魔",
+    "baseStats": { "HP": 160, "ATK": 22, "DEF": 10, "SPD": 6 },
+    "raceTagIds": [],
+    "personalityTagIds": ["残忍", "贪婪"],
+    "behaviorPool": ["attack", "defend", "call_help"],
+    "drops": [
+      { "itemId": "ogre_tooth", "chance": 0.9, "min": 1, "max": 2 },
+      { "itemId": "cooked_meat", "chance": 0.6, "min": 1, "max": 2 }
+    ],
+    "expReward": 120,
+    "combatRole": "MELEE"
+  },
+  "stone_golem": {
+    "name": "石魔像",
+    "baseStats": { "HP": 200, "ATK": 18, "DEF": 25, "SPD": 3 },
+    "raceTagIds": ["构装"],
+    "personalityTagIds": ["忠诚"],
+    "behaviorPool": ["attack", "defend"],
+    "drops": [
+      { "itemId": "golem_core", "chance": 0.8, "min": 1, "max": 1 },
+      { "itemId": "stone", "chance": 1.0, "min": 2, "max": 4 }
+    ],
+    "expReward": 150,
+    "combatRole": "MELEE"
+  },
+  "ghost": {
+    "name": "怨灵",
+    "baseStats": { "HP": 70, "ATK": 9, "DEF": 3, "SPD": 14, "MATK": 20 },
+    "raceTagIds": ["亡灵", "黑暗"],
+    "personalityTagIds": ["悲伤"],
+    "behaviorPool": ["attack", "flee"],
+    "drops": [
+      { "itemId": "ghost_essence", "chance": 0.6, "min": 1, "max": 1 }
+    ],
+    "expReward": 60,
+    "combatRole": "RANGED",
+    "specialSkills": { "ice_arrow": 1 }
+  },
+  "young_dragon": {
+    "name": "幼龙",
+    "baseStats": { "HP": 220, "ATK": 28, "DEF": 16, "SPD": 12, "MATK": 20 },
+    "raceTagIds": ["龙裔", "火焰"],
+    "personalityTagIds": ["傲慢", "贪婪"],
+    "behaviorPool": ["attack", "defend", "call_help"],
+    "drops": [
+      { "itemId": "dragon_scale", "chance": 0.7, "min": 1, "max": 2 },
+      { "itemId": "dragon_meat", "chance": 0.8, "min": 1, "max": 2 }
+    ],
+    "expReward": 400,
+    "combatRole": "BOSS",
+    "specialSkills": { "dragon_roar": 1 }
+  },
+  "dragon": {
+    "name": "巨龙",
+    "baseStats": { "HP": 500, "ATK": 45, "DEF": 30, "SPD": 12, "MATK": 30 },
+    "raceTagIds": ["龙裔"],
+    "personalityTagIds": ["贪婪", "残忍"],
+    "behaviorPool": ["attack", "defend", "call_help"],
+    "drops": [
+      { "itemId": "dragon_scale", "chance": 1.0, "min": 2, "max": 4 },
+      { "itemId": "dragon_meat", "chance": 1.0, "min": 1, "max": 3 },
+      { "itemId": "屠龙者徽章", "chance": 1.0, "min": 1, "max": 1, "conditionTag": "正义" }
+    ],
+    "expReward": 1000,
+    "combatRole": "BOSS",
+    "specialSkills": { "dragon_roar": 1 }
+  },
+  "demon_guard": {
+    "name": "恶魔卫士",
+    "baseStats": { "HP": 300, "ATK": 35, "DEF": 22, "SPD": 10, "MATK": 15 },
+    "raceTagIds": ["恶魔", "黑暗"],
+    "personalityTagIds": ["忠诚", "残忍"],
+    "behaviorPool": ["attack", "defend", "call_help"],
+    "drops": [
+      { "itemId": "magic_crystal", "chance": 0.8, "min": 1, "max": 2 },
+      { "itemId": "elixir", "chance": 0.2, "min": 1, "max": 1 }
+    ],
+    "expReward": 600,
+    "combatRole": "BOSS"
+  }
+}

@@ -1,0 +1,594 @@
+{
+  "blacksmith_hans": {
+    "name": "铁匠汉斯",
+    "identityTags": ["铁匠"],
+    "personalityTags": ["正直"],
+    "baseStats": { "HP": 80, "ATK": 10, "DEF": 10, "SPD": 8 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "欢迎来到锻造坊！炉火正旺，需要打造点什么吗？",
+        "branches": [
+          {
+            "condition": "HasTag(锻造)",
+            "text": "同行？那这把剑送你当见面礼。",
+            "next": "gift",
+            "actions": [ { "type": "giveItem", "itemId": "iron_sword" }, { "type": "affinity", "amount": 10 } ]
+          },
+          {
+            "condition": "HasTag(矿工)",
+            "text": "挖矿的好手！矿洞深处的秘银矿脉，替我留神看看。",
+            "next": "mine_talk",
+            "actions": [ { "type": "affinity", "amount": 5 } ]
+          },
+          { "text": "打听一下锻造坊的生意。", "next": "chat" },
+          { "text": "随便看看。", "next": "end" }
+        ]
+      },
+      "gift": { "text": "好好用它！剑是用来保护人的，不是用来逞凶的。", "isExit": true },
+      "mine_talk": {
+        "text": "最近矿道里不太平，听说有骷髅在游荡。你要是下去，千万小心。",
+        "branches": [
+          { "condition": "HasTag(勇敢)", "text": "有胆色！这份干粮带上。", "next": "end", "actions": [ { "type": "giveItem", "itemId": "travel_rations", "count": 2 } ] },
+          { "text": "总之，量力而行。", "next": "end" }
+        ]
+      },
+      "chat": {
+        "text": "生意还行。就是铁价涨得厉害，听说北边的商路被强盗截了。",
+        "branches": [
+          { "text": "强盗的事，我会留意。", "next": "end", "actions": [ { "type": "affinity", "amount": 5 }, { "type": "questFlag", "flag": "heard_bandit_rumor" } ] },
+          { "text": "与我无关。", "next": "end" }
+        ]
+      },
+      "end": { "text": "有需要再来。炉火随时为你烧着。", "isExit": true }
+    }
+  },
+  "merchant_lila": {
+    "name": "商人莉拉",
+    "identityTags": ["商人"],
+    "personalityTags": ["贪婪", "狡猾"],
+    "baseStats": { "HP": 60, "ATK": 5, "DEF": 5, "SPD": 9 },
+    "relation": "NEUTRAL",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "稀有的货物，只卖给识货的人。",
+        "branches": [
+          {
+            "text": "来点好货。",
+            "next": "trade_node",
+            "actions": [ { "type": "affinity", "amount": 5 } ]
+          },
+          { "condition": "HasTag(贵族)", "text": "贵族的信用，向来可靠。", "next": "noble_talk" },
+          { "text": "打听商路的见闻。", "next": "rumor" },
+          { "text": "没钱，告辞。", "next": "end" }
+        ]
+      },
+      "trade_node": {
+        "text": "成交！这是送你的小赠品。",
+        "isExit": true,
+        "onEnter": [ { "type": "giveItem", "itemId": "healing_potion", "count": 1 } ]
+      },
+      "noble_talk": {
+        "text": "哟，原来是贵人。王都最近在收购古代钱币，您若有多余的，我高价收。",
+        "branches": [
+          { "text": "古城里或许能找到。", "next": "end", "actions": [ { "type": "questFlag", "flag": "heard_coin_rumor" }, { "type": "affinity", "amount": 5 } ] },
+          { "text": "没兴趣。", "next": "end" }
+        ]
+      },
+      "rumor": {
+        "text": "最近森林里的精灵封锁了古道，据说是在防备什么瘟疫……消息可值钱得很。",
+        "branches": [
+          { "text": "记下了，多谢。", "next": "end", "actions": [ { "type": "questFlag", "flag": "heard_plague_rumor" } ] },
+          { "text": "哼，危言耸听。", "next": "end", "actions": [ { "type": "affinity", "amount": -5 } ] }
+        ]
+      },
+      "end": { "text": "下次带上金币再来。", "isExit": true }
+    }
+  },
+  "guild_receptionist": {
+    "name": "公会接待员",
+    "identityTags": ["冒险者"],
+    "personalityTags": ["正义"],
+    "baseStats": { "HP": 70, "ATK": 8, "DEF": 8, "SPD": 10 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "欢迎来到冒险者公会！",
+        "branches": [
+          {
+            "condition": "NOT HasTag(公会成员)",
+            "text": "在这里签下名字，你就是正式冒险者了。",
+            "next": "joined",
+            "actions": [ { "type": "addTag", "tag": "公会成员" }, { "type": "questFlag", "flag": "first_guild_visit" } ]
+          },
+          { "condition": "HasTag(公会成员)", "text": "今天的委托已经贴在布告板上了。", "next": "board" },
+          { "text": "告辞。", "next": "end" }
+        ]
+      },
+      "joined": {
+        "text": "欢迎加入！祝你武运昌隆。",
+        "branches": [
+          { "text": "有什么适合新人的委托？", "next": "advice" },
+          { "text": "谢谢。", "next": "end" }
+        ]
+      },
+      "advice": {
+        "text": "村外的巨鼠闹得凶，粮仓都快被啃空了。先从除鼠干起吧。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "rat_quest_hint" } ]
+      },
+      "board": {
+        "text": "布告板上钉满了委托：除鼠、猎狼、护送商队……还有一张落满灰的S级屠龙令。",
+        "branches": [
+          { "condition": "HasTag(屠龙者)", "text": "您就是那位屠龙勇士！请受我一拜。", "next": "end", "actions": [ { "type": "affinity", "amount": 20 } ] },
+          { "text": "我会量力而行。", "next": "end" }
+        ]
+      },
+      "end": { "text": "再见。", "isExit": true }
+    }
+  },
+  "fallen_priest": {
+    "name": "堕落祭司",
+    "identityTags": ["堕天使"],
+    "personalityTags": ["狂热", "冷酷"],
+    "baseStats": { "HP": 120, "ATK": 15, "DEF": 10, "SPD": 11, "MATK": 20 },
+    "relation": "HOSTILE",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "黑暗在低语……你听到了吗？",
+        "branches": [
+          {
+            "condition": "HasTag(堕落之印)",
+            "text": "原来你是被选中之人……这枚印记归你了。",
+            "next": "bless",
+            "actions": [ { "type": "affinity", "amount": 20 } ]
+          },
+          {
+            "condition": "HasTag(神圣)",
+            "text": "圣光的走狗！休想活着离开！",
+            "next": "fight",
+            "actions": [ { "type": "enterCombat", "mode": "SPAR" } ]
+          },
+          {
+            "text": "异端！接受制裁吧！",
+            "next": "fight",
+            "actions": [ { "type": "enterCombat", "mode": "SPAR" } ]
+          }
+        ]
+      },
+      "bless": {
+        "text": "愿黑暗庇佑你。古城深处的祭坛，有你要找的答案。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "dark_altar_hint" } ]
+      },
+      "fight": { "text": "那就用实力说话！", "isExit": true }
+    }
+  },
+  "hunter_oda": {
+    "name": "猎人奥达",
+    "identityTags": ["猎人"],
+    "personalityTags": ["谨慎", "忠诚"],
+    "baseStats": { "HP": 75, "ATK": 14, "DEF": 7, "SPD": 13 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（一个背着长弓的男人正擦拭着箭矢）林子最近不太平，进森林前先看看陷阱标记。",
+        "branches": [
+          {
+            "condition": "NOT HasTag(弓术)",
+            "text": "想学弓箭？站姿要稳，呼吸要缓。我先教你点皮毛。",
+            "next": "learn_bow",
+            "actions": [ { "type": "addTag", "tag": "弓术" }, { "type": "affinity", "amount": 10 } ]
+          },
+          {
+            "condition": "HasAllTags([弓术,猎狼人])",
+            "text": "狼群清完了？干得漂亮。这片林子又安静了。",
+            "next": "end",
+            "actions": [ { "type": "giveItem", "itemId": "feather", "count": 3 }, { "type": "affinity", "amount": 10 } ]
+          },
+          { "text": "森林深处有什么？", "next": "forest_lore" },
+          { "text": "先走了。", "next": "end" }
+        ]
+      },
+      "learn_bow": { "text": "记住，箭是用来救命的，不是用来炫耀的。", "isExit": true },
+      "forest_lore": {
+        "text": "深处有巨蛛的巢穴，再往里……是精灵的封禁之地。没有森林之友的信物，别去送死。",
+        "branches": [
+          { "condition": "HasTag(森林之友)", "text": "你有信物？那我可以告诉你精灵古道的入口。", "next": "end", "actions": [ { "type": "questFlag", "flag": "elf_path_hint" } ] },
+          { "text": "我会小心的。", "next": "end" }
+        ]
+      },
+      "end": { "text": "（奥达重新低下头擦拭箭矢）顺风。", "isExit": true }
+    }
+  },
+  "village_elder_rowan": {
+    "name": "村长罗万",
+    "identityTags": ["村长"],
+    "personalityTags": ["温和", "谨慎"],
+    "baseStats": { "HP": 50, "ATK": 3, "DEF": 4, "SPD": 4 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（白发苍苍的老村长放下手中的账本）年轻人，村子最近多事之秋，正缺人手。",
+        "branches": [
+          {
+            "condition": "NOT HasTag(公会成员)",
+            "text": "先去公会注册吧，有了身份，委托才轮得到你。",
+            "next": "end"
+          },
+          {
+            "condition": "HasTag(瘟疫克星)",
+            "text": "你救了全村人的命！村口的石碑上会刻下你的名字。",
+            "next": "hero",
+            "actions": [ { "type": "giveItem", "itemId": "elixir", "count": 1 }, { "type": "affinity", "amount": 30 } ]
+          },
+          { "text": "村里有什么麻烦？", "next": "troubles" },
+          { "text": "告辞。", "next": "end" }
+        ]
+      },
+      "hero": { "text": "愿村子永远记得你的恩情。", "isExit": true },
+      "troubles": {
+        "text": "一是粮仓闹鼠患；二是北边矿道出了亡灵；三是……南边森林里，好像在闹瘟疫。",
+        "branches": [
+          { "text": "我先去处理鼠患。", "next": "end", "actions": [ { "type": "questFlag", "flag": "rat_quest_hint" } ] },
+          { "text": "矿道的亡灵交给我。", "next": "end", "actions": [ { "type": "questFlag", "flag": "mine_quest_hint" } ] },
+          { "text": "瘟疫最要紧。", "next": "end", "actions": [ { "type": "questFlag", "flag": "plague_quest_hint" } ] }
+        ]
+      },
+      "end": { "text": "（老村长点点头，继续翻看账本）", "isExit": true }
+    }
+  },
+  "priestess_liya": {
+    "name": "祭司莉雅",
+    "identityTags": ["祭司"],
+    "personalityTags": ["温和", "忠诚"],
+    "baseStats": { "HP": 65, "ATK": 4, "DEF": 6, "SPD": 8, "MATK": 16 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（神殿的烛光摇曳）愿圣光照耀你的旅途。需要治疗，还是祈祷？",
+        "branches": [
+          {
+            "condition": "NOT HasTag(圣光术)",
+            "text": "你的眼神里有悲悯。来，我教你最基本的圣光术。",
+            "next": "learn_holy",
+            "actions": [ { "type": "addTag", "tag": "圣光术" }, { "type": "affinity", "amount": 10 } ]
+          },
+          {
+            "condition": "HasTag(堕落之印)",
+            "text": "（莉雅神色凝重）你身上有黑暗的气息……圣殿可以为你驱散，但你要自愿。",
+            "next": "purify_offer"
+          },
+          { "text": "为我治疗伤势。", "next": "heal_node", "actions": [ { "type": "giveItem", "itemId": "healing_potion", "count": 1 } ] },
+          { "text": "告辞。", "next": "end" }
+        ]
+      },
+      "learn_holy": { "text": "圣光不问你来自何方，只问你想守护什么。", "isExit": true },
+      "purify_offer": {
+        "text": "净化仪式需要王者之叶与魔法水晶。你若带来，我便施法。",
+        "branches": [
+          { "text": "我会去找材料。", "next": "end", "actions": [ { "type": "questFlag", "flag": "purify_quest_hint" } ] },
+          { "text": "黑暗是我自己的选择。", "next": "end", "actions": [ { "type": "affinity", "amount": -10 } ] }
+        ]
+      },
+      "heal_node": { "text": "伤痛会愈合的。愿圣光与你同在。", "isExit": true },
+      "end": { "text": "（莉雅双手合十，轻声祈祷）", "isExit": true }
+    }
+  },
+  "guard_bruno": {
+    "name": "卫兵布鲁诺",
+    "identityTags": ["守卫"],
+    "personalityTags": ["忠诚", "正直"],
+    "baseStats": { "HP": 95, "ATK": 12, "DEF": 14, "SPD": 7 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（巡逻的卫兵抬手示意）站住……哦，是冒险者。夜里别出村，最近强盗活动频繁。",
+        "branches": [
+          {
+            "condition": "NOT HasTag(盾防)",
+            "text": "看你身手不错，教你两手盾牌防御的技巧，路上用得上。",
+            "next": "learn_shield",
+            "actions": [ { "type": "addTag", "tag": "盾防" }, { "type": "affinity", "amount": 5 } ]
+          },
+          {
+            "condition": "HasTag(王国信使)",
+            "text": "原来是王国的信使！请恕我失礼，城防情报我可以全部告诉你。",
+            "next": "intel",
+            "actions": [ { "type": "affinity", "amount": 15 } ]
+          },
+          { "text": "强盗在哪里出没？", "next": "bandit_info" },
+          { "text": "知道了。", "next": "end" }
+        ]
+      },
+      "learn_shield": { "text": "盾不是挡在身前的墙，是护住同伴的门。", "isExit": true },
+      "intel": {
+        "text": "强盗盘踞在东边山道，有暗哨；矿道亡灵在午夜出没；古城入口的石像鬼会动。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "patrol_intel" } ]
+      },
+      "bandit_info": {
+        "text": "东边山道。他们劫了三批货了，公会悬赏正往上加。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "escort_quest_hint" } ]
+      },
+      "end": { "text": "（布鲁诺重新握紧长枪，继续巡逻）", "isExit": true }
+    }
+  },
+  "fisherman_gao": {
+    "name": "渔夫老高",
+    "identityTags": ["渔夫"],
+    "personalityTags": ["乐观"],
+    "baseStats": { "HP": 55, "ATK": 6, "DEF": 5, "SPD": 6 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（老渔夫坐在河边，鱼竿支在一旁）河水清，鱼才肥。小子，要不要学两手？",
+        "branches": [
+          {
+            "condition": "NOT HasTag(钓鱼)",
+            "text": "钓鱼讲究耐心。这根旧鱼竿送你，先试试手感。",
+            "next": "learn_fish",
+            "actions": [ { "type": "addTag", "tag": "钓鱼" }, { "type": "giveItem", "itemId": "raw_fish", "count": 2 }, { "type": "affinity", "amount": 10 } ]
+          },
+          {
+            "condition": "HasTag(渔王)",
+            "text": "鱼王！真的是你钓上来的？哈哈哈，后生可畏啊！",
+            "next": "end",
+            "actions": [ { "type": "affinity", "amount": 20 }, { "type": "giveItem", "itemId": "raw_fish", "count": 3 } ]
+          },
+          { "text": "最近河里有什么稀罕物？", "next": "river_lore" },
+          { "text": "改天吧。", "next": "end" }
+        ]
+      },
+      "learn_fish": { "text": "记住喽，清晨和黄昏，鱼最贪嘴。", "isExit": true },
+      "river_lore": {
+        "text": "听说河底沉着古王国的沉船，捞上来过古代钱币。钓鱼大赛快到了，想拿鱼王的都盯着深水区呢。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "fishing_contest_hint" } ]
+      },
+      "end": { "text": "（老高哼着小曲，继续盯着浮标）", "isExit": true }
+    }
+  },
+  "cook_mimi": {
+    "name": "厨师咪咪",
+    "identityTags": ["厨师"],
+    "personalityTags": ["温和", "乐观"],
+    "baseStats": { "HP": 45, "ATK": 3, "DEF": 3, "SPD": 7 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（厨房飘出炖菜的香气）饿了吧？冒险者可不能饿着肚子赶路！",
+        "branches": [
+          {
+            "condition": "NOT HasTag(烹饪)",
+            "text": "想学做饭？先从炖菜学起，火候和耐心一样都不能少。",
+            "next": "learn_cook",
+            "actions": [ { "type": "addTag", "tag": "烹饪" }, { "type": "affinity", "amount": 10 } ]
+          },
+          {
+            "condition": "HasTag(美食家)",
+            "text": "尝遍百味的食客！我的新菜就拜托您点评啦。",
+            "next": "taste_offer",
+            "actions": [ { "type": "giveItem", "itemId": "hearty_stew", "count": 1 } ]
+          },
+          { "text": "来一份热饭。", "next": "meal", "actions": [ { "type": "giveItem", "itemId": "travel_rations", "count": 2 } ] },
+          { "text": "不饿，谢谢。", "next": "end" }
+        ]
+      },
+      "learn_cook": { "text": "野猪肉配蘑菇，再加一把浆果提味——这是奶奶传下来的方子。", "isExit": true },
+      "taste_offer": { "text": "如果觉得好吃，帮我在公会传个名呗！", "isExit": true },
+      "meal": { "text": "慢慢吃，锅里还有。", "isExit": true },
+      "end": { "text": "（咪咪哼着歌回到灶台前）", "isExit": true }
+    }
+  },
+  "scholar_finn": {
+    "name": "学者芬恩",
+    "identityTags": ["学者"],
+    "personalityTags": ["多疑", "乐观"],
+    "baseStats": { "HP": 50, "ATK": 4, "DEF": 4, "SPD": 6, "MATK": 14 },
+    "relation": "NEUTRAL",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（堆满卷轴的书桌后，学者抬起头）嗯？访客。希望你不像上次那个一样，把我的残片当柴烧。",
+        "branches": [
+          {
+            "condition": "NOT HasTag(考古)",
+            "text": "对古物有兴趣？好吧，我先教你辨认遗迹文字的基础。",
+            "next": "learn_arch",
+            "actions": [ { "type": "addTag", "tag": "考古" }, { "type": "affinity", "amount": 5 } ]
+          },
+          {
+            "condition": "HasTag(古城探索者)",
+            "text": "你进过古城深处？！快说说，祭坛上的铭文写了什么？",
+            "next": "ruin_talk",
+            "actions": [ { "type": "affinity", "amount": 15 } ]
+          },
+          { "text": "古城是什么地方？", "next": "ruin_lore" },
+          { "text": "不打扰了。", "next": "end" }
+        ]
+      },
+      "learn_arch": { "text": "遗迹里的东西，先记录，再触碰。顺序错了，命就没了。", "isExit": true },
+      "ruin_talk": {
+        "text": "果然如此……古王国是被魔像军团从内部攻破的！这条线索价值连城。这瓶药水是谢礼。",
+        "isExit": true,
+        "onEnter": [ { "type": "giveItem", "itemId": "mana_potion", "count": 1 }, { "type": "questFlag", "flag": "golem_research" } ]
+      },
+      "ruin_lore": {
+        "text": "城北三十里，古王国的都城。据说宝库钥匙藏在卫兵雕像里。需要考古学识才能安全进入。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "ancient_city_hint" } ]
+      },
+      "end": { "text": "（芬恩重新埋首卷轴堆中）", "isExit": true }
+    }
+  },
+  "bartender_martha": {
+    "name": "酒保玛莎",
+    "identityTags": ["酒保"],
+    "personalityTags": ["温和", "狡猾"],
+    "baseStats": { "HP": 60, "ATK": 5, "DEF": 6, "SPD": 8 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（酒馆的壁炉烧得正旺）来了？老位置给你留着。来杯麦酒，还是听听消息？",
+        "branches": [
+          {
+            "condition": "NOT HasTag(公会成员)",
+            "text": "想接活儿？先去公会挂个名，我这儿的消息你暂时还用不上。",
+            "next": "end"
+          },
+          { "text": "来一杯麦酒。", "next": "drink", "actions": [ { "type": "giveItem", "itemId": "fine_wine", "count": 1 }, { "type": "affinity", "amount": 5 } ] },
+          { "text": "最近有什么传闻？", "next": "rumors" },
+          { "text": "改天再来。", "next": "end" }
+        ]
+      },
+      "drink": { "text": "慢饮。酒能暖身，可别贪杯误了正事。", "isExit": true },
+      "rumors": {
+        "text": "三条消息：盗贼影在西巷出没；有人重金求购魔像核心；圣殿在招募通过试炼的骑士。",
+        "branches": [
+          { "text": "盗贼影是谁？", "next": "shadow_rumor" },
+          { "text": "魔像核心？", "next": "core_rumor" },
+          { "text": "多谢。", "next": "end" }
+        ]
+      },
+      "shadow_rumor": {
+        "text": "亦正亦邪的盗贼，专偷为富不仁者。想找他，夜里去西巷的旧钟楼。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "shadow_contact_hint" } ]
+      },
+      "core_rumor": {
+        "text": "学者芬恩出的价。他说魔像核心里藏着古王国的动力秘术。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "core_buyer_hint" } ]
+      },
+      "end": { "text": "（玛莎擦着杯子，朝你点点头）", "isExit": true }
+    }
+  },
+  "thief_shadow": {
+    "name": "盗贼影",
+    "identityTags": ["盗贼"],
+    "personalityTags": ["狡猾", "谨慎"],
+    "baseStats": { "HP": 70, "ATK": 15, "DEF": 6, "SPD": 16 },
+    "relation": "NEUTRAL",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（阴影中传来低语）脚步放轻点。能摸到旧钟楼的人，可不多。",
+        "branches": [
+          {
+            "condition": "NOT HasTag(潜行)",
+            "text": "脚步够轻，心够静。教你点潜行的门道，别给我丢人。",
+            "next": "learn_stealth",
+            "actions": [ { "type": "addTag", "tag": "潜行" }, { "type": "affinity", "amount": 5 } ]
+          },
+          {
+            "condition": "HasTag(暗影行者)",
+            "text": "契约在身，你就是我们的人了。这单大买卖，分你一份。",
+            "next": "contract",
+            "actions": [ { "type": "affinity", "amount": 15 } ]
+          },
+          { "text": "你偷富济贫，是真是假？", "next": "creed" },
+          { "text": "告辞。", "next": "end" }
+        ]
+      },
+      "learn_stealth": { "text": "记住：影子是朋友，灯光是敌人。", "isExit": true },
+      "contract": {
+        "text": "商队里有赃官的私货，今晚动手。完事后钟楼集合。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "shadow_job" } ]
+      },
+      "creed": {
+        "text": "（轻笑）真真假假，看你怎么想。我只偷看得起眼的人——比如贪官，比如恶商。",
+        "branches": [
+          { "text": "有意思，交个朋友。", "next": "end", "actions": [ { "type": "affinity", "amount": 10 } ] },
+          { "text": "贼就是贼。", "next": "end", "actions": [ { "type": "affinity", "amount": -15 } ] }
+        ]
+      },
+      "end": { "text": "（阴影重新合拢，仿佛无人来过）", "isExit": true }
+    }
+  },
+  "tamer_kalu": {
+    "name": "驯兽人卡鲁",
+    "identityTags": ["驯兽师"],
+    "personalityTags": ["温和", "勇敢"],
+    "baseStats": { "HP": 70, "ATK": 10, "DEF": 8, "SPD": 11 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（一只驯鹿温顺地蹭着男人的手心）野兽不咬懂它的人。你想靠近试试吗？",
+        "branches": [
+          {
+            "condition": "NOT HasTag(驯兽)",
+            "text": "手心向上，别盯着它的眼睛。好，它接受你了。驯兽的基础，就教到这。",
+            "next": "learn_tame",
+            "actions": [ { "type": "addTag", "tag": "驯兽" }, { "type": "affinity", "amount": 10 } ]
+          },
+          {
+            "condition": "HasTag(驯兽大师)",
+            "text": "驯兽大师！连山里的巨熊都认你。我的兽栏随时为你敞开。",
+            "next": "end",
+            "actions": [ { "type": "giveItem", "itemId": "travel_rations", "count": 3 }, { "type": "affinity", "amount": 20 } ]
+          },
+          { "text": "森林里的野兽最近怎么了？", "next": "beast_lore" },
+          { "text": "改天再聊。", "next": "end" }
+        ]
+      },
+      "learn_tame": { "text": "驯服不是征服，是商量。你给它安稳，它给你信任。", "isExit": true },
+      "beast_lore": {
+        "text": "瘟疫传进了林子，染病的野兽见人就咬。想进深林，先备好解毒剂。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "beast_plague_hint" } ]
+      },
+      "end": { "text": "（卡鲁拍了拍驯鹿的脖子，目送你离开）", "isExit": true }
+    }
+  },
+  "miner_dor": {
+    "name": "矿工多尔",
+    "identityTags": ["矿工"],
+    "personalityTags": ["忠诚", "谨慎"],
+    "baseStats": { "HP": 90, "ATK": 11, "DEF": 12, "SPD": 6 },
+    "relation": "FRIENDLY",
+    "dialogueTree": {
+      "start": {
+        "root": true,
+        "text": "（矮人矿工摘下头盔，抹了把汗）矿道里凉快，就是最近……不太干净。",
+        "branches": [
+          {
+            "condition": "NOT HasTag(采集)",
+            "text": "想下矿？先把看矿脉的眼力学一学，我教你几手。",
+            "next": "learn_gather",
+            "actions": [ { "type": "addTag", "tag": "采集" }, { "type": "affinity", "amount": 5 } ]
+          },
+          {
+            "condition": "HasTag(矿脉守望者)",
+            "text": "矿道的恩人！这袋矿石是弟兄们凑的，别嫌弃。",
+            "next": "end",
+            "actions": [ { "type": "giveItem", "itemId": "iron_ore", "count": 3 }, { "type": "giveItem", "itemId": "silver_ore", "count": 1 }, { "type": "affinity", "amount": 20 } ]
+          },
+          { "text": "矿道里出了什么事？", "next": "mine_trouble" },
+          { "text": "回头再聊。", "next": "end" }
+        ]
+      },
+      "learn_gather": { "text": "矿脉会说话：石头发青是铜，泛着银光的好矿，得往深处找。", "isExit": true },
+      "mine_trouble": {
+        "text": "骷髅兵在三层游荡，守夜的弟兄吓跑了俩。深层的秘银矿脉，更是没人敢去了。",
+        "isExit": true,
+        "onEnter": [ { "type": "questFlag", "flag": "mine_quest_hint" } ]
+      },
+      "end": { "text": "（多尔重新戴上头盔，往矿道走去）", "isExit": true }
+    }
+  }
+}

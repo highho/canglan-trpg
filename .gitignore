@@ -1,0 +1,24 @@
+# 构建产物
+bin/
+obj/
+publish/
+
+# 游戏存档（运行时生成）
+saves/
+*.save.json
+
+# IDE
+.idea/
+.vs/
+*.user
+*.suo
+
+# 临时文件
+*.log
+*.tmp
+test_result.txt
+ui_smoke.txt
+smoke_out.txt
+
+# 本地AI模型文件（体积大，不入库，见 README）
+*.gguf

@@ -1,0 +1,99 @@
+{
+  "human": {
+    "name": "人类",
+    "tagIds": ["人类"],
+    "baseStats": { "HP": 100, "ATK": 12, "DEF": 8, "SPD": 10, "MATK": 5 },
+    "conflictTags": [],
+    "edges": [
+      { "to": "angel", "condition": "HasTag(光明誓约)", "description": "立下光明誓约 → 进化为天使" },
+      { "to": "fallen", "condition": "HasTag(堕落之印)", "description": "接受堕落之印 → 堕天使" }
+    ]
+  },
+  "angel": {
+    "name": "天使",
+    "tagIds": ["天使", "神圣", "光明"],
+    "baseStats": { "HP": 120, "ATK": 14, "DEF": 12, "SPD": 12, "MATK": 15 },
+    "conflictTags": ["黑暗"],
+    "edges": [
+      { "to": "seraph", "condition": "HasAllTags([神圣,光明])", "description": "神圣与光明圆满 → 炽天使" }
+    ]
+  },
+  "seraph": {
+    "name": "炽天使",
+    "tagIds": ["天使", "神圣", "光明"],
+    "baseStats": { "HP": 160, "ATK": 18, "DEF": 16, "SPD": 14, "MATK": 25 },
+    "conflictTags": ["黑暗", "堕落之印"],
+    "edges": []
+  },
+  "fallen": {
+    "name": "堕天使",
+    "tagIds": ["堕天使", "黑暗"],
+    "baseStats": { "HP": 110, "ATK": 16, "DEF": 9, "SPD": 13, "MATK": 12 },
+    "conflictTags": ["神圣", "光明", "光明誓约"],
+    "edges": [
+      { "to": "demon", "condition": "HasTag(堕落之印) AND HasTag(黑暗)", "description": "彻底堕落 → 恶魔" }
+    ]
+  },
+  "demon": {
+    "name": "恶魔",
+    "tagIds": ["恶魔", "黑暗"],
+    "baseStats": { "HP": 150, "ATK": 24, "DEF": 12, "SPD": 12, "MATK": 18 },
+    "conflictTags": ["神圣", "光明", "光明誓约"],
+    "edges": []
+  },
+  "dragonkin": {
+    "name": "龙裔",
+    "tagIds": ["龙裔", "火焰"],
+    "baseStats": { "HP": 180, "ATK": 20, "DEF": 18, "SPD": 9, "MATK": 10 },
+    "conflictTags": [],
+    "edges": []
+  },
+  "elf": {
+    "name": "精灵",
+    "tagIds": ["精灵", "自然"],
+    "baseStats": { "HP": 90, "ATK": 10, "DEF": 7, "SPD": 14, "MATK": 10 },
+    "conflictTags": ["黑暗"],
+    "edges": [
+      { "to": "high_elf", "condition": "HasTag(森林之友)", "description": "获得森林的认可 → 高等精灵" }
+    ]
+  },
+  "high_elf": {
+    "name": "高等精灵",
+    "tagIds": ["高等精灵", "自然", "圣光"],
+    "baseStats": { "HP": 110, "ATK": 12, "DEF": 9, "SPD": 16, "MATK": 20 },
+    "conflictTags": ["黑暗", "堕落之印"],
+    "edges": []
+  },
+  "orc": {
+    "name": "兽人",
+    "tagIds": ["兽人"],
+    "baseStats": { "HP": 130, "ATK": 16, "DEF": 9, "SPD": 9, "MATK": 3 },
+    "conflictTags": [],
+    "edges": [
+      { "to": "orc_warrior", "condition": "HasTag(狂暴)", "description": "历经百战点燃狂血 → 兽人战士" }
+    ]
+  },
+  "orc_warrior": {
+    "name": "兽人战士",
+    "tagIds": ["兽人战士", "狂暴"],
+    "baseStats": { "HP": 170, "ATK": 22, "DEF": 12, "SPD": 10, "MATK": 4 },
+    "conflictTags": [],
+    "edges": []
+  },
+  "dwarf": {
+    "name": "矮人",
+    "tagIds": ["矮人"],
+    "baseStats": { "HP": 120, "ATK": 11, "DEF": 14, "SPD": 7, "MATK": 4 },
+    "conflictTags": [],
+    "edges": [
+      { "to": "mountain_king", "condition": "HasTag(矿脉守望者)", "description": "守护群山的功绩获认可 → 山丘之王" }
+    ]
+  },
+  "mountain_king": {
+    "name": "山丘之王",
+    "tagIds": ["山丘之王", "锻造"],
+    "baseStats": { "HP": 160, "ATK": 15, "DEF": 22, "SPD": 8, "MATK": 6 },
+    "conflictTags": [],
+    "edges": []
+  }
+}

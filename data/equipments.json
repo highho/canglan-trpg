@@ -1,0 +1,120 @@
+{
+  "iron_sword": {
+    "name": "铁剑", "slot": "WEAPON", "tier": 1,
+    "baseStats": { "ATK": 8 },
+    "effects": [],
+    "maxDurability": 40,
+    "upgradePath": "steel_sword"
+  },
+  "steel_sword": {
+    "name": "钢剑", "slot": "WEAPON", "tier": 2,
+    "baseStats": { "ATK": 15 },
+    "effects": [],
+    "maxDurability": 60,
+    "upgradePath": "mithril_sword"
+  },
+  "mithril_sword": {
+    "name": "秘银剑", "slot": "WEAPON", "tier": 3,
+    "baseStats": { "ATK": 24, "SPD": 2 },
+    "effects": [],
+    "maxDurability": 80
+  },
+  "hunter_bow": {
+    "name": "猎弓", "slot": "WEAPON", "tier": 2,
+    "baseStats": { "ATK": 12, "CRIT": 0.08 },
+    "effects": [],
+    "equipCondition": "HasTag(弓术)",
+    "maxDurability": 50
+  },
+  "shadow_blade": {
+    "name": "暗影之刃", "slot": "WEAPON", "tier": 3,
+    "baseStats": { "ATK": 22, "CRIT": 0.1 },
+    "effects": [ { "type": "DAMAGE_MOD", "operator": "ADD", "value": 3 } ],
+    "equipCondition": "HasTag(暗杀)",
+    "maxDurability": 50,
+    "setId": "shadow_set"
+  },
+  "leather_armor": {
+    "name": "皮甲", "slot": "ARMOR", "tier": 1,
+    "baseStats": { "DEF": 6 },
+    "effects": [],
+    "maxDurability": 40,
+    "upgradePath": "leather_vest"
+  },
+  "leather_vest": {
+    "name": "皮革背心", "slot": "ARMOR", "tier": 2,
+    "baseStats": { "DEF": 10, "SPD": 1 },
+    "effects": [],
+    "maxDurability": 55
+  },
+  "dark_plate": {
+    "name": "黑暗铠甲", "slot": "ARMOR", "tier": 3,
+    "baseStats": { "DEF": 18, "HP": 30 },
+    "effects": [],
+    "equipCondition": "HasTag(黑暗)",
+    "maxDurability": 70,
+    "setId": "shadow_set"
+  },
+  "knight_plate": {
+    "name": "骑士铠甲", "slot": "ARMOR", "tier": 3,
+    "baseStats": { "DEF": 20, "HP": 25 },
+    "effects": [],
+    "equipCondition": "HasTag(盾防)",
+    "maxDurability": 80,
+    "setId": "temple_set"
+  },
+  "guardian_shield": {
+    "name": "守护之盾", "slot": "ACCESSORY", "tier": 2,
+    "baseStats": { "DEF": 12 },
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ],
+    "equipCondition": "HasTag(盾防)",
+    "maxDurability": 70,
+    "setId": "temple_set"
+  },
+  "apprentice_robe": {
+    "name": "学徒法袍", "slot": "ARMOR", "tier": 1,
+    "baseStats": { "DEF": 3, "MATK": 5 },
+    "effects": [],
+    "maxDurability": 30
+  },
+  "forest_cloak": {
+    "name": "森林斗篷", "slot": "ACCESSORY", "tier": 2,
+    "baseStats": { "SPD": 3, "DEF": 4 },
+    "effects": [],
+    "maxDurability": 45
+  },
+  "lucky_ring": {
+    "name": "幸运戒指", "slot": "RING1", "tier": 2,
+    "baseStats": { "LUCK": 1 },
+    "effects": [ { "type": "FLAG", "flagName": "lucky" } ],
+    "maxDurability": 100
+  },
+  "jade_ring": {
+    "name": "翡翠戒指", "slot": "RING1", "tier": 2,
+    "baseStats": { "HP": 15, "DEF": 2 },
+    "effects": [],
+    "maxDurability": 90
+  },
+  "shadow_ring": {
+    "name": "暗影之戒", "slot": "RING2", "tier": 3,
+    "baseStats": { "ATK": 5, "SPD": 2 },
+    "effects": [],
+    "equipCondition": "HasTag(黑暗)",
+    "maxDurability": 60,
+    "setId": "shadow_set"
+  },
+  "holy_symbol": {
+    "name": "圣徽", "slot": "RING2", "tier": 3,
+    "baseStats": { "MATK": 8, "HP": 15 },
+    "effects": [],
+    "equipCondition": "HasTag(圣光术)",
+    "maxDurability": 100,
+    "setId": "temple_set"
+  },
+  "night_goggles": {
+    "name": "夜视镜", "slot": "ACCESSORY", "tier": 2,
+    "baseStats": { "VISION": 2 },
+    "effects": [ { "type": "FLAG", "flagName": "night_vision" } ],
+    "maxDurability": 50
+  }
+}

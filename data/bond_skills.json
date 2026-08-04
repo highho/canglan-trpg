@@ -1,0 +1,26 @@
+[
+  {
+    "playerCondition": "HasTag(近战)",
+    "companionCondition": "HasTag(魔能)",
+    "minLevel": "Friend",
+    "skillId": "combo_strike"
+  },
+  {
+    "playerCondition": "HasTag(暗杀)",
+    "companionCondition": "HasTag(潜行)",
+    "minLevel": "Close",
+    "skillId": "shadow_combo"
+  },
+  {
+    "playerCondition": "HasTag(弓术)",
+    "companionCondition": "HasTag(魔能)",
+    "minLevel": "Friend",
+    "skillId": "arrow_rain"
+  },
+  {
+    "playerCondition": "HasTag(圣光术)",
+    "companionCondition": "HasTag(盾防)",
+    "minLevel": "Close",
+    "skillId": "sanctuary"
+  }
+]

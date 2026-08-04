@@ -1,0 +1,70 @@
+{
+  "burn": {
+    "name": "灼烧", "type": "TEMPORARY", "defaultDuration": 3,
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": -3 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "poison": {
+    "name": "中毒", "type": "TEMPORARY", "defaultDuration": 3,
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": -2 } ],
+    "stackable": true, "maxStacks": 3
+  },
+  "shield": {
+    "name": "护盾", "type": "TEMPORARY", "defaultDuration": 2,
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 10 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "berserk_buff": {
+    "name": "狂暴状态", "type": "TEMPORARY", "defaultDuration": 3,
+    "effects": [
+      { "type": "STAT_MOD", "target": "ATK", "operator": "MULTIPLY", "value": 1.5 },
+      { "type": "STAT_MOD", "target": "DEF", "operator": "MULTIPLY", "value": 0.8 }
+    ],
+    "stackable": false, "maxStacks": 1
+  },
+  "regen": {
+    "name": "再生", "type": "TEMPORARY", "defaultDuration": 3,
+    "effects": [ { "type": "TRIGGER", "on": "TURN_END", "action": "HEAL", "params": { "amount": 5 } } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "blessing_of_light": {
+    "name": "光明祝福", "type": "SCENE", "defaultDuration": -1,
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 5 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "dragon_blood": {
+    "name": "龙血沸腾", "type": "TRIGGERED", "defaultDuration": 3,
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 20 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "well_fed": {
+    "name": "饱足", "type": "TEMPORARY", "defaultDuration": 5,
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "warmth": {
+    "name": "温暖", "type": "SCENE", "defaultDuration": -1,
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 2 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "focus": {
+    "name": "专注", "type": "TEMPORARY", "defaultDuration": 3,
+    "effects": [ { "type": "STAT_MOD", "target": "MATK", "operator": "ADD", "value": 5 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "eagle_sight": {
+    "name": "鹰眼视野", "type": "SCENE", "defaultDuration": -1,
+    "effects": [ { "type": "STAT_MOD", "target": "VISION", "operator": "ADD", "value": 2 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "holy_shield": {
+    "name": "圣光护体", "type": "TRIGGERED", "defaultDuration": 2,
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 8 } ],
+    "stackable": false, "maxStacks": 1
+  },
+  "exhaustion": {
+    "name": "疲惫", "type": "TEMPORARY", "defaultDuration": 3,
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": -3 } ],
+    "stackable": false, "maxStacks": 1
+  }
+}

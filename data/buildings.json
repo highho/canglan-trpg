@@ -1,0 +1,76 @@
+{
+  "workshop": {
+    "name": "锻造工坊", "category": "CRAFTING",
+    "materials": { "wood": 10, "iron_ingot": 2 },
+    "condition": "HasTag(锻造)",
+    "effect": { "type": "CRAFT_UNLOCK", "params": { "recipe": "steel_sword" } }
+  },
+  "farm": {
+    "name": "农田", "category": "FARM",
+    "materials": { "wood": 5 },
+    "effect": { "type": "FARM_YIELD", "params": { "yield": 2 } }
+  },
+  "bed": {
+    "name": "床铺", "category": "REST",
+    "materials": { "wood": 8 },
+    "effect": { "type": "HEAL_RATE", "params": { "rate": 0.2 } }
+  },
+  "storage": {
+    "name": "仓库", "category": "STORAGE",
+    "materials": { "wood": 6, "stone": 4 },
+    "effect": { "type": "STORAGE_BONUS", "params": { "slots": 10 } }
+  },
+  "defense_wall": {
+    "name": "防御墙", "category": "DEFENSE",
+    "materials": { "stone": 10 },
+    "effect": { "type": "DEFENSE_BONUS", "params": { "value": 20 } }
+  },
+  "guest_house": {
+    "name": "客房", "category": "UTILITY",
+    "materials": { "wood": 12, "iron_ingot": 1 },
+    "prerequisite": "workshop",
+    "effect": { "type": "NPC_ATTRACT", "params": { "chance": 0.05 } }
+  },
+  "kitchen": {
+    "name": "厨房", "category": "CRAFTING",
+    "materials": { "wood": 8, "stone": 4 },
+    "condition": "HasTag(烹饪)",
+    "effect": { "type": "CRAFT_UNLOCK", "params": { "recipe": "hearty_stew" } }
+  },
+  "alchemy_lab": {
+    "name": "炼金室", "category": "CRAFTING",
+    "materials": { "wood": 10, "magic_crystal": 1 },
+    "condition": "HasTag(炼金)",
+    "prerequisite": "workshop",
+    "effect": { "type": "CRAFT_UNLOCK", "params": { "recipe": "elixir" } }
+  },
+  "tannery": {
+    "name": "制革坊", "category": "CRAFTING",
+    "materials": { "wood": 8, "stone": 2 },
+    "condition": "HasTag(制革)",
+    "effect": { "type": "CRAFT_UNLOCK", "params": { "recipe": "leather_vest" } }
+  },
+  "watchtower": {
+    "name": "瞭望塔", "category": "DEFENSE",
+    "materials": { "stone": 15, "wood": 8 },
+    "prerequisite": "defense_wall",
+    "effect": { "type": "DEFENSE_BONUS", "params": { "value": 15 } }
+  },
+  "fishing_hut": {
+    "name": "渔屋", "category": "FARM",
+    "materials": { "wood": 6 },
+    "condition": "HasTag(钓鱼)",
+    "effect": { "type": "FARM_YIELD", "params": { "yield": 2 } }
+  },
+  "library": {
+    "name": "藏书阁", "category": "UTILITY",
+    "materials": { "wood": 12, "oak_tree": 2 },
+    "condition": "HasTag(考古)",
+    "effect": { "type": "NPC_ATTRACT", "params": { "chance": 0.03 } }
+  },
+  "training_ground": {
+    "name": "训练场", "category": "UTILITY",
+    "materials": { "wood": 10, "stone": 6 },
+    "effect": { "type": "HEAL_RATE", "params": { "rate": 0.1 } }
+  }
+}

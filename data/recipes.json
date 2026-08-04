@@ -1,0 +1,127 @@
+{
+  "iron_ingot": {
+    "name": "冶炼铁锭",
+    "materials": { "iron_ore": 2 },
+    "output": "iron_ingot", "outputCount": 1,
+    "condition": "HasTag(锻造)",
+    "craftTime": 1
+  },
+  "copper_ingot": {
+    "name": "冶炼铜锭",
+    "materials": { "copper_ore": 2 },
+    "output": "copper_ingot", "outputCount": 1,
+    "condition": "HasTag(锻造)",
+    "craftTime": 1
+  },
+  "silver_ingot": {
+    "name": "冶炼银锭",
+    "materials": { "silver_ore": 2 },
+    "output": "silver_ingot", "outputCount": 1,
+    "condition": "TierAtLeast(锻造,2)",
+    "craftTime": 2
+  },
+  "mithril_ingot": {
+    "name": "冶炼秘银锭",
+    "materials": { "mithril_ore": 2, "magic_crystal": 1 },
+    "output": "mithril_ingot", "outputCount": 1,
+    "condition": "TierAtLeast(锻造,3)",
+    "craftTime": 3
+  },
+  "iron_sword": {
+    "name": "锻造铁剑",
+    "materials": { "iron_ingot": 3, "wood": 1 },
+    "output": "iron_sword", "outputCount": 1,
+    "condition": "TierAtLeast(锻造,2)",
+    "craftTime": 2
+  },
+  "steel_sword": {
+    "name": "锻造钢剑",
+    "materials": { "iron_ingot": 5, "wood": 1, "magic_crystal": 1 },
+    "output": "steel_sword", "outputCount": 1,
+    "condition": "TierAtLeast(锻造,3)",
+    "craftTime": 3
+  },
+  "mithril_sword": {
+    "name": "锻造秘银剑",
+    "materials": { "mithril_ingot": 4, "oak_tree": 1 },
+    "output": "mithril_sword", "outputCount": 1,
+    "condition": "TierAtLeast(锻造,3)",
+    "craftTime": 4
+  },
+  "hunter_bow": {
+    "name": "制作猎弓",
+    "materials": { "oak_tree": 2, "spider_silk": 2 },
+    "output": "hunter_bow", "outputCount": 1,
+    "condition": "HasTag(弓术)",
+    "craftTime": 2
+  },
+  "healing_potion": {
+    "name": "调制治疗药水",
+    "materials": { "herb": 2 },
+    "output": "healing_potion", "outputCount": 1,
+    "condition": "HasTag(炼金)",
+    "craftTime": 1
+  },
+  "mana_potion": {
+    "name": "调制法力药水",
+    "materials": { "herb": 2, "magic_crystal": 1 },
+    "output": "mana_potion", "outputCount": 1,
+    "condition": "HasTag(炼金)",
+    "craftTime": 1
+  },
+  "antidote": {
+    "name": "调制解毒剂",
+    "materials": { "herb": 1, "slime_gel": 1 },
+    "output": "antidote", "outputCount": 1,
+    "condition": "HasTag(炼金)",
+    "craftTime": 1
+  },
+  "elixir": {
+    "name": "炼制万灵药",
+    "materials": { "kingsfoil": 1, "magic_crystal": 2, "herb": 3 },
+    "output": "elixir", "outputCount": 1,
+    "condition": "HasTag(炼金)",
+    "craftTime": 4
+  },
+  "bandage": {
+    "name": "制作绷带",
+    "materials": { "herb": 1, "spider_silk": 1 },
+    "output": "bandage", "outputCount": 2,
+    "condition": "HasTag(医术)",
+    "craftTime": 1
+  },
+  "leather_vest": {
+    "name": "缝制皮革背心",
+    "materials": { "leather": 3 },
+    "output": "leather_vest", "outputCount": 1,
+    "condition": "HasTag(制革)",
+    "craftTime": 2
+  },
+  "leather": {
+    "name": "鞣制皮革",
+    "materials": { "wolf_pelt": 2 },
+    "output": "leather", "outputCount": 1,
+    "condition": "HasTag(制革)",
+    "craftTime": 1
+  },
+  "cooked_meat": {
+    "name": "烹制烤肉",
+    "materials": { "dragon_meat": 1 },
+    "output": "cooked_meat", "outputCount": 2,
+    "craftTime": 1
+  },
+  "grilled_fish": {
+    "name": "烤制河鱼",
+    "materials": { "raw_fish": 1, "wood": 1 },
+    "output": "grilled_fish", "outputCount": 1,
+    "condition": "HasTag(烹饪)",
+    "craftTime": 1
+  },
+  "hearty_stew": {
+    "name": "炖煮暖心炖菜",
+    "materials": { "boar_meat": 1, "mushroom": 2, "berry": 1 },
+    "output": "hearty_stew", "outputCount": 2,
+    "condition": "HasTag(烹饪)",
+    "craftTime": 2
+  }
+}

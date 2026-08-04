@@ -1,0 +1,65 @@
+{
+  "warrior": {
+    "name": "战士",
+    "tagIds": ["近战"],
+    "skillTreeRoot": "warrior_tree",
+    "statGrowth": { "HP": 12, "ATK": 2.5, "DEF": 1.5 },
+    "edges": [
+      { "to": "magic_swordsman", "condition": "HasAllTags([近战,魔能])", "description": "魔武双修 → 魔剑士" },
+      { "to": "assassin", "condition": "HasTag(潜行)", "description": "习得潜行 → 转职刺客" },
+      { "to": "knight", "condition": "HasTag(盾防)", "description": "举起盾牌守护他人 → 骑士" }
+    ]
+  },
+  "mage": {
+    "name": "法师",
+    "tagIds": ["魔能"],
+    "skillTreeRoot": "mage_tree",
+    "statGrowth": { "HP": 8, "MATK": 3.0, "DEF": 0.8 },
+    "edges": [
+      { "to": "magic_swordsman", "condition": "HasAllTags([近战,魔能])", "bidirectional": true, "description": "魔武双修 → 魔剑士" },
+      { "to": "priest", "condition": "HasTag(圣光术)", "description": "皈依圣光 → 祭司" }
+    ]
+  },
+  "magic_swordsman": {
+    "name": "魔剑士",
+    "tagIds": ["近战", "魔能"],
+    "skillTreeRoot": "magic_sword_tree",
+    "statGrowth": { "HP": 10, "ATK": 2.0, "MATK": 2.0 },
+    "edges": []
+  },
+  "assassin": {
+    "name": "刺客",
+    "tagIds": ["暗杀", "潜行"],
+    "skillTreeRoot": "assassin_tree",
+    "statGrowth": { "HP": 9, "ATK": 2.2, "SPD": 1.5 },
+    "edges": []
+  },
+  "blacksmith": {
+    "name": "锻造师",
+    "tagIds": ["锻造", "矿工"],
+    "skillTreeRoot": null,
+    "statGrowth": { "HP": 11, "ATK": 1.5, "DEF": 2.0 },
+    "edges": []
+  },
+  "hunter": {
+    "name": "猎人",
+    "tagIds": ["弓术", "采集"],
+    "skillTreeRoot": "hunter_tree",
+    "statGrowth": { "HP": 10, "ATK": 2.0, "SPD": 1.2 },
+    "edges": []
+  },
+  "priest": {
+    "name": "祭司",
+    "tagIds": ["祭司", "圣光术"],
+    "skillTreeRoot": "priest_tree",
+    "statGrowth": { "HP": 9, "MATK": 2.2, "DEF": 1.0 },
+    "edges": []
+  },
+  "knight": {
+    "name": "骑士",
+    "tagIds": ["盾防", "近战"],
+    "skillTreeRoot": "knight_tree",
+    "statGrowth": { "HP": 13, "ATK": 1.8, "DEF": 2.2 },
+    "edges": []
+  }
+}

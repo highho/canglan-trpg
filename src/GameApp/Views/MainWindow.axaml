@@ -1,0 +1,388 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:GameApp.Views"
+        x:Class="GameApp.Views.MainWindow"
+        x:Name="Root"
+        Title="苍岚大陆 —— TRPG"
+        Width="1320" Height="860"
+        MinWidth="1080" MinHeight="680">
+  <Window.Resources>
+    <local:KindToBrushConverter x:Key="KindBrush" />
+
+    <!-- 行动按钮模板：内容即完整指令，点击直接执行（游戏页用） -->
+    <DataTemplate x:Key="OptionButton">
+      <Button Content="{Binding}"
+              Command="{Binding #Root.DataContext.QuickCommand}"
+              CommandParameter="{Binding}"
+              Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+    </DataTemplate>
+  </Window.Resources>
+
+  <Window.Styles>
+    <Style Selector="TextBlock.groupHeader">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="#8C8C8C" />
+      <Setter Property="Margin" Value="0,8,0,4" />
+    </Style>
+    <Style Selector="Button.menu">
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="Padding" Value="18,10" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Button.choice">
+      <Setter Property="Margin" Value="0,0,6,6" />
+      <Setter Property="Padding" Value="10,4" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+  </Window.Styles>
+
+  <Grid>
+
+    <!-- ==================== 页面 1：开始界面 ==================== -->
+    <Grid IsVisible="{Binding IsStartPage}" Background="#FAFAFA">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" Width="420">
+        <TextBlock Text="苍岚大陆" FontSize="46" FontWeight="Bold" HorizontalAlignment="Center" />
+        <TextBlock Text="标签驱动的 TRPG 冒险" FontSize="14" Foreground="#8C8C8C" HorizontalAlignment="Center" Margin="0,0,0,22" />
+        <Button Classes="menu" Content="开始游戏" Command="{Binding NewGame}" />
+        <Button Classes="menu" Content="读取存档" Command="{Binding LoadGame}" />
+        <Button Classes="menu" Content="退出" Command="{Binding ExitApp}" />
+        <TextBlock Text="{Binding AiStatusText}" FontSize="11" Foreground="#BFBFBF"
+                   HorizontalAlignment="Center" TextWrapping="Wrap" Margin="0,16,0,0" />
+      </StackPanel>
+    </Grid>
+
+    <!-- ==================== 页面 2：存档位选择 ==================== -->
+    <Grid IsVisible="{Binding IsSavePage}" Background="#FAFAFA">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Width="560">
+        <TextBlock Text="{Binding SavePageTitle}" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" />
+
+        <Border BorderBrush="#D9D9D9" BorderThickness="1" CornerRadius="6" Background="#FFFFFF" Padding="16,12">
+          <Grid ColumnDefinitions="*,120">
+            <TextBlock Grid.Column="0" Text="{Binding Slot1Text}" VerticalAlignment="Center" TextWrapping="Wrap" />
+            <Button Grid.Column="1" Content="选择此位" Command="{Binding PickSlot}" CommandParameter="1" HorizontalAlignment="Stretch" />
+          </Grid>
+        </Border>
+
+        <Border BorderBrush="#D9D9D9" BorderThickness="1" CornerRadius="6" Background="#FFFFFF" Padding="16,12">
+          <Grid ColumnDefinitions="*,120">
+            <TextBlock Grid.Column="0" Text="{Binding Slot2Text}" VerticalAlignment="Center" TextWrapping="Wrap" />
+            <Button Grid.Column="1" Content="选择此位" Command="{Binding PickSlot}" CommandParameter="2" HorizontalAlignment="Stretch" />
+          </Grid>
+        </Border>
+
+        <Border BorderBrush="#D9D9D9" BorderThickness="1" CornerRadius="6" Background="#FFFFFF" Padding="16,12">
+          <Grid ColumnDefinitions="*,120">
+            <TextBlock Grid.Column="0" Text="{Binding Slot3Text}" VerticalAlignment="Center" TextWrapping="Wrap" />
+            <Button Grid.Column="1" Content="选择此位" Command="{Binding PickSlot}" CommandParameter="3" HorizontalAlignment="Stretch" />
+          </Grid>
+        </Border>
+
+        <Button Content="返回" Command="{Binding BackToStart}" HorizontalAlignment="Center" Margin="0,10,0,0" Padding="24,6" />
+      </StackPanel>
+    </Grid>
+
+    <!-- ==================== 页面 3：创建角色 ==================== -->
+    <Grid IsVisible="{Binding IsCreationPage}" Background="#FAFAFA">
+      <ScrollViewer>
+        <StackPanel Margin="28" Spacing="10" MaxWidth="980" HorizontalAlignment="Center">
+          <TextBlock Text="创建角色" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
+
+          <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" Margin="0,8,0,4">
+            <TextBlock Text="角色名" VerticalAlignment="Center" FontWeight="Bold" />
+            <TextBox Text="{Binding CreationNameInput}" Watermark="输入你的名字" Width="220" />
+          </StackPanel>
+
+          <TextBlock Classes="groupHeader" Text="血脉（进阶种族需在冒险中进化）" FontSize="13" Foreground="#595959" />
+          <ItemsControl ItemsSource="{Binding RaceChoices}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Classes="choice" Content="{Binding}"
+                        Command="{Binding #Root.DataContext.SelectRace}" CommandParameter="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <TextBlock Classes="groupHeader" Text="道路（进阶职业需在冒险中转职）" FontSize="13" Foreground="#595959" />
+          <ItemsControl ItemsSource="{Binding ClassChoices}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Classes="choice" Content="{Binding}"
+                        Command="{Binding #Root.DataContext.SelectClass}" CommandParameter="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <TextBlock Classes="groupHeader" Text="出身特质（随血脉与道路过滤）" FontSize="13" Foreground="#595959" />
+          <ItemsControl ItemsSource="{Binding TraitChoices}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Classes="choice" Content="{Binding}"
+                        Command="{Binding #Root.DataContext.SelectTrait}" CommandParameter="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <TextBlock Text="{Binding CreationSummary}" FontWeight="Bold" FontSize="14"
+                     HorizontalAlignment="Center" Margin="0,12,0,4" TextWrapping="Wrap" />
+
+          <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" Margin="0,4,0,20">
+            <Button Content="开始冒险" Command="{Binding BeginAdventure}" FontSize="15" Padding="28,8" />
+            <Button Content="返回" Command="{Binding GoBackSavePage}" Padding="20,8" />
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+
+    <!-- ==================== 页面 4：游戏主界面 ==================== -->
+    <Grid IsVisible="{Binding IsGamePage}" ColumnDefinitions="252,*,300">
+
+      <!-- 左栏：角色面板 -->
+      <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#D9D9D9" BorderThickness="0,0,1,0">
+        <ScrollViewer>
+          <StackPanel Margin="14" Spacing="12">
+            <TextBlock Classes="h1" Text="角色" />
+            <TextBlock Text="{Binding PlayerInfoText}" TextWrapping="Wrap" FontWeight="Bold" />
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="属性" />
+                <TextBlock Text="{Binding StatsText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="生存" />
+                <TextBlock Text="{Binding SurvivalText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="标签" />
+                <TextBlock Text="{Binding TagsText}" TextWrapping="Wrap" FontSize="12" Classes="muted" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="行囊" />
+                <TextBlock Text="{Binding InventoryText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="装备" />
+                <TextBlock Text="{Binding EquipSlotsText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+
+      <!-- 中栏：菜单栏 + 叙事区 + 行动面板 -->
+      <Grid Grid.Column="1" RowDefinitions="Auto,3*,2*">
+
+        <!-- 菜单栏 -->
+        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#D9D9D9" BorderThickness="0,0,0,1" Padding="14,6">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="存档" Command="{Binding QuickCommand}" CommandParameter="存档" Padding="12,3" FontSize="12" />
+            <Button Content="主菜单（自动存档）" Command="{Binding SaveAndMenu}" Padding="12,3" FontSize="12" />
+          </StackPanel>
+        </Border>
+
+        <!-- 叙事滚动区 -->
+        <ScrollViewer Grid.Row="1" Name="NarrationScroll" Background="#FAFAFA" Padding="18,14">
+          <ItemsControl ItemsSource="{Binding NarrationLines}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Text}"
+                           Foreground="{Binding Kind, Converter={StaticResource KindBrush}}"
+                           TextWrapping="Wrap"
+                           FontFamily="Consolas, Microsoft YaHei UI"
+                           FontSize="13"
+                           LineHeight="22"
+                           Margin="0,1" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <!-- 行动面板 -->
+        <Border Grid.Row="2" BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Background="#FFFFFF">
+          <ScrollViewer Padding="14,10">
+            <StackPanel Spacing="2">
+
+              <TextBlock Classes="groupHeader" Text="移动" />
+              <WrapPanel>
+                <Button Content="北" Command="{Binding QuickCommand}" CommandParameter="北" Margin="0,0,6,6" Padding="12,3" />
+                <Button Content="南" Command="{Binding QuickCommand}" CommandParameter="南" Margin="0,0,6,6" Padding="12,3" />
+                <Button Content="西" Command="{Binding QuickCommand}" CommandParameter="西" Margin="0,0,6,6" Padding="12,3" />
+                <Button Content="东" Command="{Binding QuickCommand}" CommandParameter="东" Margin="0,0,6,6" Padding="12,3" />
+                <Button Content="环顾四周" Command="{Binding QuickCommand}" CommandParameter="查看" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="传闻" Command="{Binding QuickCommand}" CommandParameter="传闻" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+
+              <TextBlock Classes="groupHeader" Text="交谈（先点人物，再点话题）" />
+              <ItemsControl ItemsSource="{Binding NpcOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <WrapPanel>
+                <Button Content="寒暄" Command="{Binding Say}" CommandParameter="打个招呼" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="聊聊这附近" Command="{Binding Say}" CommandParameter="聊聊这附近有什么" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="打听麻烦事" Command="{Binding Say}" CommandParameter="最近有什么麻烦事吗" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="告辞" Command="{Binding Say}" CommandParameter="我先告辞了" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+
+              <TextBlock Classes="groupHeader" Text="战斗" />
+              <ItemsControl ItemsSource="{Binding MonsterOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+
+              <TextBlock Classes="groupHeader" Text="采集与生计" />
+              <WrapPanel>
+                <Button Content="喝水" Command="{Binding QuickCommand}" CommandParameter="喝水" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+              <ItemsControl ItemsSource="{Binding ResourceOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <ItemsControl ItemsSource="{Binding FoodOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+
+              <TextBlock Classes="groupHeader" Text="装备" />
+              <ItemsControl ItemsSource="{Binding EquipOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+
+              <TextBlock Classes="groupHeader" Text="生产与家园" />
+              <WrapPanel>
+                <Button Content="配方列表" Command="{Binding QuickCommand}" CommandParameter="配方" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="家园" Command="{Binding QuickCommand}" CommandParameter="家园" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="家园升级" Command="{Binding QuickCommand}" CommandParameter="家园升级" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+              <ItemsControl ItemsSource="{Binding RecipeOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <ItemsControl ItemsSource="{Binding BuildingOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+
+              <TextBlock Classes="groupHeader" Text="成长" />
+              <WrapPanel>
+                <Button Content="技能树" Command="{Binding QuickCommand}" CommandParameter="技能" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="解锁技能" Command="{Binding QuickCommand}" CommandParameter="解锁技能" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+
+              <TextBlock Classes="groupHeader" Text="委托" />
+              <WrapPanel>
+                <Button Content="查看布告板" Command="{Binding QuickCommand}" CommandParameter="任务" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+              <ItemsControl ItemsSource="{Binding QuestOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+
+              <TextBlock Classes="groupHeader" Text="社交与队伍" />
+              <ItemsControl ItemsSource="{Binding RecruitOptions}" ItemTemplate="{StaticResource OptionButton}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+
+              <TextBlock Classes="groupHeader" Text="信息" />
+              <WrapPanel>
+                <Button Content="状态" Command="{Binding QuickCommand}" CommandParameter="状态" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="背包" Command="{Binding QuickCommand}" CommandParameter="背包" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="标签" Command="{Binding QuickCommand}" CommandParameter="标签" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+                <Button Content="存档列表" Command="{Binding QuickCommand}" CommandParameter="存档列表" Margin="0,0,6,6" Padding="8,3" FontSize="12" />
+              </WrapPanel>
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+
+      <!-- 右栏：世界情报 -->
+      <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="#D9D9D9" BorderThickness="1,0,0,0">
+        <ScrollViewer>
+          <StackPanel Margin="14" Spacing="12">
+            <TextBlock Classes="h1" Text="世界情报" />
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="所在" />
+                <TextBlock Text="{Binding LocationText}" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <StackPanel Spacing="4">
+              <TextBlock Classes="h2" Text="可接委托" />
+              <TextBlock Text="{Binding QuestText}" TextWrapping="Wrap" FontSize="12" />
+            </StackPanel>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="结识的人" />
+                <TextBlock Text="{Binding NpcText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="技能" />
+                <TextBlock Text="{Binding SkillText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="家园" />
+                <TextBlock Text="{Binding HomeText}" TextWrapping="Wrap" FontSize="12" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="存档" />
+                <TextBlock Text="{Binding SlotsText}" TextWrapping="Wrap" FontSize="12" Classes="muted" />
+              </StackPanel>
+            </Border>
+
+            <Border BorderBrush="#D9D9D9" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h2" Text="本地AI" />
+                <TextBlock Text="{Binding AiStatusText}" TextWrapping="Wrap" FontSize="12" Classes="muted" />
+                <TextBlock Classes="muted" FontSize="11" Text="模型须位于纯ASCII路径（推荐 C:\GameModels）。" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

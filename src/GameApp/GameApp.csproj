@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    GameApp — 标签驱动游戏引擎的桌面 UI（Avalonia）。
+    框架选型理由：
+      1. Avalonia 为纯 .NET + NuGet 方案，Windows 桌面原生支持（Win32 渲染）；
+      2. Avalonia 11 官方支持 Android（未来新增 GameApp.Android 项目引用同一套
+         Views/ViewModels 即可移植，UI 代码零平台耦合）；
+      3. AXAML 声明式布局契合"极简文字风"，无需任何图片资源。
+    安卓移植步骤（未来）：
+      1) 本项目追加 <TargetFrameworks>net8.0-android</TargetFrameworks>；
+      2) 添加包 Avalonia.Android；
+      3) 新增 Android 入口 Activity 调用 BuildAvaloniaApp().SetupWithLifetime()。
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyName>GameApp</AssemblyName>
+    <RootNamespace>GameApp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.6" Condition="'$(Configuration)' == 'Debug'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameCore\GameCore.csproj" />
+  </ItemGroup>
+
+  <!-- 数据文件随构建拷贝（与 GameDemo/Tests 保持一致） -->
+  <ItemGroup>
+    <None Include="..\..\data\**\*.json" CopyToOutputDirectory="PreserveNewest" LinkBase="Data" />
+  </ItemGroup>
+
+</Project>

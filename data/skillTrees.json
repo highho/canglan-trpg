@@ -1,0 +1,56 @@
+{
+  "warrior_tree": {
+    "nodes": ["slash", "shield_bash", "berserk", "dragon_slash", "sword_mastery"],
+    "edges": [
+      { "from": "slash", "to": "shield_bash" },
+      { "from": "slash", "to": "berserk", "condition": "HasTag(狂暴)" },
+      { "from": "berserk", "to": "dragon_slash", "condition": "HasTag(龙血觉醒)" },
+      { "from": "slash", "to": "sword_mastery", "condition": "HasTag(近战)" }
+    ]
+  },
+  "mage_tree": {
+    "nodes": ["fireball", "ice_arrow", "heal", "mana_flow"],
+    "edges": [
+      { "from": "fireball", "to": "ice_arrow" },
+      { "from": "fireball", "to": "heal", "condition": "HasTag(神圣)" },
+      { "from": "fireball", "to": "mana_flow", "condition": "HasTag(魔能)" }
+    ]
+  },
+  "magic_sword_tree": {
+    "nodes": ["slash", "fireball", "sword_mastery", "mana_flow"],
+    "edges": [
+      { "from": "slash", "to": "sword_mastery", "condition": "HasTag(近战)" },
+      { "from": "fireball", "to": "mana_flow", "condition": "HasTag(魔能)" }
+    ]
+  },
+  "assassin_tree": {
+    "nodes": ["shadow_strike", "poison_blade"],
+    "edges": [
+      { "from": "shadow_strike", "to": "poison_blade", "condition": "HasTag(毒素)" }
+    ]
+  },
+  "hunter_tree": {
+    "nodes": ["precise_shot", "net_throw", "arrow_rain", "hunter_instinct"],
+    "edges": [
+      { "from": "precise_shot", "to": "net_throw" },
+      { "from": "precise_shot", "to": "hunter_instinct", "condition": "HasTag(弓术)" },
+      { "from": "net_throw", "to": "arrow_rain", "condition": "HasTag(猎狼人)" }
+    ]
+  },
+  "priest_tree": {
+    "nodes": ["heal", "holy_light", "sanctuary", "light_blessing"],
+    "edges": [
+      { "from": "heal", "to": "holy_light" },
+      { "from": "heal", "to": "light_blessing", "condition": "HasTag(圣光术)" },
+      { "from": "holy_light", "to": "sanctuary", "condition": "HasTag(圣殿骑士)" }
+    ]
+  },
+  "knight_tree": {
+    "nodes": ["shield_bash", "shield_wall", "war_charge", "iron_will"],
+    "edges": [
+      { "from": "shield_bash", "to": "shield_wall", "condition": "HasTag(盾防)" },
+      { "from": "shield_bash", "to": "war_charge" },
+      { "from": "shield_wall", "to": "iron_will", "condition": "HasTag(近战)" }
+    ]
+  }
+}
