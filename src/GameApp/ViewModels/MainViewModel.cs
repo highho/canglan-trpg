@@ -17,8 +17,8 @@ using GameCore.Npc;
 using GameCore.Save;
 using GameCore.Skill;
 using GameCore.Social;
-using GameCore.Tag;
 using GameCore.World;
+using GameCore.Tag;
 using Unit = GameCore.Unit.Unit;
 
 namespace GameApp.ViewModels;
@@ -57,7 +57,13 @@ public sealed class MainViewModel : ViewModelBase
     private const int NearbyRange = 4;   // 怪物/采集点的可行动半径
     private const int NpcRange = 4;      // NPC 可交谈半径（新手村范围）
 
-    // ==================== 角色创建状态机 ====================
+    // ==================== 随机遭遇状态 ====================
+    private EncounterEvent _pendingEncounter;   // 等待玩家选择的遭遇事件
+    private readonly Random _rng = new();
+
+    /// <summary>随机遭遇选择的选项列表（纯 VM 渲染绑定）。</summary>
+    public List<string> EncounterOptions { get; } = new();
+    public bool HasPendingEncounter => _pendingEncounter != null;
     private int _creationStage;               // 0=未开始 1=选种族 2=选职业 3=选特质
     private string _creationName = "旅人";
     private List<RaceNode> _creationRaces = new();
@@ -431,6 +437,9 @@ public sealed class MainViewModel : ViewModelBase
 
         switch (head)
         {
+            // 随机遭遇选择：用户输入数字即视为选项编号
+            case "1" or "2" or "3" or "4" when _pendingEncounter != null:
+                CmdEncounterChoice(head); return;
             case "帮助": case "help": CmdHelp(); break;
             case "创建": CmdCreate(arg); break;
             case "取消": Narrate("当前没有可取消的操作。", NarrationKind.System); break;
@@ -462,6 +471,7 @@ public sealed class MainViewModel : ViewModelBase
             case "存档": CmdSave(); break;
             case "读档": CmdLoad(); break;
             case "存档列表": CmdSlots(); break;
+            case "声望": CmdReputation(); break;
             default: await AiFreeTalkAsync(raw); break;   // 未识别指令 → AI 自由对话
         }
     }
@@ -622,6 +632,9 @@ public sealed class MainViewModel : ViewModelBase
             return;
         }
         _player.WorldPos = new MapPos(x, y);
+        World.StepCount++;
+        World.Codex.TurnNumber = World.StepCount;
+        EncounterTable.TickAll();
         World.SurvivalManager.OnPlayerMove(_player, World.Map);
         foreach (var gp in _gatherPoints.Values) gp.TickCooldown();   // 每走一步 = 一回合，采集点冷却递减
         World.Map.CurrentFog().DecayAfterMove(_player);
@@ -629,6 +642,10 @@ public sealed class MainViewModel : ViewModelBase
         Narrate($"你向{dir}走去，脚步落在（{x},{y}）的土地上。", NarrationKind.Narration);
         DescribeSurroundings();
         RefreshNearbyOptions();
+
+        // 随机遭遇抽取：概率随距村距离递增
+        var encounter = EncounterTable.Roll(_player.WorldPos, _player.Level, _rng);
+        if (encounter != null) PresentEncounter(encounter);
     }
 
     private void CmdLook()
@@ -902,6 +919,7 @@ public sealed class MainViewModel : ViewModelBase
             foreach (var (key, value) in quest.Data.Rewards)
             {
                 if (key == "gold") { _player.Gold += value; gains.Add($"金币 +{value}"); }
+                else if (key.StartsWith("reputation_")) { World.Factions.Add(key, value); gains.Add($"{key} +{value}"); }
                 else { _player.Inventory.Add(key, value); gains.Add($"{ItemRegistry.Instance.Get(key).Name} x{value}"); }
             }
         }
@@ -917,6 +935,41 @@ public sealed class MainViewModel : ViewModelBase
         if (gains.Count > 0) Narrate("报酬：" + string.Join("，", gains), NarrationKind.Reward);
         _questCache = _guild.GetAvailableQuests(_player).ToList();
     }
+
+    private void CmdReputation()
+    {
+        if (!EnsurePlayer()) return;
+        var sb = new StringBuilder();
+        sb.AppendLine("════ 阵营声望 ════");
+        foreach (FactionId fid in Enum.GetValues<FactionId>())
+        {
+            var val = World.Factions.Get(fid);
+            var lvl = World.Factions.GetLevel(fid);
+            var lvlName = lvl switch
+            {
+                RepLevel.Hostile => "敌视",
+                RepLevel.Neutral => "中立",
+                RepLevel.Friendly => "友善",
+                RepLevel.Honored => "尊敬",
+                RepLevel.Revered => "崇敬",
+                _ => "?"
+            };
+            sb.AppendLine($"  {FactionLabel(fid)}：{val}（{lvlName}）");
+        }
+        sb.AppendLine($"图鉴：已击杀 {World.Codex.TotalSpeciesKilled} 种怪物，共 {World.Codex.TotalKills} 次");
+        Narrate(sb.ToString().TrimEnd(), NarrationKind.System);
+    }
+
+    private static string FactionLabel(FactionId fid) => fid switch
+    {
+        FactionId.Ranger => "游骑兵",
+        FactionId.Adventurer => "冒险公会",
+        FactionId.Merchant => "商盟",
+        FactionId.Shadow => "暗影",
+        FactionId.Holy => "圣殿",
+        FactionId.Citizen => "平民",
+        _ => fid.ToString()
+    };
 
     // ==================== 成长：技能 / 制造 / 家园 ====================
     private void CmdSkills()
@@ -1226,5 +1279,74 @@ public sealed class MainViewModel : ViewModelBase
 
         HomeText = _home == null ? "" : $"家园 Lv{_home.Level}\n建筑：{(_home.GetBuildings().Count == 0 ? "（空）" : string.Join("、", _home.GetBuildings().Select(b => b.Name)))}";
         RefreshOptions();
+    }
+
+    // ==================== 随机遭遇处理 ====================
+
+    private void PresentEncounter(EncounterEvent encounter)
+    {
+        _pendingEncounter = encounter;
+        EncounterTable.SetCooldown(encounter);
+        Narrate(encounter.Description, NarrationKind.Narration);
+        EncounterOptions.Clear();
+        for (var i = 0; i < encounter.Options.Count; i++)
+        {
+            var opt = encounter.Options[i];
+            // 过滤不满足标签条件的选项
+            if (opt.Condition != null && !opt.Condition.Evaluate(_player.ActiveTagIds)) continue;
+            EncounterOptions.Add($"[{i + 1}] {opt.Label}");
+        }
+        if (EncounterOptions.Count == 0)
+        {
+            Narrate("你无从应对眼前的情形，只得径直离去。", NarrationKind.Narration);
+            _pendingEncounter = null;
+            return;
+        }
+        OnPropertyChanged(nameof(HasPendingEncounter));
+        OnPropertyChanged(nameof(EncounterOptions));
+        Narrate(string.Join("\n", EncounterOptions.Select(o => $"  {o}")), NarrationKind.Input);
+    }
+
+    private void ApplyEncounterResult(EncounterOption option)
+    {
+        if (option.Rewards != null)
+        {
+            foreach (var (key, amount) in option.Rewards)
+            {
+                if (key == "gold") { _player.Gold += amount; Narrate($"金币 +{amount}", NarrationKind.Reward); }
+                else if (key.StartsWith("reputation_")) { World.Factions.Add(key, amount); }
+                else if (key.StartsWith("hp") || key.StartsWith("hunger") || key.StartsWith("thirst"))
+                {
+                    // 直接属性修改在 Penalties 里处理，这里略过
+                }
+                else { _player.Inventory.Add(key, amount); }
+            }
+        }
+        if (option.Penalties != null)
+        {
+            foreach (var (key, amount) in option.Penalties)
+            {
+                if (key == "gold") { _player.Gold = Math.Max(0, _player.Gold + amount); Narrate($"金币 {amount}", NarrationKind.System); }
+                else if (key == "hp") { _player.Stats.Hp = Math.Max(1, (int)(_player.Stats.Hp + amount)); Narrate($"体力 {amount:+0;-#}", NarrationKind.System); }
+            }
+        }
+        Narrate(option.ResultText, NarrationKind.Narration);
+        RefreshNearbyOptions();
+    }
+
+    /// <summary>遭遇选择指令（由 QuickCommand 分发）。</summary>
+    private void CmdEncounterChoice(string arg)
+    {
+        if (_pendingEncounter == null) return;
+        if (!int.TryParse(arg, out var idx) || idx < 1 || idx > _pendingEncounter.Options.Count)
+        {
+            Narrate("请输入选项编号（如 1、2）。", NarrationKind.System);
+            return;
+        }
+        var chosen = _pendingEncounter.Options[idx - 1];
+        ApplyEncounterResult(chosen);
+        _pendingEncounter = null;
+        EncounterOptions.Clear();
+        OnPropertyChanged(nameof(HasPendingEncounter));
     }
 }

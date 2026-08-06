@@ -44,6 +44,12 @@ public sealed class GameWorld
     public Monster.MonsterFactory MonsterFactory { get; private set; }
     public Npc.NPCFactory NpcFactory { get; private set; }
 
+    // ==================== 长线系统（本迭代新增） ====================
+    public Social.FactionSystem Factions { get; private set; }
+    public Bestiary.Codex Codex { get; private set; }
+    /// <summary>自创角以来的移动步数（驱动 Codex 时间标签 / 冷却）。</summary>
+    public int StepCount { get; set; }
+
     public string DataDir { get; private set; }
 
     private GameWorld()
@@ -113,6 +119,10 @@ public sealed class GameWorld
             TraitRegistry.Instance, world.TagFactory, world.EffectEngine, world.EventBus);
         world.MonsterFactory = new Monster.MonsterFactory(world.TagFactory, world.EffectEngine, world.EventBus, rng);
         world.NpcFactory = new Npc.NPCFactory(world.TagFactory, world.EffectEngine, world.EventBus);
+
+        // 10. 长线驱动系统（本迭代）
+        world.Factions = new Social.FactionSystem();
+        world.Codex = new Bestiary.Codex(world.EventBus);
 
         return world;
     }

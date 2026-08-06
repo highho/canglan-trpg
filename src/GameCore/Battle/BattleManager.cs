@@ -54,6 +54,8 @@ public sealed class BattleManager
     private readonly Random _rng = new();
     private readonly EffectEngine _effectEngine;
     private readonly Dictionary<Unit.Unit, Unit.Unit> _covers = new();   // 被掩护者 → 掩护者
+    /// <summary>连击追踪：同一攻击者对同一目标的连续命中次数。</summary>
+    private readonly Dictionary<Unit.Unit, (Unit.Unit LastAttacker, int Count)> _comboTracker = new();
 
     public BattleManager(GridSystem grid, IEventBus bus, BattleAI ai, EffectEngine effectEngine,
         List<Unit.Unit> allies, List<Unit.Unit> enemies, Unit.CombatMode mode = Unit.CombatMode.Lethal)
@@ -221,6 +223,23 @@ public sealed class BattleManager
         }
 
         var (damage, crit) = DamageCalculator.Calculate(actor, target, Grid, _rng);
+        
+        // 连击追踪：同一攻击者连续攻击同一目标 → 伤害递增
+        float comboMult = 1f;
+        if (_comboTracker.TryGetValue(target, out var comboEntry)
+            && ReferenceEquals(comboEntry.LastAttacker, actor))
+        {
+            _comboTracker[target] = (actor, comboEntry.Count + 1);
+            comboMult = 1f + comboEntry.Count * 0.12f;  // 2连击+12%, 3连击+24%...
+            if (comboEntry.Count >= 1)
+                EventBus.Emit("COMBO_TRIGGERED", actor, target, comboEntry.Count + 1);
+        }
+        else
+        {
+            _comboTracker[target] = (actor, 1);
+        }
+        damage *= comboMult;
+        
         target.TakeDamage(damage, actor, EventBus, lethal: IsLethal);
         EventBus.Emit(EventTypes.DamageDealt, actor, target, (int)damage);
         if (crit) EventBus.Emit(EventTypes.DamageCrit, target, actor);
@@ -298,6 +317,7 @@ public sealed class BattleManager
     private void ResolveTurnEnd()
     {
         EventBus.Emit(EventTypes.TurnEnd, TurnNumber);   // Buff倒计时/技能冷却由订阅者处理
+        _comboTracker.Clear();   // 回合结束连击计数归零
         // 情感自然衰减 → 活跃情感变化时重建标签
         foreach (var unit in Allies.Concat(Enemies))
         {

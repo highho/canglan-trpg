@@ -83,11 +83,14 @@ public sealed class BattleAI
         var enemies = battle.Enemies.Where(e => !battle.IsOutOfCombat(e)).ToList();
         var firstEnemy = enemies.FirstOrDefault();
 
+        // 根据个性标签选择最优目标（攻击/技能共用）
+        var primaryTarget = SelectByPersonality(actor, enemies, battle);
+
         switch (optionId)
         {
             case "attack":
-                if (firstEnemy == null) return new BattleAction { Type = ActionType.Pass, Actor = actor };
-                return new BattleAction { Type = ActionType.Attack, Actor = actor, Targets = { firstEnemy } };
+                if (primaryTarget == null) return new BattleAction { Type = ActionType.Pass, Actor = actor };
+                return new BattleAction { Type = ActionType.Attack, Actor = actor, Targets = { primaryTarget } };
 
             case "defend":
                 return new BattleAction { Type = ActionType.Defend, Actor = actor };
@@ -100,12 +103,13 @@ public sealed class BattleAI
 
             case "skill" when usableSkill != null:
                 GridPosition targetPos = null;
-                if (usableSkill.TargetPattern == Skill.TargetPattern.Single && firstEnemy != null)
-                    targetPos = battle.Grid.FindPosition(firstEnemy);
+                var skillTarget = primaryTarget ?? firstEnemy;
+                if (usableSkill.TargetPattern == Skill.TargetPattern.Single && skillTarget != null)
+                    targetPos = battle.Grid.FindPosition(skillTarget);
                 else if (usableSkill.TargetPattern == Skill.TargetPattern.All)
-                    targetPos = battle.Grid.FindPosition(actor);   // ALL 取对面全场
-                else if (firstEnemy != null)
-                    targetPos = battle.Grid.FindPosition(firstEnemy);
+                    targetPos = battle.Grid.FindPosition(actor);
+                else if (skillTarget != null)
+                    targetPos = battle.Grid.FindPosition(skillTarget);
                 return new BattleAction
                 {
                     Type = ActionType.Skill,
@@ -121,10 +125,64 @@ public sealed class BattleAI
                 return new BattleAction { Type = ActionType.BetrayAlly, Actor = actor, Targets = { betrayTarget } };
 
             default:
-                return firstEnemy != null
-                    ? new BattleAction { Type = ActionType.Attack, Actor = actor, Targets = { firstEnemy } }
+                return primaryTarget != null
+                    ? new BattleAction { Type = ActionType.Attack, Actor = actor, Targets = { primaryTarget } }
                     : new BattleAction { Type = ActionType.Pass, Actor = actor };
         }
+    }
+
+    /// <summary>根据个性标签从敌人列表中选最优目标。</summary>
+    private static Unit.Unit SelectByPersonality(Unit.Unit actor, List<Unit.Unit> enemies, BattleManager battle)
+    {
+        if (enemies.Count == 0) return null;
+        if (enemies.Count == 1) return enemies[0];
+
+        var tags = actor.ActiveTagIds;
+
+        // 天敌/狩猎本能：优先选择种族标签为[野兽]的目标
+        if (tags.Contains("猎狼人") || tags.Contains("屠兽者") || tags.Contains("驯兽大师"))
+        {
+            var beast = enemies.FirstOrDefault(e => e.ActiveTagIds.Contains("野兽"));
+            if (beast != null) return beast;
+        }
+
+        // 圣职驱魔：优先选择[亡灵][黑暗][恶魔]
+        if (tags.Contains("圣殿骑士") || tags.Contains("光明誓约"))
+        {
+            var corrupt = enemies.FirstOrDefault(e =>
+                e.ActiveTagIds.Contains("亡灵") || e.ActiveTagIds.Contains("黑暗") || e.ActiveTagIds.Contains("恶魔"));
+            if (corrupt != null) return corrupt;
+        }
+
+        // 复仇/记仇：优先攻击上次攻击过自己的敌人（存在伤害记录）
+        if (tags.Contains("记仇") || tags.Contains("愤怒"))
+        {
+            // 找血量最高的敌人（愤怒状态下想打最强的那一个）
+            var strongest = enemies.OrderByDescending(e => e.Stats.Hp).First();
+            if (strongest != null) return strongest;
+        }
+
+        // 狡猾/贪婪：优先攻击低血量目标（补刀收割）
+        if (tags.Contains("狡猾") || tags.Contains("贪婪"))
+        {
+            var low = enemies.OrderBy(e => e.HpPercent).First();
+            if (low != null && low.HpPercent < 50) return low;
+        }
+
+        // 懦弱：优先攻击 SPD 最低的目标（不敢打快的）
+        if (tags.Contains("懦弱"))
+        {
+            var slowest = enemies.OrderBy(e => e.Spd).First();
+            if (slowest != null) return slowest;
+        }
+
+        // 忠诚/勇敢：优先保护 Boss——如果有 BOSS 则攻击离 Boss 最近的敌人？简化：血量百分比最低的敌人
+        if (tags.Contains("忠诚") || tags.Contains("勇敢"))
+        {
+            return enemies.OrderBy(e => e.HpPercent).First();
+        }
+
+        return enemies[0];   // 默认：第一个活着的敌人
     }
 
     /// <summary>怪物换位评估：交换后收益 > 0 才换位（MVP：前排空位/规避集火的简化评估）。</summary>
