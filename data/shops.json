@@ -1,0 +1,28 @@
+{
+  "village_shop": {
+    "name": "村口杂货铺",
+    "owner": "merchant_lila",
+    "items": [
+      { "itemId": "healing_potion", "price": 45, "stock": 8 },
+      { "itemId": "bandage", "price": 15, "stock": 12 },
+      { "itemId": "antidote", "price": 40, "stock": 6 },
+      { "itemId": "stamina_potion", "price": 60, "stock": 5 },
+      { "itemId": "travel_rations", "price": 8, "stock": 20 },
+      { "itemId": "fine_wine", "price": 120, "stock": 3 },
+      { "itemId": "torch", "price": 12, "stock": 10 }
+    ]
+  },
+  "smithy": {
+    "name": "村中铁匠铺",
+    "owner": "blacksmith_hans",
+    "items": [
+      { "itemId": "iron_ingot", "price": 60, "stock": 10 },
+      { "itemId": "copper_ingot", "price": 35, "stock": 10 },
+      { "itemId": "silver_ingot", "price": 150, "stock": 5 },
+      { "itemId": "mithril_ingot", "price": 300, "stock": 3 },
+      { "itemId": "iron_sword", "price": 220, "stock": 2 },
+      { "itemId": "leather_armor", "price": 180, "stock": 2 },
+      { "itemId": "lucky_ring", "price": 400, "stock": 1 }
+    ]
+  }
+}

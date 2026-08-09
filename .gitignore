@@ -2,23 +2,32 @@
 bin/
 obj/
 publish/
+build-all/
+build-*-test/
 
-# 游戏存档（运行时生成）
+# 依赖
+node_modules/
+
+# 游戏存档与运行时数据（本地生成）
 saves/
+saves-frontend/
 *.save.json
+memories.db
 
 # IDE
 .idea/
 .vs/
+.vscode/
 *.user
 *.suo
 
 # 临时文件
 *.log
 *.tmp
+sources.txt
 test_result.txt
 ui_smoke.txt
 smoke_out.txt
 
-# 本地AI模型文件（体积大，不入库，见 README）
+# 本地 AI 模型文件（体积大，不入库，见 README）
 *.gguf

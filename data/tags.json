@@ -332,6 +332,15 @@
     "allowedSources": ["BUFF"],
     "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "MULTIPLY", "value": 0.9 } ]
   },
+  "疯癫": {
+    "name": "疯癫", "description": "理智崩坏（理智≤30），言语混乱、行动失常", "category": "EMOTION", "tier": 1,
+    "allowedSources": ["BUFF"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "ATK", "operator": "MULTIPLY", "value": 0.85 },
+      { "type": "STAT_MOD", "target": "SPD", "operator": "MULTIPLY", "value": 0.85 }
+    ],
+    "behaviorWeights": { "combat": [ { "option": "flee", "weight": 40 } ] }
+  },
 
   "堕落之印": {
     "name": "堕落之印", "description": "堕落之路的印记（不可逆）", "category": "QUEST_MARK", "tier": 1,
@@ -527,5 +536,73 @@
   "家园Lv3": {
     "name": "家园Lv3", "description": "家园等级3", "category": "SKILL", "tier": 3,
     "allowedSources": ["TRAIT"]
+  },
+
+  "龙战士": {
+    "name": "龙战士", "description": "龙裔血脉与战斗技艺的完美结合", "category": "IDENTITY", "tier": 4,
+    "allowedSources": ["RACE", "CLASS"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 12 },
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 25 },
+      { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.1 }
+    ]
+  },
+  "炎术士": {
+    "name": "炎术士", "description": "将魔能与火焰融为一体的施法者", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["CLASS"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "MATK", "operator": "ADD", "value": 10 },
+      { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.15 }
+    ]
+  },
+  "圣殿守卫": {
+    "name": "圣殿守卫", "description": "以圣光之力加固防御的圣骑士", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["CLASS", "QUEST"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 10 },
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 20 }
+    ]
+  },
+  "影刃": {
+    "name": "影刃", "description": "潜行于暗影之中的刺杀者", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["CLASS"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "CRIT", "operator": "ADD", "value": 0.15 },
+      { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 6 }
+    ]
+  },
+  "风行者": {
+    "name": "风行者", "description": "将自然之力注入箭矢的游侠", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["CLASS"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 8 },
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 6 }
+    ]
+  },
+  "山丘锻王": {
+    "name": "山丘锻王", "description": "矮人血脉觉醒的锻造大师", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["RACE", "CLASS"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 8 },
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 5 }
+    ]
+  },
+  "圣光龙裔": {
+    "name": "圣光龙裔", "description": "被圣光祝福的龙族后裔", "category": "IDENTITY", "tier": 4,
+    "allowedSources": ["RACE", "QUEST"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 40 },
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 10 },
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 8 }
+    ]
+  },
+  "暗黑骑士": {
+    "name": "暗黑骑士", "description": "拥抱黑暗之力的近战者", "category": "IDENTITY", "tier": 3,
+    "allowedSources": ["CLASS", "QUEST"],
+    "effects": [
+      { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 10 },
+      { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 4 },
+      { "type": "DAMAGE_MOD", "operator": "ADD", "value": 4 }
+    ]
   }
 }

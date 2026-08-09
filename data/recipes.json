@@ -123,5 +123,30 @@
     "output": "hearty_stew", "outputCount": 2,
     "condition": "HasTag(烹饪)",
     "craftTime": 2
+  },
+  "grilled_fish": {
+    "name": "烤鱼", "materials": { "fish": 2 }, "output": "grilled_fish", "outputCount": 1,
+    "condition": "HasTag(烹饪)", "craftTime": 1
+  },
+  "cooked_meat2": {
+    "name": "烤肉", "materials": { "raw_meat": 2 }, "output": "cooked_meat", "outputCount": 1,
+    "condition": "HasTag(烹饪)", "craftTime": 1
+  },
+  "torch_craft": {
+    "name": "制作火把", "materials": { "wood": 1 }, "output": "torch", "outputCount": 2,
+    "condition": "HasTag(木工)", "craftTime": 1
+  },
+  "greater_healing": {
+    "name": "调和大治疗药水", "materials": { "healing_potion": 2, "herb": 1, "enchanted_essence": 1 },
+    "output": "greater_healing_potion", "outputCount": 1,
+    "condition": "TierAtLeast(炼金,3)", "craftTime": 2
+  },
+  "gold_ingot_craft": {
+    "name": "冶炼金锭", "materials": { "gold_ore": 2 }, "output": "gold_ingot", "outputCount": 1,
+    "condition": "TierAtLeast(锻造,4)", "craftTime": 3
+  },
+  "essence_distill": {
+    "name": "萃取附魔精华", "materials": { "magic_crystal": 2, "herb": 3 }, "output": "enchanted_essence", "outputCount": 1,
+    "condition": "TierAtLeast(炼金,2)", "craftTime": 2
   }
 }

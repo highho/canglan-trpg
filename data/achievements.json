@@ -1,0 +1,161 @@
+{
+  "first_step": {
+    "name": "踏出第一步",
+    "description": "累计移动 10 步",
+    "category": "explore",
+    "metric": "steps",
+    "threshold": 10,
+    "rewardGold": 20,
+    "rewardItems": { "travel_rations": 2 }
+  },
+  "explorer_50": {
+    "name": "初探荒野",
+    "description": "累计移动 50 步",
+    "category": "explore",
+    "metric": "steps",
+    "threshold": 50,
+    "rewardGold": 80,
+    "rewardItems": { "stamina_potion": 1 }
+  },
+  "explorer_200": {
+    "name": "跋山涉水",
+    "description": "累计移动 200 步",
+    "category": "explore",
+    "metric": "steps",
+    "threshold": 200,
+    "rewardGold": 300,
+    "rewardItems": { "gold_ore": 2 }
+  },
+  "first_kill": {
+    "name": "初试锋芒",
+    "description": "击杀第一只怪物",
+    "category": "combat",
+    "metric": "kills",
+    "threshold": 1,
+    "rewardGold": 30,
+    "rewardItems": { "bandage": 2 }
+  },
+  "hunter_10": {
+    "name": "猎手之名",
+    "description": "累计击杀 10 只怪物",
+    "category": "combat",
+    "metric": "kills",
+    "threshold": 10,
+    "rewardGold": 100,
+    "rewardItems": { "healing_potion": 2 }
+  },
+  "slayer_50": {
+    "name": "百人斩",
+    "description": "累计击杀 50 只怪物",
+    "category": "combat",
+    "metric": "kills",
+    "threshold": 50,
+    "rewardGold": 500,
+    "rewardItems": { "silver_ingot": 3 }
+  },
+  "battle_worn": {
+    "name": "身经百战",
+    "description": "累计经历 30 场战斗",
+    "category": "combat",
+    "metric": "battles",
+    "threshold": 30,
+    "rewardGold": 200,
+    "rewardItems": { "iron_ingot": 4 }
+  },
+  "first_craft": {
+    "name": "能工巧匠",
+    "description": "第一次成功制造物品",
+    "category": "craft",
+    "metric": "craft",
+    "threshold": 1,
+    "rewardGold": 30,
+    "rewardItems": { "wood": 5 }
+  },
+  "craftsman_20": {
+    "name": "老练工匠",
+    "description": "累计制造 20 件物品",
+    "category": "craft",
+    "metric": "craft",
+    "threshold": 20,
+    "rewardGold": 200,
+    "rewardItems": { "copper_ingot": 4 }
+  },
+  "gatherer_30": {
+    "name": "采集达人",
+    "description": "累计采集 30 次",
+    "category": "craft",
+    "metric": "gather",
+    "threshold": 30,
+    "rewardGold": 150,
+    "rewardItems": { "herb": 5 }
+  },
+  "first_quest": {
+    "name": "受托之人",
+    "description": "完成第一个委托",
+    "category": "quest",
+    "metric": "quests",
+    "threshold": 1,
+    "rewardGold": 50,
+    "rewardItems": { "ancient_coin": 1 }
+  },
+  "quest_master": {
+    "name": "委托大师",
+    "description": "累计完成 10 个委托",
+    "category": "quest",
+    "metric": "quests",
+    "threshold": 10,
+    "rewardGold": 400,
+    "rewardItems": { "magic_crystal": 2 }
+  },
+  "rich_500": {
+    "name": "腰缠万贯",
+    "description": "生涯累计获得 500 金币",
+    "category": "social",
+    "metric": "gold",
+    "threshold": 500,
+    "rewardGold": 100
+  },
+  "rich_2000": {
+    "name": "富甲一方",
+    "description": "生涯累计获得 2000 金币",
+    "category": "social",
+    "metric": "gold",
+    "threshold": 2000,
+    "rewardGold": 500,
+    "rewardItems": { "gold_ingot": 2 }
+  },
+  "social_butterfly": {
+    "name": "交际花",
+    "description": "与 8 位不同的 NPC 交谈过",
+    "category": "social",
+    "metric": "npcs_met",
+    "threshold": 8,
+    "rewardGold": 100,
+    "rewardItems": { "fine_wine": 1 }
+  },
+  "recruiter": {
+    "name": "同伴之力",
+    "description": "招募一位同伴",
+    "category": "social",
+    "metric": "recruits",
+    "threshold": 1,
+    "rewardGold": 150
+  },
+  "survivor_grace": {
+    "name": "死里逃生",
+    "description": "第一次死亡后重新站起来",
+    "category": "survival",
+    "metric": "deaths",
+    "threshold": 1,
+    "rewardGold": 60,
+    "rewardItems": { "healing_potion": 3 }
+  },
+  "miser_use": {
+    "name": "节俭度日",
+    "description": "使用 30 件物品",
+    "category": "survival",
+    "metric": "items_used",
+    "threshold": 30,
+    "rewardGold": 80
+  }
+}

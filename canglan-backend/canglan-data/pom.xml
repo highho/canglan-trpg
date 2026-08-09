@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.canglan</groupId>
+    <artifactId>canglan-backend</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>canglan-data</artifactId>
+  <name>canglan-data</name>
+  <description>JSON 配置加载 + 注册表初始化（Bootstrap 顺序编排）+ 轻量 JSON 解析器。</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.canglan</groupId>
+      <artifactId>canglan-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

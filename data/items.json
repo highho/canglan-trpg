@@ -74,5 +74,13 @@
   "forest_cloak": { "name": "森林斗篷", "type": "EQUIPMENT", "value": 280, "description": "精灵织就的伪装斗篷", "maxStack": 1 },
   "lucky_ring": { "name": "幸运戒指", "type": "EQUIPMENT", "value": 400, "description": "提升掉落运气的戒指", "maxStack": 1 },
   "jade_ring": { "name": "翡翠戒指", "type": "EQUIPMENT", "value": 320, "description": "温润的翡翠指环", "maxStack": 1 },
-  "night_goggles": { "name": "夜视镜", "type": "EQUIPMENT", "value": 250, "description": "提升视野的护目镜", "maxStack": 1 }
+  "night_goggles": { "name": "夜视镜", "type": "EQUIPMENT", "value": 250, "description": "提升视野的护目镜", "maxStack": 1 },
+  "torch": { "name": "火把", "type": "CONSUMABLE", "value": 10, "description": "照亮前路，驱散黑暗中的怯意", "maxStack": 20 },
+  "gold_ingot": { "name": "金锭", "type": "MATERIAL", "value": 400, "description": "锻造传说装备的核心材料", "maxStack": 20 },
+  "greater_healing_potion": { "name": "大治疗药水", "type": "CONSUMABLE", "value": 120, "description": "恢复80点生命，勇者的信赖之选", "maxStack": 20 },
+  "raw_meat": { "name": "生肉", "type": "CONSUMABLE", "value": 6, "description": "未经烹制的肉，勉强充饥", "maxStack": 30 },
+  "fish": { "name": "鲜鱼", "type": "CONSUMABLE", "value": 5, "description": "活蹦乱跳的河鱼", "maxStack": 30 },
+  "enchanted_essence": { "name": "附魔精华", "type": "MATERIAL", "value": 100, "description": "蕴含着元素力量的结晶，附魔必备", "maxStack": 10 },
+  "shadow_essence": { "name": "暗影精华", "type": "MATERIAL", "value": 150, "description": "从暗影生物体内提取的精华", "maxStack": 10 },
+  "dragon_heart": { "name": "龙之心", "type": "MATERIAL", "value": 500, "description": "传说巨龙的炽热心脏，至宝", "maxStack": 3 }
 }

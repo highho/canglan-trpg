@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>苍岚大陆</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <!-- ==================== 页面 1：开始界面 ==================== -->
+  <section id="page-start" class="page">
+    <div class="stack">
+      <h1 class="title">苍岚大陆</h1>
+      <p class="subtitle">标签驱动的 TRPG 冒险</p>
+      <button id="btn-new-game" class="menu-btn">开始游戏</button>
+      <button id="btn-load-game" class="menu-btn">读取存档</button>
+      <button id="btn-exit" class="menu-btn">退出</button>
+      <p id="start-ai-status" class="hint"></p>
+    </div>
+  </section>
+
+  <!-- ==================== 页面 2：存档位选择 ==================== -->
+  <section id="page-save-select" class="page">
+    <div class="stack">
+      <h1 id="save-page-title" class="title">选择存档位</h1>
+      <div id="save-slots" class="slot-list"></div>
+      <button id="btn-save-back" class="menu-btn">返回</button>
+    </div>
+  </section>
+
+  <!-- ==================== 页面 3：创建角色 ==================== -->
+  <section id="page-creation" class="page">
+    <div class="stack stack-wide">
+      <h1 class="title">创建角色</h1>
+
+      <div class="name-row">
+        <label for="creation-name">角色名</label>
+        <input id="creation-name" type="text" placeholder="输入你的名字" />
+      </div>
+
+      <h2 class="group-header">血脉（进阶种族需在冒险中进化）</h2>
+      <div id="race-choices" class="btn-row"></div>
+
+      <h2 class="group-header">道路（进阶职业需在冒险中转职）</h2>
+      <div id="class-choices" class="btn-row"></div>
+
+      <h2 class="group-header">出身特质（随血脉与道路过滤）</h2>
+      <div id="trait-choices" class="btn-row"></div>
+
+      <h2 class="group-header">难度（决定敌人强度、生存消耗与掉落）</h2>
+      <div id="difficulty-choices" class="btn-row"></div>
+      <p id="difficulty-text" class="hint"></p>
+
+      <p id="creation-summary" class="summary"></p>
+
+      <div class="btn-row">
+        <button id="btn-begin" class="menu-btn">开始冒险</button>
+        <button id="btn-creation-back" class="menu-btn">返回</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 页面 4：游戏主界面（纵向流：状态 + 叙事 + 行动 + 功能栏） ==================== -->
+  <section id="page-game" class="page game-page">
+
+    <header class="hud">
+      <div class="hud-line">
+        <span id="hud-time"></span>
+        <span id="hud-coord"></span>
+        <span>难度 <span id="hud-difficulty"></span></span>
+        <span id="hud-overload" hidden>超重</span>
+        <span class="hud-ops">
+          <button id="btn-status" class="link-btn">状态</button>
+          <button id="btn-menu" class="link-btn">菜单</button>
+        </span>
+      </div>
+      <div class="hud-line" id="hud-vitals"></div>
+      <div class="hud-line" id="hud-combat"></div>
+    </header>
+
+    <div id="narration" class="narration"></div>
+
+    <div class="action-area">
+      <div class="group-title">移动</div>
+      <div id="move-buttons" class="btn-row"></div>
+
+      <div class="group-title">行动</div>
+      <div id="action-buttons" class="btn-row"></div>
+
+      <div id="nearby-block" hidden>
+        <div class="group-title">附近</div>
+        <div id="nearby-cards" class="btn-row"></div>
+      </div>
+
+      <div id="dialog-block" hidden>
+        <div class="group-title">对话</div>
+        <div id="dialog-buttons" class="btn-row"></div>
+      </div>
+
+      <div class="group-title">物品（点击使用）</div>
+      <div id="quick-slots" class="btn-row"></div>
+    </div>
+
+    <nav class="tab-bar">
+      <button class="tab-btn" data-panel="map">探索</button>
+      <button class="tab-btn" data-panel="bag">行囊</button>
+      <button class="tab-btn" data-panel="skill">技能</button>
+      <button class="tab-btn" data-panel="recipe">制造</button>
+      <button class="tab-btn" data-panel="quest">委托</button>
+      <button class="tab-btn" data-panel="home">家园</button>
+      <button class="tab-btn" data-panel="codex">图鉴</button>
+      <button class="tab-btn" data-panel="settings">设置</button>
+    </nav>
+
+    <!-- 覆盖层：遮罩仅作视觉暗层（不拦截点击），面板居中 -->
+    <div id="overlay-mask" class="overlay-mask" hidden></div>
+    <div id="overlay-panel" class="overlay-panel" hidden>
+      <div class="overlay-head">
+        <h2 id="overlay-title" class="overlay-title"></h2>
+        <button id="overlay-close" class="menu-btn">关闭</button>
+      </div>
+      <div id="overlay-body" class="overlay-body"></div>
+    </div>
+
+  </section>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

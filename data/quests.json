@@ -5,9 +5,15 @@
     "minLevel": 1,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 50, "healing_potion": 2 },
+    "rewards": {
+      "gold": 50,
+      "healing_potion": 2
+    },
     "edges": [
-      { "to": "guild_registration", "description": "完成狩猎后前往公会注册" }
+      {
+        "to": "guild_registration",
+        "description": "完成狩猎后前往公会注册"
+      }
     ]
   },
   "guild_registration": {
@@ -15,18 +21,57 @@
     "description": "成为冒险者公会的正式成员",
     "minLevel": 1,
     "cooldown": 0,
-    "rewardTagIds": ["公会成员"],
-    "rewards": { "gold": 20 },
+    "rewardTagIds": [
+      "公会成员"
+    ],
+    "rewards": {
+      "gold": 20
+    },
     "edges": [
-      { "to": "iron_delivery", "condition": "HasTag(公会成员)", "description": "承接公会物流委托" },
-      { "to": "rat_problem", "description": "粮仓告急，接下除鼠委托" },
-      { "to": "escort_caravan", "condition": "HasTag(公会成员)", "description": "护送商队穿越山道" },
-      { "to": "king_courier", "condition": "HasTag(公会成员)", "description": "承接王国密信护送" },
-      { "to": "herb_collection", "condition": "HasTag(公会成员)", "description": "承接药草采集委托" },
-      { "to": "fishing_tournament", "condition": "HasTag(钓鱼)", "description": "报名参加钓鱼大赛" },
-      { "to": "shadow_contract", "condition": "HasTag(潜行)", "description": "西巷的阴影向你递出契约" },
-      { "to": "ancient_ruins_explore", "condition": "HasTag(考古)", "description": "学者芬恩委托你勘探古城" },
-      { "to": "dragon_slay", "condition": "HasTag(公会成员)", "description": "接受S级讨伐令" }
+      {
+        "to": "iron_delivery",
+        "condition": "HasTag(公会成员)",
+        "description": "承接公会物流委托"
+      },
+      {
+        "to": "rat_problem",
+        "description": "粮仓告急，接下除鼠委托"
+      },
+      {
+        "to": "escort_caravan",
+        "condition": "HasTag(公会成员)",
+        "description": "护送商队穿越山道"
+      },
+      {
+        "to": "king_courier",
+        "condition": "HasTag(公会成员)",
+        "description": "承接王国密信护送"
+      },
+      {
+        "to": "herb_collection",
+        "condition": "HasTag(公会成员)",
+        "description": "承接药草采集委托"
+      },
+      {
+        "to": "fishing_tournament",
+        "condition": "HasTag(钓鱼)",
+        "description": "报名参加钓鱼大赛"
+      },
+      {
+        "to": "shadow_contract",
+        "condition": "HasTag(潜行)",
+        "description": "西巷的阴影向你递出契约"
+      },
+      {
+        "to": "ancient_ruins_explore",
+        "condition": "HasTag(考古)",
+        "description": "学者芬恩委托你勘探古城"
+      },
+      {
+        "to": "dragon_slay",
+        "condition": "HasTag(公会成员)",
+        "description": "接受S级讨伐令"
+      }
     ]
   },
   "rat_problem": {
@@ -35,9 +80,15 @@
     "minLevel": 1,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 60, "travel_rations": 3 },
+    "rewards": {
+      "gold": 60,
+      "travel_rations": 3
+    },
     "edges": [
-      { "to": "wolf_hunt", "description": "村外狼群开始袭扰牧场" }
+      {
+        "to": "wolf_hunt",
+        "description": "村外狼群开始袭扰牧场"
+      }
     ]
   },
   "wolf_hunt": {
@@ -45,11 +96,24 @@
     "description": "清剿袭扰牧场的狼群，还森林边缘以安宁",
     "minLevel": 2,
     "cooldown": 0,
-    "rewardTagIds": ["猎狼人"],
-    "rewards": { "gold": 150, "hunter_bow": 1 },
+    "rewardTagIds": [
+      "猎狼人"
+    ],
+    "rewards": {
+      "gold": 150,
+      "hunter_bow": 1
+    },
     "edges": [
-      { "to": "forest_pact", "condition": "HasTag(猎狼人)", "description": "猎人的信物为你打开了深林之门" },
-      { "to": "beast_slay", "condition": "HasTag(猎狼人)", "description": "山脉边缘出现了食人魔的踪迹" }
+      {
+        "to": "forest_pact",
+        "condition": "HasTag(猎狼人)",
+        "description": "猎人的信物为你打开了深林之门"
+      },
+      {
+        "to": "beast_slay",
+        "condition": "HasTag(猎狼人)",
+        "description": "山脉边缘出现了食人魔的踪迹"
+      }
     ]
   },
   "forest_pact": {
@@ -57,11 +121,24 @@
     "description": "获得森林的认可，与林中的生灵立下互不侵犯的盟约",
     "minLevel": 2,
     "cooldown": 0,
-    "rewardTagIds": ["森林之友"],
-    "rewards": { "gold": 100, "forest_cloak": 1 },
+    "rewardTagIds": [
+      "森林之友"
+    ],
+    "rewards": {
+      "gold": 100,
+      "forest_cloak": 1
+    },
     "edges": [
-      { "to": "plague_investigation", "condition": "HasTag(森林之友)", "description": "深林中传来瘟疫的消息" },
-      { "to": "tamer_trial", "condition": "HasTag(驯兽)", "description": "卡鲁邀你参加驯兽试炼" }
+      {
+        "to": "plague_investigation",
+        "condition": "HasTag(森林之友)",
+        "description": "深林中传来瘟疫的消息"
+      },
+      {
+        "to": "tamer_trial",
+        "condition": "HasTag(驯兽)",
+        "description": "卡鲁邀你参加驯兽试炼"
+      }
     ]
   },
   "plague_investigation": {
@@ -70,9 +147,15 @@
     "minLevel": 3,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 200, "antidote": 2 },
+    "rewards": {
+      "gold": 200,
+      "antidote": 2
+    },
     "edges": [
-      { "to": "plague_cure", "description": "样本已到手，寻找解药的关键材料" }
+      {
+        "to": "plague_cure",
+        "description": "样本已到手，寻找解药的关键材料"
+      }
     ]
   },
   "plague_cure": {
@@ -80,8 +163,13 @@
     "description": "采集王者之叶，调制解药，阻止瘟疫蔓延",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["瘟疫克星"],
-    "rewards": { "gold": 400, "elixir": 1 },
+    "rewardTagIds": [
+      "瘟疫克星"
+    ],
+    "rewards": {
+      "gold": 400,
+      "elixir": 1
+    },
     "edges": []
   },
   "ancient_ruins_explore": {
@@ -89,10 +177,19 @@
     "description": "深入古王国都城遗址，找到宝库钥匙并记录铭文",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["古城探索者"],
-    "rewards": { "gold": 300, "ancient_coin": 2 },
+    "rewardTagIds": [
+      "古城探索者"
+    ],
+    "rewards": {
+      "gold": 300,
+      "ancient_coin": 2
+    },
     "edges": [
-      { "to": "golem_core", "condition": "HasTag(古城探索者)", "description": "宝库深处的魔像仍在运转" }
+      {
+        "to": "golem_core",
+        "condition": "HasTag(古城探索者)",
+        "description": "宝库深处的魔像仍在运转"
+      }
     ]
   },
   "golem_core": {
@@ -101,7 +198,10 @@
     "minLevel": 4,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 500, "magic_crystal": 2 },
+    "rewards": {
+      "gold": 500,
+      "magic_crystal": 2
+    },
     "edges": []
   },
   "king_courier": {
@@ -109,10 +209,19 @@
     "description": "护送国王的密信穿越强盗出没的山道，送达边境要塞",
     "minLevel": 2,
     "cooldown": 0,
-    "rewardTagIds": ["王国信使"],
-    "rewards": { "gold": 250, "stamina_potion": 2 },
+    "rewardTagIds": [
+      "王国信使"
+    ],
+    "rewards": {
+      "gold": 250,
+      "stamina_potion": 2
+    },
     "edges": [
-      { "to": "mine_guard", "condition": "HasTag(王国信使)", "description": "要塞司令请你驰援矿道" }
+      {
+        "to": "mine_guard",
+        "condition": "HasTag(王国信使)",
+        "description": "要塞司令请你驰援矿道"
+      }
     ]
   },
   "mine_guard": {
@@ -120,10 +229,19 @@
     "description": "清剿矿道中游荡的骷髅兵，恢复采矿作业",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["矿脉守望者"],
-    "rewards": { "gold": 300, "silver_ingot": 2 },
+    "rewardTagIds": [
+      "矿脉守望者"
+    ],
+    "rewards": {
+      "gold": 300,
+      "silver_ingot": 2
+    },
     "edges": [
-      { "to": "ghost_peace", "condition": "HasTag(矿脉守望者)", "description": "矿道深处传来幽怨的哭声" }
+      {
+        "to": "ghost_peace",
+        "condition": "HasTag(矿脉守望者)",
+        "description": "矿道深处传来幽怨的哭声"
+      }
     ]
   },
   "ghost_peace": {
@@ -132,7 +250,10 @@
     "minLevel": 4,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 350, "holy_symbol": 1 },
+    "rewards": {
+      "gold": 350,
+      "holy_symbol": 1
+    },
     "edges": []
   },
   "temple_trial": {
@@ -140,10 +261,19 @@
     "description": "通过圣殿的三重试炼，成为光荣的圣殿骑士",
     "minLevel": 4,
     "cooldown": 0,
-    "rewardTagIds": ["圣殿骑士"],
-    "rewards": { "gold": 400, "temple_badge": 1 },
+    "rewardTagIds": [
+      "圣殿骑士"
+    ],
+    "rewards": {
+      "gold": 400,
+      "temple_badge": 1
+    },
     "edges": [
-      { "to": "dark_purge", "condition": "HasTag(圣殿骑士)", "description": "黑暗教徒的祭坛就在城外" }
+      {
+        "to": "dark_purge",
+        "condition": "HasTag(圣殿骑士)",
+        "description": "黑暗教徒的祭坛就在城外"
+      }
     ]
   },
   "dark_purge": {
@@ -152,7 +282,10 @@
     "minLevel": 5,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 600, "knight_plate": 1 },
+    "rewards": {
+      "gold": 600,
+      "knight_plate": 1
+    },
     "edges": []
   },
   "shadow_contract": {
@@ -160,8 +293,13 @@
     "description": "与盗贼影签下契约，完成一次只针对为富不仁者的行动",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["暗影行者"],
-    "rewards": { "gold": 400, "shadow_ring": 1 },
+    "rewardTagIds": [
+      "暗影行者"
+    ],
+    "rewards": {
+      "gold": 400,
+      "shadow_ring": 1
+    },
     "edges": []
   },
   "fishing_tournament": {
@@ -169,10 +307,19 @@
     "description": "在河中钓起最大的鱼，夺得鱼王称号",
     "minLevel": 2,
     "cooldown": 0,
-    "rewardTagIds": ["渔王"],
-    "rewards": { "gold": 200, "trophy_fish": 1 },
+    "rewardTagIds": [
+      "渔王"
+    ],
+    "rewards": {
+      "gold": 200,
+      "trophy_fish": 1
+    },
     "edges": [
-      { "to": "gourmet_challenge", "condition": "HasTag(渔王)", "description": "厨师咪咪向你发出美食挑战" }
+      {
+        "to": "gourmet_challenge",
+        "condition": "HasTag(渔王)",
+        "description": "厨师咪咪向你发出美食挑战"
+      }
     ]
   },
   "gourmet_challenge": {
@@ -180,8 +327,13 @@
     "description": "尝遍村里的名菜，集齐百味食客的美誉",
     "minLevel": 2,
     "cooldown": 0,
-    "rewardTagIds": ["美食家"],
-    "rewards": { "gold": 150, "hearty_stew": 3 },
+    "rewardTagIds": [
+      "美食家"
+    ],
+    "rewards": {
+      "gold": 150,
+      "hearty_stew": 3
+    },
     "edges": []
   },
   "tamer_trial": {
@@ -189,8 +341,12 @@
     "description": "安抚暴走的野兽，通过卡鲁的驯兽试炼",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["驯兽大师"],
-    "rewards": { "gold": 250 },
+    "rewardTagIds": [
+      "驯兽大师"
+    ],
+    "rewards": {
+      "gold": 250
+    },
     "edges": []
   },
   "beast_slay": {
@@ -198,8 +354,13 @@
     "description": "讨伐盘踞山脉边缘的食人魔，保护商路安全",
     "minLevel": 4,
     "cooldown": 0,
-    "rewardTagIds": ["屠兽者"],
-    "rewards": { "gold": 450, "guardian_shield": 1 },
+    "rewardTagIds": [
+      "屠兽者"
+    ],
+    "rewards": {
+      "gold": 450,
+      "guardian_shield": 1
+    },
     "edges": []
   },
   "escort_caravan": {
@@ -208,7 +369,9 @@
     "minLevel": 2,
     "cooldown": 8,
     "rewardTagIds": [],
-    "rewards": { "gold": 180 },
+    "rewards": {
+      "gold": 180
+    },
     "edges": []
   },
   "herb_collection": {
@@ -217,7 +380,10 @@
     "minLevel": 1,
     "cooldown": 6,
     "rewardTagIds": [],
-    "rewards": { "gold": 80, "healing_potion": 1 },
+    "rewards": {
+      "gold": 80,
+      "healing_potion": 1
+    },
     "edges": []
   },
   "iron_delivery": {
@@ -226,9 +392,15 @@
     "minLevel": 1,
     "cooldown": 10,
     "rewardTagIds": [],
-    "rewards": { "gold": 100 },
+    "rewards": {
+      "gold": 100
+    },
     "edges": [
-      { "to": "ore_quota", "condition": "HasTag(锻造)", "description": "汉斯需要一批精钢原料" }
+      {
+        "to": "ore_quota",
+        "condition": "HasTag(锻造)",
+        "description": "汉斯需要一批精钢原料"
+      }
     ]
   },
   "ore_quota": {
@@ -237,7 +409,9 @@
     "minLevel": 2,
     "cooldown": 12,
     "rewardTagIds": [],
-    "rewards": { "gold": 220 },
+    "rewards": {
+      "gold": 220
+    },
     "edges": []
   },
   "dragonkin_legacy": {
@@ -246,7 +420,10 @@
     "minLevel": 5,
     "cooldown": 0,
     "rewardTagIds": [],
-    "rewards": { "gold": 800, "dragon_scale": 1 },
+    "rewards": {
+      "gold": 800,
+      "dragon_scale": 1
+    },
     "edges": []
   },
   "dragon_slay": {
@@ -254,10 +431,19 @@
     "description": "讨伐盘踞深山的巨龙",
     "minLevel": 5,
     "cooldown": 0,
-    "rewardTagIds": ["屠龙者"],
-    "rewards": { "gold": 5000, "屠龙者徽章": 1 },
+    "rewardTagIds": [
+      "屠龙者"
+    ],
+    "rewards": {
+      "gold": 5000,
+      "屠龙者徽章": 1
+    },
     "edges": [
-      { "to": "blood_awakening", "condition": "HasTag(屠龙者)", "description": "龙血引发血脉异变" }
+      {
+        "to": "blood_awakening",
+        "condition": "HasTag(屠龙者)",
+        "description": "龙血引发血脉异变"
+      }
     ]
   },
   "blood_awakening": {
@@ -265,10 +451,18 @@
     "description": "屠龙之后，龙族血脉在你体内觉醒",
     "minLevel": 5,
     "cooldown": 0,
-    "rewardTagIds": ["龙血觉醒"],
-    "rewards": { "gold": 500 },
+    "rewardTagIds": [
+      "龙血觉醒"
+    ],
+    "rewards": {
+      "gold": 500
+    },
     "edges": [
-      { "to": "dragonkin_legacy", "condition": "HasTag(龙血觉醒)", "description": "血脉记忆指引你前往龙裔遗迹" }
+      {
+        "to": "dragonkin_legacy",
+        "condition": "HasTag(龙血觉醒)",
+        "description": "血脉记忆指引你前往龙裔遗迹"
+      }
     ]
   },
   "oath_of_light": {
@@ -276,10 +470,18 @@
     "description": "在神殿立下光明誓约，踏上天使进化之路",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["光明誓约"],
-    "rewards": { "gold": 200 },
+    "rewardTagIds": [
+      "光明誓约"
+    ],
+    "rewards": {
+      "gold": 200
+    },
     "edges": [
-      { "to": "temple_trial", "condition": "HasTag(光明誓约)", "description": "圣殿向你发出骑士试炼的邀请" }
+      {
+        "to": "temple_trial",
+        "condition": "HasTag(光明誓约)",
+        "description": "圣殿向你发出骑士试炼的邀请"
+      }
     ]
   },
   "path_of_fall": {
@@ -287,10 +489,50 @@
     "description": "接受黑暗的低语，获得堕落之印（不可逆）",
     "minLevel": 3,
     "cooldown": 0,
-    "rewardTagIds": ["堕落之印"],
-    "rewards": { "gold": 300 },
+    "rewardTagIds": [
+      "堕落之印"
+    ],
+    "rewards": {
+      "gold": 300
+    },
     "edges": [
-      { "to": "shadow_contract", "condition": "HasTag(堕落之印)", "description": "暗影的行会向你敞开大门" }
+      {
+        "to": "shadow_contract",
+        "condition": "HasTag(堕落之印)",
+        "description": "暗影的行会向你敞开大门"
+      }
     ]
+  },
+  "elite_hunt": {
+    "name": "精英猎杀令",
+    "description": "村外出现了异变的精英野兽，猎杀一只证明你的勇气",
+    "minLevel": 6,
+    "cooldown": 20,
+    "rewardTagIds": [],
+    "rewards": {
+      "gold": 300,
+      "enchanted_essence": 1
+    },
+    "edges": [
+      {
+        "to": "world_boss_hunt",
+        "condition": "HasTag(猎人)",
+        "description": "老猎人提起传说中的荒原领主"
+      }
+    ]
+  },
+  "world_boss_hunt": {
+    "name": "荒原领主传说",
+    "description": "传闻荒原深处沉睡着一头名为「裂地者」的巨兽，无数赏金猎人折戟沉沙",
+    "minLevel": 10,
+    "cooldown": 30,
+    "rewardTagIds": [
+      "屠龙者"
+    ],
+    "rewards": {
+      "gold": 800,
+      "dragon_heart": 1
+    },
+    "edges": []
   }
 }

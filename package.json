@@ -1,0 +1,19 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "一款基于 **C# / .NET 8 + Avalonia UI 11** 的桌面文字冒险游戏（TRPG）。世界由「标签」驱动：种族进化、职业转职、任务推进、NPC 关系、采集制造全部由标签条件触发；本地 AI（LLamaSharp 直连 GGUF 模型）为 NPC 对话提供自由文本生成，离线自动降级，永不阻塞游戏。",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "typescript": "^5.9.3"
+  }
+}

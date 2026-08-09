@@ -116,5 +116,132 @@
     "baseStats": { "VISION": 2 },
     "effects": [ { "type": "FLAG", "flagName": "night_vision" } ],
     "maxDurability": 50
+  },
+
+  "flame_blade": {
+    "name": "烈焰之刃", "slot": "WEAPON", "tier": 3,
+    "baseStats": { "ATK": 18, "MATK": 5 },
+    "effects": [ { "type": "DAMAGE_MOD", "operator": "ADD", "value": 4 } ],
+    "equipCondition": "HasTag(近战)",
+    "maxDurability": 65,
+    "tagIds": ["火焰"]
+  },
+  "frost_staff": {
+    "name": "寒霜法杖", "slot": "WEAPON", "tier": 3,
+    "baseStats": { "MATK": 15, "DEF": 3 },
+    "effects": [ { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.1 } ],
+    "equipCondition": "HasTag(魔能)",
+    "maxDurability": 55,
+    "tagIds": ["寒冰"]
+  },
+  "dragon_fang": {
+    "name": "龙牙匕首", "slot": "WEAPON", "tier": 4,
+    "baseStats": { "ATK": 25, "CRIT": 0.15 },
+    "effects": [ { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.15 } ],
+    "equipCondition": "HasTag(龙裔)",
+    "maxDurability": 70,
+    "tagIds": ["龙裔"]
+  },
+  "thunder_hammer": {
+    "name": "雷霆战锤", "slot": "WEAPON", "tier": 3,
+    "baseStats": { "ATK": 22 },
+    "effects": [ { "type": "STAT_MOD", "target": "SPD", "operator": "ADD", "value": 4 } ],
+    "equipCondition": "HasTag(近战)",
+    "maxDurability": 75,
+    "tagIds": ["雷电"]
+  },
+
+  "dragon_scale_armor": {
+    "name": "龙鳞甲", "slot": "ARMOR", "tier": 4,
+    "baseStats": { "DEF": 22, "HP": 35 },
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 5 } ],
+    "equipCondition": "HasTag(龙裔)",
+    "maxDurability": 90,
+    "tagIds": ["龙裔"]
+  },
+  "mage_robe": {
+    "name": "秘法长袍", "slot": "ARMOR", "tier": 2,
+    "baseStats": { "DEF": 5, "MATK": 10 },
+    "effects": [],
+    "equipCondition": "HasTag(魔能)",
+    "maxDurability": 40,
+    "tagIds": ["魔能"]
+  },
+  "ranger_vest": {
+    "name": "游侠背心", "slot": "ARMOR", "tier": 2,
+    "baseStats": { "DEF": 8, "SPD": 4 },
+    "effects": [],
+    "equipCondition": "HasTag(弓术)",
+    "maxDurability": 50,
+    "tagIds": ["弓术"]
+  },
+  "dwarven_plate": {
+    "name": "矮人锻甲", "slot": "ARMOR", "tier": 3,
+    "baseStats": { "DEF": 18, "HP": 20 },
+    "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 4 } ],
+    "equipCondition": "HasTag(矮人)",
+    "maxDurability": 100,
+    "tagIds": ["锻造"]
+  },
+
+  "amulet_of_nature": {
+    "name": "自然护符", "slot": "ACCESSORY", "tier": 3,
+    "baseStats": { "HP": 20, "MATK": 5 },
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ],
+    "maxDurability": 60,
+    "tagIds": ["自然"]
+  },
+  "shadow_cloak": {
+    "name": "暗影斗篷", "slot": "ACCESSORY", "tier": 3,
+    "baseStats": { "SPD": 5, "CRIT": 0.08 },
+    "effects": [],
+    "equipCondition": "HasTag(暗杀)",
+    "maxDurability": 50,
+    "tagIds": ["潜行"]
+  },
+  "warrior_belt": {
+    "name": "战士腰带", "slot": "ACCESSORY", "tier": 2,
+    "baseStats": { "ATK": 5, "DEF": 4 },
+    "effects": [],
+    "equipCondition": "HasTag(近战)",
+    "maxDurability": 60,
+    "tagIds": ["近战"]
+  },
+  "alchemist_pouch": {
+    "name": "炼金囊", "slot": "ACCESSORY", "tier": 2,
+    "baseStats": { "MATK": 6 },
+    "effects": [ { "type": "FLAG", "flagName": "alchemy_boost" } ],
+    "maxDurability": 40
+  },
+
+  "ring_of_flame": {
+    "name": "烈焰之戒", "slot": "RING1", "tier": 3,
+    "baseStats": { "ATK": 5, "MATK": 5 },
+    "effects": [],
+    "maxDurability": 70,
+    "tagIds": ["火焰"]
+  },
+  "ring_of_frost": {
+    "name": "寒霜之戒", "slot": "RING2", "tier": 3,
+    "baseStats": { "DEF": 4, "MATK": 4 },
+    "effects": [],
+    "maxDurability": 70,
+    "tagIds": ["寒冰"]
+  },
+  "holy_ring": {
+    "name": "圣光之戒", "slot": "RING1", "tier": 3,
+    "baseStats": { "HP": 20, "MATK": 6 },
+    "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ],
+    "equipCondition": "HasTag(圣光术)",
+    "maxDurability": 80,
+    "tagIds": ["圣光"]
+  },
+  "ring_of_shadow": {
+    "name": "暗夜之戒", "slot": "RING2", "tier": 3,
+    "baseStats": { "ATK": 6, "SPD": 3 },
+    "effects": [],
+    "equipCondition": "HasTag(暗杀)",
+    "maxDurability": 55,
+    "tagIds": ["黑暗"]
   }
 }

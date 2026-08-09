@@ -1,0 +1,9 @@
+# Maven / javac 构建产物
+target/
+build-core/
+build-all/
+*.class
+
+# 编译用的临时源文件清单与冒烟测试存档
+sources.txt
+build-save-test/
