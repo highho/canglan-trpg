@@ -21,6 +21,9 @@ async function get(path) {
 }
 export const api = {
     health: () => get('/api/health'),
+    aiConfig: () => get('/api/ai/config'),
+    saveAiConfig: (cfg) => post('/api/ai/config', cfg),
+    testAi: (cfg) => post('/api/ai/test', cfg),
     newGame: (difficulty) => post('/api/game/new', { difficulty: difficulty ?? '' }),
     creationOptions: (race, clazz) => {
         const q = new URLSearchParams();

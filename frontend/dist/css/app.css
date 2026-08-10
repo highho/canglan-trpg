@@ -279,6 +279,15 @@ input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px
   .map-grid { font-size: 11px; grid-template-columns: repeat(50, 1.1em); }
 }
 
+/* ═══ AI 供应商设置（body 级覆盖层：固定定位，起始页/游戏内共用） ═══ */
+#ai-mask { position: fixed; }
+#ai-panel { position: fixed; }
+.form-row { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+.form-row-col { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; font-size: 14px; }
+.form-row-col input { width: 100%; box-sizing: border-box; }
+.hint.ok { color: var(--ok); }
+.hint.err { color: var(--danger); }
+
 /* ═══ 动效偏好：减少动画 ═══ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

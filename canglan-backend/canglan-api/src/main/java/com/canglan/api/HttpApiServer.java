@@ -13,6 +13,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import com.canglan.ai.AiProviderSettings;
+import com.canglan.ai.OpenAiCompatClient;
 import com.canglan.core.graph.ClassNode;
 import com.canglan.core.graph.QuestNode;
 import com.canglan.core.graph.RaceNode;
@@ -48,6 +50,9 @@ import com.canglan.world.equipment.Equip;
  *   GET  /api/panel/{name}     覆盖层面板数据（char/bag/skill/quest/home/recipe/settings/map/codex）
  *   GET  /api/creation/options 创建页选项（血脉/道路/特质，随选择过滤）
  *   POST /api/game/start       一步建档（name/race/clazz/trait/difficulty）→ 会话 + 完整叙事
+ *   GET  /api/ai/config        AI 供应商配置（启用/地址/密钥/模型）
+ *   POST /api/ai/config        保存供应商配置（立即生效 + 持久化）
+ *   POST /api/ai/test          按载荷配置试连供应商（不落盘）
  *   非 /api 路径               静态托管 frontend/dist（P8 前端产物）
  * CORS 头与 OPTIONS 预检由 MiniHttpServer 统一处理。
  */
@@ -67,6 +72,7 @@ public final class HttpApiServer {
         this.dataDir = dataDir;
         this.saveDir = saveDir;
         this.staticDir = staticDir;
+        AiProviderSettings.init(saveDir.resolve("ai-config.json"));   // 供应商配置：文件 > 系统属性播种
     }
 
     /** 会话注册表只读视图（冒烟测试用）。 */
@@ -85,6 +91,8 @@ public final class HttpApiServer {
         server.route("/api/game/state", this::handleState);
         server.route("/api/game/start", this::handleStart);
         server.route("/api/creation/options", this::handleCreationOptions);
+        server.route("/api/ai/config", this::handleAiConfig);
+        server.route("/api/ai/test", this::handleAiTest);
         server.route("/api/panel/", this::handlePanel);
         server.route("/", this::handleStatic);
         server.start(port);
@@ -108,8 +116,58 @@ public final class HttpApiServer {
         // AI 可用性：取任一会话的 AiClient 状态（无会话时视为不可用）
         boolean aiUp = sessions.values().stream().anyMatch(gs -> gs.ai.isAvailable());
         body.put("aiAvailable", aiUp);
+        body.put("llm", AiProviderSettings.llmEnabled());   // 供应商是否已配置并启用
         body.put("sessions", sessions.size());
         sendJson(resp, 200, body);
+    }
+
+    /** GET/POST /api/ai/config：AI 供应商配置（本地模型服务与云端模型同构：地址/密钥/模型）。 */
+    private void handleAiConfig(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if ("POST".equals(req.method)) {
+            JsonValue body = readJson(req);
+            if (body == null) {
+                sendError(resp, 400, "请求体需为 JSON 对象 {enabled, baseUrl, apiKey, model}");
+                return;
+            }
+            AiProviderSettings.update(new AiProviderSettings.Config(
+                    body.getBoolean("enabled", false),
+                    body.getString("baseUrl", "").trim(),
+                    body.getString("apiKey", "").trim(),
+                    body.getString("model", "").trim()));
+        } else if (!requireMethod(req, resp, "GET")) {
+            return;
+        }
+        AiProviderSettings.Config c = AiProviderSettings.get();
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("enabled", c.enabled());
+        out.put("baseUrl", c.baseUrl());
+        out.put("apiKey", c.apiKey());
+        out.put("model", c.model());
+        sendJson(resp, 200, out);
+    }
+
+    /** POST /api/ai/test：按载荷配置试连供应商（不落盘）；结果以 {ok, reply|error} 返回，永不 5xx。 */
+    private void handleAiTest(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "POST")) return;
+        JsonValue body = readJson(req);
+        String baseUrl = body == null ? "" : body.getString("baseUrl", "").trim();
+        if (baseUrl.isBlank()) {
+            sendError(resp, 400, "服务地址不能为空");
+            return;
+        }
+        String model = body.getString("model", "").trim();
+        OpenAiCompatClient probe = new OpenAiCompatClient(baseUrl,
+                body.getString("apiKey", "").trim(), model.isBlank() ? "local-model" : model, 8_000);
+        String reply = probe.complete("你是文字冒险游戏里的村长，请用一句简短的中文问候玩家。", 48);
+        Map<String, Object> out = new LinkedHashMap<>();
+        if (reply != null) {
+            out.put("ok", true);
+            out.put("reply", reply);
+        } else {
+            out.put("ok", false);
+            out.put("error", "无法连接供应商或生成失败：请核对服务地址、API 密钥与模型名（云端需含 /v1 前缀的 OpenAI 兼容地址）");
+        }
+        sendJson(resp, 200, out);
     }
 
     private void handleNew(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {

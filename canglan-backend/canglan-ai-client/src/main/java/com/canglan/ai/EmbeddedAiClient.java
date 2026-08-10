@@ -8,7 +8,7 @@ import java.util.Random;
  * EmbeddedAiClient — ai-service/main.py LangGraph 管线的 Java 内嵌移植。
  * 管线：召回记忆 → 构建 prompt → LLM 生成（可选，失败降级）→ 安全过滤 → 写入记忆。
  * 零依赖、Android 兼容：APK 单机形态无需 Python 服务即可享有二层记忆对话；
- * 配置 -Dcanglan.ai.llm.url（OpenAI 兼容端点）后启用真模型生成。
+ * LLM 供应商经 {@link AiProviderSettings} 运行时配置（本地模型服务/云端模型，立即生效）。
  * 铁律：永不抛异常；无 LLM 或 LLM 失败时走带记忆召回的规则回复。
  */
 public final class EmbeddedAiClient implements AiClient {
@@ -18,13 +18,11 @@ public final class EmbeddedAiClient implements AiClient {
     private static final int REPLY_LIMIT = 200;
 
     private final NpcMemoryStore memory;
-    private final OpenAiCompatClient llm;   // 可为 null（纯规则模式）
     private final AiCircuitBreaker breaker;
     private final RuleFallbackService fallback;
 
-    public EmbeddedAiClient(Random rng, NpcMemoryStore memory, OpenAiCompatClient llm) {
+    public EmbeddedAiClient(Random rng, NpcMemoryStore memory) {
         this.memory = memory;
-        this.llm = llm;
         this.breaker = new AiCircuitBreaker(3, 30_000);
         this.fallback = new RuleFallbackService(rng);
     }
@@ -43,6 +41,7 @@ public final class EmbeddedAiClient implements AiClient {
             String prompt = buildPrompt(req, mem);         // 构建 prompt
             String text = null;
             boolean fromLlm = false;
+            OpenAiCompatClient llm = AiProviderSettings.client();   // 供应商运行时配置（可动态切换）
             if (llm != null && breaker.allowRequest()) {   // LLM 生成（含熔断）
                 text = llm.complete(prompt);
                 if (text != null) {

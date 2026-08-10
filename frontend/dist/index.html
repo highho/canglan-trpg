@@ -16,6 +16,7 @@
       <p class="subtitle">标签驱动的 TRPG 冒险</p>
       <button id="btn-new-game" class="menu-btn">开始游戏</button>
       <button id="btn-load-game" class="menu-btn">读取存档</button>
+      <button id="btn-ai-settings" class="menu-btn">AI 设置</button>
       <button id="btn-exit" class="menu-btn">退出</button>
       <p id="start-ai-status" class="hint"></p>
     </div>
@@ -125,6 +126,16 @@
     </div>
 
   </section>
+
+  <!-- ==================== AI 供应商设置（起始页与游戏内共用，body 级） ==================== -->
+  <div id="ai-mask" class="overlay-mask" hidden></div>
+  <div id="ai-panel" class="overlay-panel" hidden>
+    <div class="overlay-head">
+      <h2 class="overlay-title">AI 设置（供应商接入）</h2>
+      <button id="ai-settings-close" class="menu-btn">关闭</button>
+    </div>
+    <div id="ai-settings-body" class="overlay-body"></div>
+  </div>
 
   <script type="module" src="main.js"></script>
 </body>

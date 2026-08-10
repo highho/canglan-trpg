@@ -56,14 +56,14 @@ node_modules\.bin\tsc.cmd -p frontend\tsconfig.json
 java "-Dfile.encoding=UTF-8" -cp build-all com.canglan.api.HttpApiServer data saves-frontend 8792 frontend\dist
 # 浏览器打开 http://localhost:8792/
 
-# 4. 回归测试（七套共 235 断言，一键运行或单套执行，详见 ACCEPTANCE.md）
+# 4. 回归测试（七套共 243 断言，一键运行或单套执行，详见 ACCEPTANCE.md）
 node run-regress.js
 java -cp build-all com.canglan.data.BootstrapSmokeTest data        # 14
 java -cp build-all com.canglan.world.WorldSmokeTest data            # 33
 java -cp build-all com.canglan.world.battle.BattleSmokeTest data    # 71
 java -cp build-all com.canglan.save.SaveRoundTripSmokeTest data build-save-test   # 26
-java -cp build-all com.canglan.api.ApiSmokeTest data build-api-test               # 59
-java -cp build-all com.canglan.ai.AiSmokeTest data                                # 19
+java -cp build-all com.canglan.api.ApiSmokeTest data build-api-test               # 64
+java -cp build-all com.canglan.ai.AiSmokeTest data                                # 22
 java -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test         # 13
 ```
 
@@ -82,15 +82,15 @@ java -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test       
 - **Android 形态**：APK 启动时将 assets 中的 data/web 解压到应用内部存储，后台线程起本地 HTTP 服务（仅回环监听，随机端口），WebView 加载 127.0.0.1；存档存应用沙箱，卸载即清。debug 签名仅供侧载安装。
 - **构建路径**：Android 构建经 `C:\canglan-trpg` 目录联接（ASCII 路径）执行，规避 aapt2 不支持中文/# 路径的问题；无 Gradle/Maven，纯 javac + d8 + aapt2 + zipalign + apksigner。
 
-## AI 模块（内嵌管线，零依赖）
+## AI 模块（内嵌管线 + 供应商接入，零依赖）
 
 NPC 自由对话由 `canglan-ai-client` 内嵌管线驱动（Python `ai-service/main.py` 的 Java 移植，Android 兼容）：召回记忆 → 构建 prompt → LLM 生成（可选）→ 安全过滤 → 写入记忆；记忆以 `saveDir/memories.json` 持久化（个体 npcId + 群体 group:village/guild，上限 500 条）。接入优先级：
 
-1. **外部 AI 服务**（可选）：`-Dcanglan.ai.url=http://localhost:8000` 指向 `ai-service/main.py`（Python LangGraph 版），探活失败自动降级内嵌管线；
-2. **LLM 端点**（可选）：`-Dcanglan.ai.llm.url=<OpenAI 兼容端点>`（如 llama.cpp server/Ollama/远程 API，模型名 `-Dcanglan.ai.llm.model`），启用真模型生成；失败自动降级规则回复（含熔断）；
-3. **默认形态**：无外部服务、无 LLM 时，内嵌规则引擎 + 记忆召回兜底；`-Dcanglan.ai.url=off` 可显式完全禁用。
+1. **外部 AI 服务**（可选）：`-Dcanglan.ai.url=http://localhost:8000` 指向 `ai-service/main.py`（Python LangGraph 版），探活失败自动降级内嵌管线；`-Dcanglan.ai.url=off` 显式完全禁用；
+2. **LLM 供应商接入**（设置页配置）：起始页「AI 设置」（游戏内设置面板亦可）选择供应商——本地模型服务（Ollama/llama.cpp，免密钥）或云端模型（DeepSeek/OpenAI/Kimi/GLM/通义千问等，需 API 密钥），统一为 OpenAI 兼容端点（地址/密钥/模型名）；支持「测试连接」试连，保存立即生效并持久化于 `saveDir/ai-config.json`（后端 `/api/ai/config`、`/api/ai/test` 端点）；失败自动降级规则回复（含熔断）；
+3. **默认形态**：无外部服务、未配置供应商时，内嵌规则引擎 + 记忆召回兜底。
 
-铁律：任何 AI 调用失败不得阻塞游戏主流程（AiSmokeTest 19 断言覆盖全部降级路径）。
+铁律：任何 AI 调用失败不得阻塞游戏主流程（AiSmokeTest 22 断言 + ApiSmokeTest 配置端点 5 断言覆盖全部降级路径）。
 
 ## 玩法速览
 

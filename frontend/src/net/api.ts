@@ -73,6 +73,16 @@ export interface CreationOptions {
   difficulties: string[];
 }
 
+/** AI 供应商配置（本地模型服务与云端模型同构：OpenAI 兼容端点）。 */
+export interface AiProviderConfig {
+  enabled: boolean;
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+}
+
+export interface AiTestResult { ok: boolean; reply?: string; error?: string; }
+
 async function post<T>(path: string, payload: unknown): Promise<T> {
   const resp = await fetch(path, {
     method: 'POST',
@@ -92,7 +102,11 @@ async function get<T>(path: string): Promise<T> {
 }
 
 export const api = {
-  health: () => get<{ status: string; aiAvailable: boolean; sessions: number }>('/api/health'),
+  health: () => get<{ status: string; aiAvailable: boolean; llm?: boolean; sessions: number }>('/api/health'),
+
+  aiConfig: () => get<AiProviderConfig>('/api/ai/config'),
+  saveAiConfig: (cfg: AiProviderConfig) => post<AiProviderConfig>('/api/ai/config', cfg),
+  testAi: (cfg: AiProviderConfig) => post<AiTestResult>('/api/ai/test', cfg),
 
   newGame: (difficulty?: string) =>
     post<{ sessionId: string; difficulty: string }>('/api/game/new', { difficulty: difficulty ?? '' }),

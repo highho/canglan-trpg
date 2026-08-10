@@ -1,17 +1,19 @@
 /**
- * start.ts — 页面 1：开始界面（对齐 MainView.axaml 开始页：标题 + 三菜单按钮 + AI 状态）。
+ * start.ts — 页面 1：开始界面（标题 + 四菜单按钮 + AI 状态；「AI 设置」接入供应商配置）。
  */
 
 import { api } from '../net/api.js';
 import { setState } from '../state/store.js';
+import { initAiSettings } from './ai-settings.js';
 
 export function initStartPage(): void {
+  initAiSettings();
   const status = document.getElementById('start-ai-status');
   api.health()
     .then(h => {
-      if (status) status.textContent = h.aiAvailable
-        ? '本地 AI 已连接，自由对话与动态遭遇已启用'
-        : '本地 AI 未启动（localhost:8000），已降级为规则兜底叙事';
+      if (status) status.textContent = h.llm
+        ? 'AI 供应商已配置（LLM 生成已启用），点「AI 设置」可调整'
+        : '内嵌 AI 管线就绪（二层记忆 + 规则兜底），点「AI 设置」可接入本地/云端模型';
     })
     .catch(() => {
       if (status) status.textContent = '后端未响应，请确认 HttpApiServer 已启动';

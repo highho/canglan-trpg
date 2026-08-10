@@ -127,7 +127,7 @@ public final class GameSession {
         this.rng = rng != null ? rng : new Random();
         this.difficulty = difficulty != null ? difficulty : DifficultyMode.NORMAL;
         // AI 接入：外部服务 -Dcanglan.ai.url（探活失败/空值 → 内嵌管线）；"off" 显式禁用；
-        // 内嵌管线可选接 LLM：-Dcanglan.ai.llm.url（OpenAI 兼容端点）
+        // LLM 供应商经 AiProviderSettings 运行时配置（前端设置页，本地/云端 OpenAI 兼容端点）
         this.ai = AiClients.connect(System.getProperty("canglan.ai.url", "http://localhost:8000"), this.rng, saveDir);
         this.registries = RegistryInitializer.initialize(dataDir);
         this.bus = new EventBusImpl();

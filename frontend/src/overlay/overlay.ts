@@ -6,6 +6,7 @@
 import { api } from '../net/api.js';
 import { getState, esc, setPage, setState } from '../state/store.js';
 import { BIOME_NAME, DIFF_CN } from '../state/narration.js';
+import { openAiSettings } from '../pages/ai-settings.js';
 
 const TITLES: Record<string, string> = {
   char: '角色状态', bag: '行囊', skill: '技能', recipe: '制造',
@@ -273,6 +274,10 @@ function renderSettings(d: Record<string, unknown>, body: HTMLElement): void {
   body.appendChild(row('阶段', String(d['stage'] ?? '')));
   const ops = document.createElement('div');
   ops.className = 'btn-row';
+  const aiBtn = document.createElement('button');
+  aiBtn.textContent = 'AI 设置';
+  aiBtn.addEventListener('click', () => { closeOverlay(); void openAiSettings(); });
+  ops.appendChild(aiBtn);
   const saveBtn = document.createElement('button');
   saveBtn.textContent = '保存游戏';
   saveBtn.addEventListener('click', () => { closeOverlay(); saveHandler(); });

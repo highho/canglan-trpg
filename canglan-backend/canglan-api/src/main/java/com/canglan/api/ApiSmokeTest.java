@@ -131,6 +131,23 @@ public final class ApiSmokeTest {
             HttpResponse<String> badSlot = send(client, "POST",
                     base + "/api/save/99?sessionId=" + sessionId, "");
             check("非法槽位 400", badSlot.statusCode() == 400);
+
+            // AI 供应商配置：默认禁用 → 保存 → 回读一致 → health.llm 联动 → 试连失败路径
+            HttpResponse<String> cfg0 = send(client, "GET", base + "/api/ai/config", null);
+            check("GET /api/ai/config 200", cfg0.statusCode() == 200 && cfg0.body().contains("enabled"));
+            HttpResponse<String> cfgSave = send(client, "POST", base + "/api/ai/config",
+                    "{\"enabled\":true,\"baseUrl\":\"http://127.0.0.1:1/v1\",\"apiKey\":\"sk-test\",\"model\":\"qwen2\"}");
+            check("POST /api/ai/config 200", cfgSave.statusCode() == 200);
+            HttpResponse<String> cfg1 = send(client, "GET", base + "/api/ai/config", null);
+            check("配置保存后回读一致", cfg1.body().contains("sk-test") && cfg1.body().contains("qwen2"));
+            HttpResponse<String> health2 = send(client, "GET", base + "/api/health", null);
+            check("health.llm 随配置联动", health2.body().contains("\"llm\": true")
+                    || health2.body().contains("\"llm\":true"));
+            HttpResponse<String> test = send(client, "POST", base + "/api/ai/test",
+                    "{\"baseUrl\":\"http://127.0.0.1:1/v1\",\"apiKey\":\"\",\"model\":\"x\"}");
+            check("试连失败返回 ok=false", test.statusCode() == 200 && test.body().contains("\"ok\": false")
+                    || test.body().contains("\"ok\":false"));
+            send(client, "POST", base + "/api/ai/config", "{\"enabled\":false}");   // 复原禁用
         } finally {
             api.stop();
         }

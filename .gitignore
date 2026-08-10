@@ -20,6 +20,7 @@ memories.json
 reg-saves/
 reg-api-saves/
 reg-flow-saves/
+ai-config.json
 
 # IDE
 .idea/
@@ -35,6 +36,7 @@ sources.txt
 test_result.txt
 ui_smoke.txt
 smoke_out.txt
+0[0-9]-*.png
 
 # 本地 AI 模型文件（体积大，不入库，见 README）
 *.gguf

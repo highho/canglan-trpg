@@ -99,18 +99,33 @@ public final class AiSmokeTest {
         });
         stub.setExecutor(daemonPool());
         stub.start();
-        System.setProperty("canglan.ai.llm.url", "http://127.0.0.1:" + stub.getAddress().getPort());
+        String stubUrl = "http://127.0.0.1:" + stub.getAddress().getPort();
         try {
+            // 供应商配置运行时生效：update 后新建会话即走 LLM
+            AiProviderSettings.update(new AiProviderSettings.Config(true, stubUrl, "", "stub-model"));
+            check("供应商配置启用后 client 非空", AiProviderSettings.llmEnabled());
             AiClient ai = AiClients.connect("", new Random(9), tempDir());
             ChatReply ok = ai.chatSync(new ChatRequest("npc", "村长", "旅人", "你好", null, null));
             check("LLM 生成成功", !ok.fallback() && ok.text().contains("LLM 生成的问候"));
 
+            // 供应商运行时切换：已有会话立即改用新供应商（此处切到 500 stub → 降级规则）
             mode.set(1);
             ChatReply bad = ai.chatSync(new ChatRequest("npc", "村长", "旅人", "你好", null, null));
             check("LLM 失败降级规则", bad.fallback() && !bad.text().isEmpty());
+
+            // 配置持久化：落盘 → 重新 init → 仍启用
+            java.nio.file.Path cfgFile = tempDir().resolve("ai-config.json");
+            AiProviderSettings.resetForTest();
+            AiProviderSettings.init(cfgFile);
+            check("配置未落盘时 init 回退禁用", !AiProviderSettings.llmEnabled());
+            AiProviderSettings.update(new AiProviderSettings.Config(true, stubUrl, "sk-x", "stub-model"));
+            AiProviderSettings.resetForTest();
+            AiProviderSettings.init(cfgFile);
+            check("配置跨重启持久化", AiProviderSettings.llmEnabled()
+                    && "sk-x".equals(AiProviderSettings.get().apiKey()));
         } finally {
+            AiProviderSettings.resetForTest();
             stub.stop(0);
-            System.clearProperty("canglan.ai.llm.url");
         }
     }
 
