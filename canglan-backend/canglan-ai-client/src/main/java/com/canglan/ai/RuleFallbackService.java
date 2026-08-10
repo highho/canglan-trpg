@@ -35,11 +35,23 @@ public final class RuleFallbackService {
     /** 依据玩家话语做关键词匹配；无命中返回通用文案。 */
     public String reply(ChatRequest request) {
         String utterance = request == null || request.utterance() == null ? "" : request.utterance();
+        String hit = matchKeyword(utterance);
+        return hit != null ? hit : generic();
+    }
+
+    /** 关键词匹配：命中返回对应文案，否则 null（供内嵌管线叠加记忆召回）。 */
+    public String matchKeyword(String utterance) {
+        String text = utterance == null ? "" : utterance;
         for (String[] kv : KEYWORD_REPLIES) {
             for (String key : kv[0].split(",")) {
-                if (utterance.contains(key)) return kv[1];
+                if (text.contains(key)) return kv[1];
             }
         }
+        return null;
+    }
+
+    /** 随机通用文案。 */
+    public String generic() {
         return GENERIC_REPLIES[rng.nextInt(GENERIC_REPLIES.length)];
     }
 }

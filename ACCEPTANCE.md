@@ -8,9 +8,9 @@
 | # | 验收项 | 结论 | 证据 |
 |---|---|---|---|
 | 1 | 核心玩法全流程无异常 | ✅ | `FullFlowSmokeTest` 13/13：建档→寻矿采集（收获矿石）→回家制造（冶炼金属锭）→遭遇战完整结算→布告板委托结算（金币+50）→存档/读档一致 |
-| 2 | 标签/任务行为一致 | ✅ | 六套回归 14/33/71/26/59/12 全绿；`CommandDispatcher` pickOne 支持编号/名称/id，与 C# 三选状态机一致；任务图为标签条件驱动（HasTag 门槛） |
+| 2 | 标签/任务行为一致 | ✅ | 六套回归 14/33/71/26/59/19 全绿；`CommandDispatcher` pickOne 支持编号/名称/id，与 C# 三选状态机一致；任务图为标签条件驱动（HasTag 门槛） |
 | 3 | 存档一致（只存源头数据） | ✅ | `SaveRoundTripSmokeTest` 26/26；`FullFlowSmokeTest` §6 读档后金币/坐标逐项一致；读档走 recalculateTags 全量重建 |
-| 4 | AI 降级一致 | ✅ | `AiSmokeTest` 12/12（Python 服务不启动）；`ApiSmokeTest` 「自由对话回退」断言：未识别指令走规则兜底并提示「帮助」，永不抛异常 |
+| 4 | AI 降级一致 | ✅ | `AiSmokeTest` 19/19（禁用/内嵌管线/LLM stub/外部服务四路径）；`ApiSmokeTest` 「自由对话回退」断言：未识别指令走规则兜底并提示「帮助」，永不抛异常 |
 | 5 | 空间化一致 | ✅ | `WorldSmokeTest` 33/33（怪物刷新环带 5.5~22.5、NPC 半径 2.5、findNearby）；HUD `nearby` 半径 NEARBY_RANGE=4；浏览器冒烟确认村内无怪物卡 |
 | 6 | 前端交互一致 | ✅ | 浏览器对照冒烟全绿（console 零报错）：四页面状态机、创建四组选卡+难度金色高亮、游戏页五区、十字移动键盘、7 格快捷栏、八 Tab 覆盖层（地图 50×50/图鉴过滤）、Tab 可直接切换 |
 
@@ -53,9 +53,9 @@
 | 5 | 地图/迷雾/层级 | ✅ FogOfWar Visible→Explored，WorldSmokeTest |
 | 6 | 任务图 GraphEngine 三图 | ✅ 职业转职/种族进化/委托链条件一致 |
 | 7 | 空间化行动 NEARBY_RANGE=4 | ✅ hud.nearby/cmdGather/cmdFight 均按半径守门 |
-| 8 | AI 降级永不阻塞 | ✅ 3s 超时+熔断+RuleFallback+NullAiClient |
+| 8 | AI 降级永不阻塞 | ✅ 3s 超时+熔断+RuleFallback+NullAiClient；内嵌管线 EmbeddedAiClient 同样零异常（双层 try 兜底） |
 | 9 | Bootstrap 加载顺序 | ✅ RegistryInitializer，BootstrapSmokeTest 14/14 |
-| 10 | 二层记忆（个体≤60/衰减） | ✅ AI 服务端实现（Python），AiSmokeTest 覆盖降级路径 |
+| 10 | 二层记忆（个体+群体） | ✅ 已由 Python 服务移植为 Java 内嵌 `NpcMemoryStore`（memories.json 持久化，上限 500 条），AiSmokeTest 覆盖召回/落盘/跨实例持久化 |
 
 ## 5. 回归测试矩阵（当前基线）
 
@@ -65,8 +65,8 @@
 | 世界 | com.canglan.world.WorldSmokeTest | 33 | 同上 |
 | 战斗 | com.canglan.world.battle.BattleSmokeTest | 71 | 同上 |
 | 存档 | com.canglan.save.SaveRoundTripSmokeTest | 26 | 同上 + saveDir |
-| API | com.canglan.api.ApiSmokeTest | 59 | `-Dcanglan.ai.url=` 空值跑降级 |
-| AI 降级 | com.canglan.ai.AiSmokeTest | 12 | 同上 |
+| API | com.canglan.api.ApiSmokeTest | 59 | `java -cp build-all <类> <dataDir> <saveDir>` |
+| AI（四路径） | com.canglan.ai.AiSmokeTest | 19 | 同上 |
 | **全链路** | com.canglan.api.FullFlowSmokeTest | **13** | 同上 + saveDir |
 
 ## 6. 遗留事项与后续清理
@@ -76,4 +76,5 @@
 - 后端传输层由 JDK `com.sun.net.httpserver` 替换为自研 `MiniHttpServer`（ServerSocket，Android 兼容），替换后七套回归 228 断言复验全绿；
 - 双端发行版已产出：`build-pc.ps1` → dist/canglan-trpg-win-x64.zip（内置 jlink 精简 JRE，自测探活通过）；`build-android.ps1` → dist/canglan-trpg-android.apk（内置后端单机版，minSdk 30，apksigner 验证通过；无真机，运行时验证待用户侧载确认）；
 - 沙箱环境无法杀旧服务，历史遗留监听端口 8787~8793（均为旧代码）；
-- Python LangGraph AI 服务未在本机部署（以 `-Dcanglan.ai.url=` 空值验证降级路径，符合契约 #8 设计）。
+- AI 已 Java 化内嵌：Python `ai-service/main.py` 管线移植为 `canglan-ai-client` 的 `EmbeddedAiClient`（默认形态，Android APK 单机版同样可用）；`-Dcanglan.ai.llm.url` 可接 OpenAI 兼容端点启用真模型；`ai-service/main.py` 保留作为可选外部服务（未在本机部署，回归 235 断言全绿）；
+- 真模型生成待接入：本机有 C:\GameModels\qwen2-7b-q4.gguf 与 Ollama（仅 bge-m3），可用 llama.cpp server / ollama pull qwen2 后配置 `-Dcanglan.ai.llm.url` 启用。

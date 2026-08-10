@@ -1,8 +1,10 @@
 package com.canglan.ai;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -11,8 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * AiSmokeTest — P7 验收：AI 不可用时规则回退正常（在线/失败熔断/离线三路径 + GameSession 接线）。
- * 内嵌 JDK HttpServer 充当 AI stub，零外部依赖、零 Python 依赖。
+ * AiSmokeTest — P7 验收 + AI 内嵌化验收：
+ * 禁用/降级路径、内嵌管线（二层记忆+规则）、LLM 端点（stub）、在线外部服务（stub）四路径。
+ * 内嵌 JDK HttpServer 充当 stub，零外部依赖、零 Python 依赖。
  * 用法：java com.canglan.ai.AiSmokeTest <dataDir>
  */
 public final class AiSmokeTest {
@@ -23,6 +26,8 @@ public final class AiSmokeTest {
         Path dataDir = Path.of(args.length > 0 ? args[0] : "../data");
 
         offlinePaths();
+        embeddedPaths();
+        llmPath();
         onlinePath(dataDir);
 
         System.out.println();
@@ -30,18 +35,22 @@ public final class AiSmokeTest {
         if (fail > 0) System.exit(1);
     }
 
-    // ==================== 离线/禁用路径 ====================
+    // ==================== 禁用/降级路径 ====================
 
     private static void offlinePaths() {
-        System.out.println("== 离线/禁用路径 ==");
+        System.out.println("== 禁用/降级路径 ==");
 
-        // 显式禁用 → NullAiClient
-        AiClient disabled = AiClients.connect("", new Random(1));
-        check("空 URL 降级 NullAiClient", disabled instanceof NullAiClient && !disabled.isAvailable());
+        // "off" 显式禁用 → NullAiClient
+        AiClient disabled = AiClients.connect("off", new Random(1), null);
+        check("off 显式禁用 NullAiClient", disabled instanceof NullAiClient && !disabled.isAvailable());
 
-        // 探活失败 → NullAiClient（端口 1 必然拒绝连接）
-        AiClient down = AiClients.connect("http://127.0.0.1:1", new Random(1));
-        check("探活失败降级 NullAiClient", down instanceof NullAiClient);
+        // 空 URL → 内嵌管线（默认形态，恒可用）
+        AiClient embedded = AiClients.connect("", new Random(1), tempDir());
+        check("空 URL 构建内嵌管线", embedded instanceof EmbeddedAiClient && embedded.isAvailable());
+
+        // 外部服务探活失败 → 降级内嵌管线（端口 1 必然拒绝连接）
+        AiClient down = AiClients.connect("http://127.0.0.1:1", new Random(1), tempDir());
+        check("探活失败降级内嵌管线", down instanceof EmbeddedAiClient && down.isAvailable());
 
         // NullAiClient 的规则兜底：关键词命中 + 永不抛异常
         ChatReply kw = disabled.chatSync(new ChatRequest("npc", "铁匠", "旅人",
@@ -51,10 +60,64 @@ public final class AiSmokeTest {
         check("规则兜底通用文案", generic.fallback() && !generic.text().isEmpty());
     }
 
-    // ==================== 在线路径（stub 服务） ====================
+    // ==================== 内嵌管线（二层记忆 + 规则） ====================
+
+    private static void embeddedPaths() {
+        System.out.println("== 内嵌管线（记忆+规则） ==");
+        Path dir = tempDir();
+        AiClient ai = AiClients.connect("", new Random(7), dir);
+
+        // 第一回合：关键词命中 + 写入个体记忆
+        ChatReply first = ai.chatSync(new ChatRequest("npc_smith", "铁匠汉斯", "测试者", "你好啊", null, null));
+        check("内嵌关键词命中", first.fallback() && first.text().contains("是你啊"));
+        check("个体记忆已落盘", Files.exists(dir.resolve("memories.json")));
+
+        // 第二回合：无关键词命中 → 召回上一回合记忆（回忆模板）
+        ChatReply second = ai.chatSync(new ChatRequest("npc_smith", "铁匠汉斯", "测试者", "啦啦啦", null, null));
+        check("无命中召回记忆", second.fallback() && second.text().contains("回忆")
+                && second.text().contains("你好啊"));
+
+        // 记忆跨实例持久化：同目录重建客户端仍能召回
+        AiClient reloaded = AiClients.connect("", new Random(7), dir);
+        ChatReply third = reloaded.chatSync(new ChatRequest("npc_smith", "铁匠汉斯", "测试者", "随便聊聊", null, null));
+        check("记忆跨实例持久化", third.text().contains("玩家说"));
+    }
+
+    // ==================== 内嵌管线 + LLM 端点（stub） ====================
+
+    private static void llmPath() throws Exception {
+        System.out.println("== 内嵌管线 + LLM 端点（stub） ==");
+        AtomicInteger mode = new AtomicInteger(0);   // 0=正常 1=500
+        HttpServer stub = HttpServer.create(new InetSocketAddress(0), 0);
+        stub.createContext("/v1/chat/completions", ex -> {
+            ex.getRequestBody().readAllBytes();
+            if (mode.get() == 1) {
+                respond(ex, 500, "{\"error\":\"boom\"}");
+            } else {
+                respond(ex, 200, "{\"choices\":[{\"message\":{\"content\":\"LLM 生成的问候\"}}]}");
+            }
+        });
+        stub.setExecutor(daemonPool());
+        stub.start();
+        System.setProperty("canglan.ai.llm.url", "http://127.0.0.1:" + stub.getAddress().getPort());
+        try {
+            AiClient ai = AiClients.connect("", new Random(9), tempDir());
+            ChatReply ok = ai.chatSync(new ChatRequest("npc", "村长", "旅人", "你好", null, null));
+            check("LLM 生成成功", !ok.fallback() && ok.text().contains("LLM 生成的问候"));
+
+            mode.set(1);
+            ChatReply bad = ai.chatSync(new ChatRequest("npc", "村长", "旅人", "你好", null, null));
+            check("LLM 失败降级规则", bad.fallback() && !bad.text().isEmpty());
+        } finally {
+            stub.stop(0);
+            System.clearProperty("canglan.ai.llm.url");
+        }
+    }
+
+    // ==================== 在线外部服务路径（stub） ====================
 
     private static void onlinePath(Path dataDir) throws Exception {
-        System.out.println("== 在线路径（stub 服务） ==");
+        System.out.println("== 在线路径（外部服务 stub） ==");
         AtomicInteger mode = new AtomicInteger(0);   // 0=正常 1=500
         HttpServer stub = HttpServer.create(new InetSocketAddress(0), 0);
         stub.createContext("/health", ex -> respond(ex, 200, "{\"status\":\"ok\"}"));
@@ -66,16 +129,12 @@ public final class AiSmokeTest {
                 respond(ex, 200, "{\"reply\":\"stub 自由对话回复\"}");
             }
         });
-        stub.setExecutor(Executors.newFixedThreadPool(2, r -> {
-            Thread t = new Thread(r, "ai-stub");
-            t.setDaemon(true);
-            return t;
-        }));
+        stub.setExecutor(daemonPool());
         stub.start();
         String url = "http://127.0.0.1:" + stub.getAddress().getPort();
         try {
             // 探活成功 → LangGraphHttpClient
-            AiClient online = AiClients.connect(url, new Random(2));
+            AiClient online = AiClients.connect(url, new Random(2), tempDir());
             check("探活成功建 LangGraphHttpClient", online instanceof LangGraphHttpClient && online.isAvailable());
             ChatReply ok = online.chatSync(new ChatRequest("npc_smith", "铁匠汉斯", "测试者",
                     "今天天气如何", java.util.List.of(), java.util.List.of()));
@@ -106,6 +165,24 @@ public final class AiSmokeTest {
         } finally {
             stub.stop(0);
             System.clearProperty("canglan.ai.url");
+        }
+    }
+
+    // ==================== 工具 ====================
+
+    private static java.util.concurrent.ExecutorService daemonPool() {
+        return Executors.newFixedThreadPool(2, r -> {
+            Thread t = new Thread(r, "ai-stub");
+            t.setDaemon(true);
+            return t;
+        });
+    }
+
+    private static Path tempDir() {
+        try {
+            return Files.createTempDirectory("ai-embed");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

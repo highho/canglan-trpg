@@ -1,6 +1,6 @@
 # 苍岚大陆 —— 标签驱动的纯文字 TRPG 冒险
 
-一款 **Java 17 零依赖后端 + 纯 HTML/CSS/TypeScript Web 前端** 的文字冒险游戏（TRPG），界面完全文字化：无图标、无符号、无彩色条块。世界由「标签」驱动：种族进化、职业转职、任务推进、NPC 关系、采集制造全部由标签条件触发；Python LangGraph AI 服务（可选）为 NPC 对话提供自由文本生成，未部署时自动降级为规则兜底叙事，永不阻塞游戏。
+一款 **Java 17 零依赖后端 + 纯 HTML/CSS/TypeScript Web 前端** 的文字冒险游戏（TRPG），界面完全文字化：无图标、无符号、无彩色条块。世界由「标签」驱动：种族进化、职业转职、任务推进、NPC 关系、采集制造全部由标签条件触发；NPC 自由对话由内嵌 AI 管线（二层记忆 + prompt + 可选 LLM 端点 + 规则兜底）驱动，永不阻塞游戏。
 
 > 本项目由 C#/.NET/Avalonia 桌面版迁移而来（迁移过程与验收见 `MIGRATION_PLAN.md` 与 `ACCEPTANCE.md`），旧栈文件已按约定清理，`data/` 配置双栈共用。
 
@@ -22,7 +22,7 @@
 - **锻造系统**：家园铁匠铺 修理（金币恢复耐久）/ 强化（白→绿→蓝→紫→金，消耗矿石）/ 附魔（追加随机词缀，上限 4 条），自动重穿刷新属性
 - **世界 Boss**：低概率遭遇「荒原领主」等稀有事件，高风险高回报
 - **生涯记录**：步数/战斗/击杀/采集/制造/金币全程统计，随存档持久化
-- **本地 AI**：Python LangGraph 服务（localhost:8000），未启动时自动回退规则对话
+- **本地 AI**：内嵌二层记忆管线（个体+群体记忆、prompt 构建、安全过滤、记忆回写），可选接 OpenAI 兼容 LLM 端点；也可外接 Python LangGraph 服务，全部失败路径规则兜底
 - **存档体系**：3 存档位，建档自动存档 + 手动存档，恢复家园/迷雾/好感/声望/生涯统计/成就
 
 ## 目录结构
@@ -52,19 +52,19 @@ javac --release 17 -encoding UTF-8 -d build-all "@sources.txt"
 # 2. 编译前端 TS（仅 typescript 一个 devDependency，dist 中已含 index.html/css）
 node_modules\.bin\tsc.cmd -p frontend\tsconfig.json
 
-# 3. 启动服务（AI 服务未部署时以空 url 走规则降级）
-java "-Dfile.encoding=UTF-8" "-Dcanglan.ai.url=" -cp build-all com.canglan.api.HttpApiServer data saves-frontend 8792 frontend\dist
+# 3. 启动服务（默认内嵌 AI 管线；可选接外部 AI 服务或 LLM 端点，见「AI 模块」节）
+java "-Dfile.encoding=UTF-8" -cp build-all com.canglan.api.HttpApiServer data saves-frontend 8792 frontend\dist
 # 浏览器打开 http://localhost:8792/
 
-# 4. 回归测试（七套共 228 断言，一键运行或单套执行，详见 ACCEPTANCE.md）
+# 4. 回归测试（七套共 235 断言，一键运行或单套执行，详见 ACCEPTANCE.md）
 node run-regress.js
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.data.BootstrapSmokeTest data        # 14
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.world.WorldSmokeTest data            # 33
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.world.battle.BattleSmokeTest data    # 71
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.save.SaveRoundTripSmokeTest data build-save-test   # 26
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.api.ApiSmokeTest data build-api-test               # 59
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.ai.AiSmokeTest data                                # 12
-java "-Dcanglan.ai.url=" -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test         # 13
+java -cp build-all com.canglan.data.BootstrapSmokeTest data        # 14
+java -cp build-all com.canglan.world.WorldSmokeTest data            # 33
+java -cp build-all com.canglan.world.battle.BattleSmokeTest data    # 71
+java -cp build-all com.canglan.save.SaveRoundTripSmokeTest data build-save-test   # 26
+java -cp build-all com.canglan.api.ApiSmokeTest data build-api-test               # 59
+java -cp build-all com.canglan.ai.AiSmokeTest data                                # 19
+java -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test         # 13
 ```
 
 ## 发行版构建
@@ -82,9 +82,15 @@ java "-Dcanglan.ai.url=" -cp build-all com.canglan.api.FullFlowSmokeTest data bu
 - **Android 形态**：APK 启动时将 assets 中的 data/web 解压到应用内部存储，后台线程起本地 HTTP 服务（仅回环监听，随机端口），WebView 加载 127.0.0.1；存档存应用沙箱，卸载即清。debug 签名仅供侧载安装。
 - **构建路径**：Android 构建经 `C:\canglan-trpg` 目录联接（ASCII 路径）执行，规避 aapt2 不支持中文/# 路径的问题；无 Gradle/Maven，纯 javac + d8 + aapt2 + zipalign + apksigner。
 
-## 本地 AI 服务（可选）
+## AI 模块（内嵌管线，零依赖）
 
-`ai-service/main.py` 为 Python LangGraph NPC 对话服务（监听 localhost:8000）。启动后端时用 `-Dcanglan.ai.url=http://localhost:8000` 接入；未启动时后端自动降级为规则兜底对话，不影响游玩。
+NPC 自由对话由 `canglan-ai-client` 内嵌管线驱动（Python `ai-service/main.py` 的 Java 移植，Android 兼容）：召回记忆 → 构建 prompt → LLM 生成（可选）→ 安全过滤 → 写入记忆；记忆以 `saveDir/memories.json` 持久化（个体 npcId + 群体 group:village/guild，上限 500 条）。接入优先级：
+
+1. **外部 AI 服务**（可选）：`-Dcanglan.ai.url=http://localhost:8000` 指向 `ai-service/main.py`（Python LangGraph 版），探活失败自动降级内嵌管线；
+2. **LLM 端点**（可选）：`-Dcanglan.ai.llm.url=<OpenAI 兼容端点>`（如 llama.cpp server/Ollama/远程 API，模型名 `-Dcanglan.ai.llm.model`），启用真模型生成；失败自动降级规则回复（含熔断）；
+3. **默认形态**：无外部服务、无 LLM 时，内嵌规则引擎 + 记忆召回兜底；`-Dcanglan.ai.url=off` 可显式完全禁用。
+
+铁律：任何 AI 调用失败不得阻塞游戏主流程（AiSmokeTest 19 断言覆盖全部降级路径）。
 
 ## 玩法速览
 

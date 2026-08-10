@@ -16,6 +16,10 @@ saves/
 saves-frontend/
 *.save.json
 memories.db
+memories.json
+reg-saves/
+reg-api-saves/
+reg-flow-saves/
 
 # IDE
 .idea/
