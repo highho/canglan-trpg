@@ -1,5 +1,7 @@
 package com.canglan.world.buff;
 
+import java.util.stream.Collectors;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public final class BuffManager {
     /** 回合结束：倒计时 → 清理过期Buff（不触发 recalculateTags）。 */
     public void onTurnEnd() {
         for (Buff buff : activeBuffs) buff.tickDown();
-        List<Buff> expired = activeBuffs.stream().filter(Buff::isExpired).toList();
+        List<Buff> expired = activeBuffs.stream().filter(Buff::isExpired).collect(Collectors.toList());
         if (expired.isEmpty()) return;
         for (Buff buff : expired) {
             activeBuffs.remove(buff);

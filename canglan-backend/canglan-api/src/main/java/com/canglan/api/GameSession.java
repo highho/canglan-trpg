@@ -1,5 +1,7 @@
 package com.canglan.api;
 
+import java.util.stream.Collectors;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,9 +136,9 @@ public final class GameSession {
 
         this.map = new WorldMap(WORLD_SIZE, WORLD_SIZE);
         WorldPopulator.populate(map,
-                registries.npcs.getAll().stream().map(NpcDef::id).toList(),
-                registries.monsters.getAll().stream().map(MonsterTemplate::id).toList(),
-                registries.resources.getAll().stream().map(GatherableResource::id).toList());
+                registries.npcs.getAll().stream().map(NpcDef::id).collect(Collectors.toList()),
+                registries.monsters.getAll().stream().map(MonsterTemplate::id).collect(Collectors.toList()),
+                registries.resources.getAll().stream().map(GatherableResource::id).collect(Collectors.toList()));
 
         this.survivalManager = new SurvivalManager(bus);
         this.saveManager = new SaveManager(saveDir);
@@ -168,7 +170,7 @@ public final class GameSession {
                 narrate("指令执行异常：" + ex.getMessage(), NarrationKind.ERROR);
             }
         }
-        return new CommandResult(List.copyOf(lines), hud());
+        return new CommandResult(new ArrayList<>(lines), hud());
     }
 
     void narrate(String text, NarrationKind kind) {
@@ -180,7 +182,7 @@ public final class GameSession {
 
     /** 全量叙事日志快照（GET /api/game/state 用）。 */
     public List<NarrationLine> log() {
-        return List.copyOf(log);
+        return new ArrayList<>(log);
     }
 
     // ==================== 空间/状态助手（契约铁律在此收口） ====================
@@ -324,7 +326,7 @@ public final class GameSession {
             hud.put("weight", player.inventory().totalWeight() + "/" + player.carryCapacity());
             hud.put("overloaded", player.isOverloaded());
             hud.put("tags", new ArrayList<>(player.activeTagIds()));
-            hud.put("companions", companions.stream().map(Unit::name).toList());
+            hud.put("companions", companions.stream().map(Unit::name).collect(Collectors.toList()));
             hud.put("directions", directionsPayload());
             hud.put("nearby", nearbyPayload());
             hud.put("quickBar", quickBarPayload());
@@ -332,7 +334,7 @@ public final class GameSession {
         if (home != null) {
             hud.put("homeLevel", home.level());
             hud.put("homeBuildings", home.getBuildings().stream()
-                    .map(b -> b.name()).toList());
+                    .map(b -> b.name()).collect(Collectors.toList()));
         }
         return hud;
     }

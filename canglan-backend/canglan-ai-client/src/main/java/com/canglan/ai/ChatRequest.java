@@ -1,5 +1,6 @@
 package com.canglan.ai;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public record ChatRequest(
         List<String> memory) {
 
     public ChatRequest {
-        tags = tags == null ? List.of() : List.copyOf(tags);
-        memory = memory == null ? List.of() : List.copyOf(memory);
+        tags = tags == null ? List.of() : new ArrayList<>(tags);
+        memory = memory == null ? List.of() : new ArrayList<>(memory);
     }
 }

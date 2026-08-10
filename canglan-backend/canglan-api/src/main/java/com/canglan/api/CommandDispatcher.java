@@ -1,5 +1,7 @@
 package com.canglan.api;
 
+import java.util.stream.Collectors;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -326,16 +328,16 @@ final class CommandDispatcher {
         List<String> monsters = nearby.stream().filter(f -> f.type() == FeatureType.MONSTER_SPAWN)
                 .map(TerrainFeature::id).distinct()
                 .map(id -> { MonsterTemplate t = s.registries.monsters.tryGet(id); return t != null ? t.name() : null; })
-                .filter(Objects::nonNull).toList();
+                .filter(Objects::nonNull).collect(Collectors.toList());
         List<String> resources = nearby.stream().filter(f -> f.type() == FeatureType.GATHER_POINT)
                 .map(TerrainFeature::id).distinct()
                 .map(id -> { GatherableResource r = s.registries.resources.tryGet(id); return r != null ? r.name() : null; })
-                .filter(Objects::nonNull).toList();
+                .filter(Objects::nonNull).collect(Collectors.toList());
         List<String> people = s.map.findNearby(s.player.worldPos(), GameSession.NPC_RANGE).stream()
                 .filter(f -> f.type() == FeatureType.NPC_SPAWN)
                 .map(TerrainFeature::id).distinct()
                 .map(id -> { NpcDef n = s.registries.npcs.tryGet(id); return n != null ? n.name() : null; })
-                .filter(Objects::nonNull).toList();
+                .filter(Objects::nonNull).collect(Collectors.toList());
         s.narrate(monsters.isEmpty() ? "附近没有怪物的踪迹。" : "附近游荡着：" + String.join("、", monsters) + "。", NarrationKind.SYSTEM);
         s.narrate(resources.isEmpty() ? "附近没什么可采集的。" : "附近可采集：" + String.join("、", resources) + "。", NarrationKind.SYSTEM);
         if (!people.isEmpty()) s.narrate("附近的人：" + String.join("、", people) + "。", NarrationKind.SYSTEM);
@@ -454,14 +456,14 @@ final class CommandDispatcher {
         if (!s.ensurePlayer()) return;
         List<String> nearbyIds = s.map.findNearby(s.player.worldPos(), GameSession.NEARBY_RANGE).stream()
                 .filter(f -> f.type() == FeatureType.GATHER_POINT)
-                .map(TerrainFeature::id).distinct().toList();
+                .map(TerrainFeature::id).distinct().collect(Collectors.toList());
         List<GatherableResource> nearby = new ArrayList<>();
         for (GatherableResource r : s.registries.resources.getAll())
             if (nearbyIds.contains(r.id())) nearby.add(r);
         if (arg.isEmpty()) {
             s.narrate(nearby.isEmpty()
                     ? "这附近没什么可采集的，换个地方看看。"
-                    : "附近可采集的资源：" + String.join("、", nearby.stream().map(GatherableResource::name).toList()),
+                    : "附近可采集的资源：" + String.join("、", nearby.stream().map(GatherableResource::name).collect(Collectors.toList())),
                     NarrationKind.SYSTEM);
             return;
         }
@@ -497,7 +499,7 @@ final class CommandDispatcher {
         Collection<MonsterTemplate> all = s.registries.monsters.getAll();
         if (arg.isEmpty()) {
             s.narrate("可以挑战的对手：" + String.join("、",
-                    all.stream().map(MonsterTemplate::name).toList()), NarrationKind.SYSTEM);
+                    all.stream().map(MonsterTemplate::name).collect(Collectors.toList())), NarrationKind.SYSTEM);
             return;
         }
         int idx = arg.indexOf('（');
@@ -552,7 +554,7 @@ final class CommandDispatcher {
         Unit npc;
         if (arg.isEmpty()) {
             if (s.lastTalkNpcId == null) {
-                s.narrate("村里的人：" + String.join("、", all.stream().map(NpcDef::name).toList())
+                s.narrate("村里的人：" + String.join("、", all.stream().map(NpcDef::name).collect(Collectors.toList()))
                         + "。想和谁谈谈？", NarrationKind.SYSTEM);
                 return;
             }
@@ -734,7 +736,7 @@ final class CommandDispatcher {
             return;
         }
         s.narrate("已掌握的配方：" + String.join("、",
-                s.recipeCache.stream().map(Recipe::name).toList()), NarrationKind.SYSTEM);
+                s.recipeCache.stream().map(Recipe::name).collect(Collectors.toList())), NarrationKind.SYSTEM);
     }
 
     private void cmdCraft(String arg) {
@@ -818,7 +820,7 @@ final class CommandDispatcher {
         List<Building> buildings = s.home.getBuildings();
         s.narrate("家园等级 Lv" + s.home.level() + "。已建建筑："
                 + (buildings.isEmpty() ? "（空）"
-                        : String.join("、", buildings.stream().map(Building::name).toList())),
+                        : String.join("、", buildings.stream().map(Building::name).collect(Collectors.toList()))),
                 NarrationKind.SYSTEM);
     }
 
@@ -841,7 +843,7 @@ final class CommandDispatcher {
                 .filter(n -> n.name().contains(arg) || n.id().contains(arg))
                 .findFirst().orElse(null);
         if (def == null) {
-            s.narrate("你想招募谁？村里的人：" + String.join("、", all.stream().map(NpcDef::name).toList()), NarrationKind.SYSTEM);
+            s.narrate("你想招募谁？村里的人：" + String.join("、", all.stream().map(NpcDef::name).collect(Collectors.toList())), NarrationKind.SYSTEM);
             return;
         }
         Unit npc = s.getNpcInstance(def.id());
@@ -863,7 +865,7 @@ final class CommandDispatcher {
         if (s.player == null) return shops;
         List<String> ownerIds = s.map.findNearby(s.player.worldPos(), GameSession.NPC_RANGE).stream()
                 .filter(f -> f.type() == FeatureType.NPC_SPAWN)
-                .map(TerrainFeature::id).distinct().toList();
+                .map(TerrainFeature::id).distinct().collect(Collectors.toList());
         for (String ownerId : ownerIds) {
             ShopDef def = s.registries.shops.getByOwner(ownerId);
             if (def != null) shops.add(s.getShopInstance(def));
@@ -987,7 +989,7 @@ final class CommandDispatcher {
             var equipped = s.equipment.getAllEquipped();
             if (equipped.isEmpty()) {
                 s.narrate("你什么都没装备。可装备的兵器甲胄：" + String.join("、",
-                        s.registries.equips.getAll().stream().map(EquipDef::name).toList()), NarrationKind.SYSTEM);
+                        s.registries.equips.getAll().stream().map(EquipDef::name).collect(Collectors.toList())), NarrationKind.SYSTEM);
             } else {
                 List<String> rows = new ArrayList<>();
                 for (var kv : equipped.entrySet())

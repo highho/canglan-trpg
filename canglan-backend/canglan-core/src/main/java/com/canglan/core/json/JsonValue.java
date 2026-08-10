@@ -1,5 +1,6 @@
 package com.canglan.core.json;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +35,7 @@ public final class JsonValue {
         return new JsonValue(Kind.OBJECT, new LinkedHashMap<>(map), null, null, 0, false);
     }
     public static JsonValue ofArray(List<JsonValue> list) {
-        return new JsonValue(Kind.ARRAY, null, List.copyOf(list), null, 0, false);
+        return new JsonValue(Kind.ARRAY, null, new ArrayList<>(list), null, 0, false);
     }
     public static JsonValue ofString(String s) { return new JsonValue(Kind.STRING, null, null, s, 0, false); }
     public static JsonValue ofNumber(double n) { return new JsonValue(Kind.NUMBER, null, null, null, n, false); }

@@ -1,5 +1,7 @@
 package com.canglan.world;
 
+import java.util.stream.Collectors;
+
 import java.nio.file.Path;
 import java.util.List;
 
@@ -92,9 +94,9 @@ public final class WorldSmokeTest {
         map.switchLayer(MapLayer.SURFACE);
 
         // ========== WorldPopulator 固定种子布局一致 ==========
-        List<String> npcIds = r.npcs.getAll().stream().map(d -> d.id()).toList();
-        List<String> monsterIds = r.monsters.getAll().stream().map(t -> t.id()).toList();
-        List<String> resourceIds = r.resources.getAll().stream().map(res -> res.id()).toList();
+        List<String> npcIds = r.npcs.getAll().stream().map(d -> d.id()).collect(Collectors.toList());
+        List<String> monsterIds = r.monsters.getAll().stream().map(t -> t.id()).collect(Collectors.toList());
+        List<String> resourceIds = r.resources.getAll().stream().map(res -> res.id()).collect(Collectors.toList());
 
         WorldMap mapA = new WorldMap(50, 50);
         WorldMap mapB = new WorldMap(50, 50);

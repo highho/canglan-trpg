@@ -174,7 +174,7 @@ public final class BattleManager {
         if (currentPhase != BattlePhase.PLAYER_TURN) return;
 
         // 己方行动
-        for (Unit ally : List.copyOf(allies)) {
+        for (Unit ally : new ArrayList<>(allies)) {
             if (isOutOfCombat(ally)) continue;
             BattleAction action = allyActionSelector != null
                     ? allyActionSelector.apply(ally) : ai.decide(ally, this);
@@ -184,7 +184,7 @@ public final class BattleManager {
         nextPhase();
 
         // 敌方行动
-        for (Unit enemy : List.copyOf(enemies)) {
+        for (Unit enemy : new ArrayList<>(enemies)) {
             if (isOutOfCombat(enemy)) continue;
             BattleAction action = ai.decide(enemy, this);
             executeAction(enemy, action);
@@ -358,7 +358,7 @@ public final class BattleManager {
         List<Unit> survivors = new ArrayList<>();
         for (Unit u : allies) if (!isOutOfCombat(u)) survivors.add(u);
         for (Unit u : enemies) if (!isOutOfCombat(u)) survivors.add(u);
-        result = new BattleResult(playerWin, List.copyOf(deathList), survivors);
+        result = new BattleResult(playerWin, new ArrayList<>(deathList), survivors);
         for (Unit u : allies) if (!u.isDead()) u.exitCombat();
         for (Unit u : enemies) if (!u.isDead()) u.exitCombat();
         eventBus.emit(EventTypes.BATTLE_END, result);

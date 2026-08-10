@@ -15,7 +15,12 @@ public final class AiClients {
         if (baseUrl == null || baseUrl.isBlank()) {
             return new NullAiClient(rng);
         }
-        LangGraphHttpClient client = new LangGraphHttpClient(baseUrl, rng);
-        return client.probe() ? client : new NullAiClient(rng);
+        try {
+            LangGraphHttpClient client = new LangGraphHttpClient(baseUrl, rng);
+            return client.probe() ? client : new NullAiClient(rng);
+        } catch (Throwable t) {
+            // Android API < 33 无 java.net.http.HttpClient：类加载失败时降级为规则回退
+            return new NullAiClient(rng);
+        }
     }
 }

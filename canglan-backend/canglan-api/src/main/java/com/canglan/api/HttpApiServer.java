@@ -1,8 +1,6 @@
 package com.canglan.api;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import com.canglan.core.graph.ClassNode;
 import com.canglan.core.graph.QuestNode;
@@ -34,27 +32,24 @@ import com.canglan.world.MapPos;
 import com.canglan.world.TerrainFeature;
 import com.canglan.data.equipment.EquipSlot;
 import com.canglan.world.equipment.Equip;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 
 /**
- * HttpApiServer — REST 层（MIGRATION_PLAN §7a，JDK 内置 com.sun.net.httpserver，零外部依赖）。
- * P6 端点子集：
+ * HttpApiServer — REST 层（MIGRATION_PLAN §7a）。
+ * 传输层为自研 MiniHttpServer（ServerSocket 实现），PC 与 Android 共用——
+ * JDK 内置 com.sun.net.httpserver 在 Android 上不存在。
+ * 端点全集：
  *   GET  /api/health           探活（含 AI 可用性）
  *   POST /api/game/new         新游戏 → {sessionId}
  *   POST /api/game/command     {sessionId, line} → {narration[], hud}
  *   POST /api/save/{slot}      手动存档到指定槽位
  *   POST /api/load/{slot}      读档
  *   GET  /api/save/slots       槽位列表（?sessionId=xxx）
- * P8 扩展：
  *   GET  /api/game/state       全量叙事日志 + HUD（前端刷新恢复）
- *   GET  /api/panel/{name}     覆盖层面板数据（char/bag/skill/quest/home/recipe/settings）
- *   非 /api 路径               静态托管 frontend/dist（P8 前端产物）
- * P8 对齐原 Avalonia UI：
+ *   GET  /api/panel/{name}     覆盖层面板数据（char/bag/skill/quest/home/recipe/settings/map/codex）
  *   GET  /api/creation/options 创建页选项（血脉/道路/特质，随选择过滤）
  *   POST /api/game/start       一步建档（name/race/clazz/trait/difficulty）→ 会话 + 完整叙事
- *   panel 补 map（迷雾 50x50 网格）/ codex（怪物/物品/配方图鉴）
- * WS 事件推送延至后续阶段（与前端双向交互同期）。
+ *   非 /api 路径               静态托管 frontend/dist（P8 前端产物）
+ * CORS 头与 OPTIONS 预检由 MiniHttpServer 统一处理。
  */
 public final class HttpApiServer {
 
@@ -62,7 +57,7 @@ public final class HttpApiServer {
     private final Path saveDir;
     private final Path staticDir;
     private final Map<String, GameSession> sessions = new ConcurrentHashMap<>();
-    private HttpServer server;
+    private MiniHttpServer server;
 
     public HttpApiServer(Path dataDir, Path saveDir) {
         this(dataDir, saveDir, Path.of("frontend", "dist"));
@@ -80,133 +75,114 @@ public final class HttpApiServer {
     }
 
     public void start(int port) throws IOException {
-        server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/api/health", this::handleHealth);
-        server.createContext("/api/game/new", this::handleNew);
-        server.createContext("/api/game/command", this::handleCommand);
-        server.createContext("/api/save/slots", this::handleSlots);
-        server.createContext("/api/save/", this::handleSaveSlot);
-        server.createContext("/api/load/", this::handleLoadSlot);
-        server.createContext("/api/game/state", this::handleState);
-        server.createContext("/api/game/start", this::handleStart);
-        server.createContext("/api/creation/options", this::handleCreationOptions);
-        server.createContext("/api/panel/", this::handlePanel);
-        server.createContext("/", this::handleStatic);
-        // 守护线程池：stop() 后不阻止 JVM 退出
-        server.setExecutor(Executors.newFixedThreadPool(4, r -> {
-            Thread t = new Thread(r, "canglan-http-worker");
-            t.setDaemon(true);
-            return t;
-        }));
-        server.start();
+        server = new MiniHttpServer();
+        server.route("/api/health", this::handleHealth);
+        server.route("/api/game/new", this::handleNew);
+        server.route("/api/game/command", this::handleCommand);
+        server.route("/api/save/slots", this::handleSlots);
+        server.route("/api/save/", this::handleSaveSlot);
+        server.route("/api/load/", this::handleLoadSlot);
+        server.route("/api/game/state", this::handleState);
+        server.route("/api/game/start", this::handleStart);
+        server.route("/api/creation/options", this::handleCreationOptions);
+        server.route("/api/panel/", this::handlePanel);
+        server.route("/", this::handleStatic);
+        server.start(port);
     }
 
     public void stop() {
-        if (server != null) server.stop(0);
+        if (server != null) server.stop();
     }
 
     /** 实际监听端口（传 0 启动时由系统分配，冒烟测试用）。 */
     public int port() {
-        return server == null ? -1 : server.getAddress().getPort();
+        return server == null ? -1 : server.port();
     }
 
     // ==================== 端点实现 ====================
 
-    private void handleHealth(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "GET")) return;
+    private void handleHealth(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "GET")) return;
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("status", "ok");
         // AI 可用性：取任一会话的 AiClient 状态（无会话时视为不可用）
         boolean aiUp = sessions.values().stream().anyMatch(gs -> gs.ai.isAvailable());
         body.put("aiAvailable", aiUp);
         body.put("sessions", sessions.size());
-        sendJson(ex, 200, body);
+        sendJson(resp, 200, body);
     }
 
-    private void handleNew(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "POST")) return;
-        JsonValue req = readJson(ex);
+    private void handleNew(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "POST")) return;
+        JsonValue body = readJson(req);
         DifficultyMode mode = DifficultyMode.NORMAL;
-        String raw = req == null ? "" : req.getString("difficulty", "");
+        String raw = body == null ? "" : body.getString("difficulty", "");
         if (!raw.isEmpty()) {
             try {
                 mode = DifficultyMode.valueOf(raw.toUpperCase());
             } catch (IllegalArgumentException e) {
-                sendError(ex, 400, "未知难度：" + raw);
+                sendError(resp, 400, "未知难度：" + raw);
                 return;
             }
         }
         String sessionId = UUID.randomUUID().toString();
         sessions.put(sessionId, new GameSession(dataDir, saveDir, new Random(), mode));
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("sessionId", sessionId);
-        body.put("difficulty", mode.name());
-        sendJson(ex, 200, body);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("sessionId", sessionId);
+        out.put("difficulty", mode.name());
+        sendJson(resp, 200, out);
     }
 
-    private void handleCommand(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "POST")) return;
-        JsonValue req = readJson(ex);
-        if (req == null) { sendError(ex, 400, "请求体需为 JSON 对象 {sessionId, line}"); return; }
-        GameSession session = sessions.get(req.getString("sessionId", ""));
-        if (session == null) { sendError(ex, 404, "会话不存在，请先 POST /api/game/new"); return; }
-        String line = req.getString("line", "");
+    private void handleCommand(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "POST")) return;
+        JsonValue body = readJson(req);
+        if (body == null) { sendError(resp, 400, "请求体需为 JSON 对象 {sessionId, line}"); return; }
+        GameSession session = sessions.get(body.getString("sessionId", ""));
+        if (session == null) { sendError(resp, 404, "会话不存在，请先 POST /api/game/new"); return; }
+        String line = body.getString("line", "");
         CommandResult result;
         synchronized (session) {
             result = session.execute(line);
         }
-        sendJson(ex, 200, commandToJson(result));
+        sendJson(resp, 200, commandToJson(result));
     }
 
-    private void handleSaveSlot(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "POST")) return;
-        GameSession session = resolveSession(ex);
+    private void handleSaveSlot(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "POST")) return;
+        GameSession session = resolveSession(req, resp);
         if (session == null) return;
-        int slot = parseSlot(ex, pathTail(ex));
+        int slot = parseSlot(resp, pathTail(req.path));
         if (slot < 0) return;
         CommandResult result;
         synchronized (session) {
             session.selectedSlot = slot;
             result = session.execute("存档");
         }
-        sendJson(ex, 200, commandToJson(result));
+        sendJson(resp, 200, commandToJson(result));
     }
 
-    private void handleLoadSlot(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "POST")) return;
-        GameSession session = resolveSession(ex);
+    private void handleLoadSlot(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "POST")) return;
+        GameSession session = resolveSession(req, resp);
         if (session == null) return;
-        int slot = parseSlot(ex, pathTail(ex));
+        int slot = parseSlot(resp, pathTail(req.path));
         if (slot < 0) return;
         CommandResult result;
         synchronized (session) {
             session.selectedSlot = slot;
             result = session.execute("读档");
         }
-        sendJson(ex, 200, commandToJson(result));
+        sendJson(resp, 200, commandToJson(result));
     }
 
-    private void handleSlots(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "GET")) return;
+    private void handleSlots(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "GET")) return;
         // ?sessionId=xxx；缺省时仅允许只有一个会话
-        String query = ex.getRequestURI().getQuery();
-        String sessionId = "";
-        if (query != null) {
-            for (String kv : query.split("&")) {
-                String[] p = kv.split("=", 2);
-                if (p.length == 2 && p[0].equals("sessionId")) sessionId = p[1];
-            }
-        }
+        String sessionId = queryParams(req.query).getOrDefault("sessionId", "");
         GameSession session = sessionId.isEmpty() && sessions.size() == 1
                 ? sessions.values().iterator().next()
                 : sessions.get(sessionId);
-        if (session == null) { sendError(ex, 404, "会话不存在，请通过 ?sessionId= 指定"); return; }
+        if (session == null) { sendError(resp, 404, "会话不存在，请通过 ?sessionId= 指定"); return; }
         List<Object> slots = new ArrayList<>();
         for (SaveSlotInfo info : session.saveManager.listSlots()) {
             Map<String, Object> m = new LinkedHashMap<>();
@@ -217,20 +193,19 @@ public final class HttpApiServer {
             m.put("level", info.level());
             slots.add(m);
         }
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("slots", slots);
-        sendJson(ex, 200, body);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("slots", slots);
+        sendJson(resp, 200, out);
     }
 
     // ==================== P8：状态恢复 / 面板 / 静态托管 ====================
 
     /** GET /api/game/state：全量叙事日志 + HUD（前端刷新恢复）。 */
-    private void handleState(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "GET")) return;
-        GameSession session = resolveSession(ex);
+    private void handleState(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "GET")) return;
+        GameSession session = resolveSession(req, resp);
         if (session == null) return;
-        Map<String, Object> body;
+        Map<String, Object> out;
         synchronized (session) {
             List<Object> log = new ArrayList<>();
             for (NarrationLine line : session.log()) {
@@ -239,20 +214,19 @@ public final class HttpApiServer {
                 m.put("kind", line.kind().name());
                 log.add(m);
             }
-            body = new LinkedHashMap<>();
-            body.put("log", log);
-            body.put("hud", session.hud());
+            out = new LinkedHashMap<>();
+            out.put("log", log);
+            out.put("hud", session.hud());
         }
-        sendJson(ex, 200, body);
+        sendJson(resp, 200, out);
     }
 
     /** GET /api/creation/options：创建页选项（血脉/道路/特质，随 race/clazz 过滤，对齐原 Avalonia 创建页）。 */
-    private void handleCreationOptions(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "GET")) return;
+    private void handleCreationOptions(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "GET")) return;
         GameSession probe = new GameSession(dataDir, saveDir, new Random(), DifficultyMode.NORMAL);
-        Map<String, String> q = queryParams(ex);
-        Map<String, Object> body = new LinkedHashMap<>();
+        Map<String, String> q = queryParams(req.query);
+        Map<String, Object> out = new LinkedHashMap<>();
         List<Object> races = new ArrayList<>();
         for (RaceNode n : probe.creation.getAvailableRaces()) {
             Map<String, Object> m = new LinkedHashMap<>();
@@ -260,7 +234,7 @@ public final class HttpApiServer {
             m.put("name", n.name());
             races.add(m);
         }
-        body.put("races", races);
+        out.put("races", races);
         List<Object> classes = new ArrayList<>();
         for (ClassNode n : probe.creation.getAvailableClasses()) {
             Map<String, Object> m = new LinkedHashMap<>();
@@ -268,7 +242,7 @@ public final class HttpApiServer {
             m.put("name", n.name());
             classes.add(m);
         }
-        body.put("classes", classes);
+        out.put("classes", classes);
         List<Object> traits = new ArrayList<>();
         // race/clazz 参数兼容 id 与名称（前端创建页按名称回传）
         RaceNode race = probe.creation.getAvailableRaces().stream()
@@ -284,66 +258,64 @@ public final class HttpApiServer {
                 traits.add(m);
             }
         }
-        body.put("traits", traits);
+        out.put("traits", traits);
         List<String> difficulties = new ArrayList<>();
         for (DifficultyMode m : DifficultyMode.values()) difficulties.add(m.name());
-        body.put("difficulties", difficulties);
-        sendJson(ex, 200, body);
+        out.put("difficulties", difficulties);
+        sendJson(resp, 200, out);
     }
 
     /** POST /api/game/start：一步建档（对齐原 Avalonia「开始冒险」按钮）。 */
-    private void handleStart(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "POST")) return;
-        JsonValue req = readJson(ex);
-        if (req == null) { sendError(ex, 400, "请求体需为 JSON {name,race,clazz,trait,difficulty}"); return; }
+    private void handleStart(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "POST")) return;
+        JsonValue body = readJson(req);
+        if (body == null) { sendError(resp, 400, "请求体需为 JSON {name,race,clazz,trait,difficulty}"); return; }
         DifficultyMode mode = DifficultyMode.NORMAL;
-        String diffRaw = req.getString("difficulty", "");
+        String diffRaw = body.getString("difficulty", "");
         if (!diffRaw.isEmpty()) {
             try {
                 mode = DifficultyMode.valueOf(diffRaw.toUpperCase());
             } catch (IllegalArgumentException e) {
-                sendError(ex, 400, "未知难度：" + diffRaw);
+                sendError(resp, 400, "未知难度：" + diffRaw);
                 return;
             }
         }
-        String name = req.getString("name", "");
+        String name = body.getString("name", "");
         if (name.isEmpty()) name = "旅人";
         GameSession session = new GameSession(dataDir, saveDir, new Random(), mode);
         CommandResult result;
         synchronized (session) {
             session.execute("创建 " + name);
-            session.execute(req.getString("race", ""));
-            session.execute(req.getString("clazz", ""));
-            result = session.execute(req.getString("trait", ""));
+            session.execute(body.getString("race", ""));
+            session.execute(body.getString("clazz", ""));
+            result = session.execute(body.getString("trait", ""));
         }
         if (session.player == null) {
-            sendError(ex, 400, "建档失败：选项不匹配或服务器异常");
+            sendError(resp, 400, "建档失败：选项不匹配或服务器异常");
             return;
         }
         String sessionId = UUID.randomUUID().toString();
         sessions.put(sessionId, session);
-        Map<String, Object> body = commandToJson(result);
-        body.put("sessionId", sessionId);
-        sendJson(ex, 200, body);
+        Map<String, Object> out = commandToJson(result);
+        out.put("sessionId", sessionId);
+        sendJson(resp, 200, out);
     }
 
     /** GET /api/panel/{name}：覆盖层面板数据（只读快照，不改变游戏状态）。 */
-    private void handlePanel(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "GET")) return;
-        GameSession session = resolveSession(ex);
+    private void handlePanel(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        if (!requireMethod(req, resp, "GET")) return;
+        GameSession session = resolveSession(req, resp);
         if (session == null) return;
-        String name = pathTail(ex);
+        String name = pathTail(req.path);
         Map<String, Object> payload;
         synchronized (session) {
             payload = panelPayload(session, name);
         }
         if (payload == null) {
-            sendError(ex, 404, "未知面板：" + name);
+            sendError(resp, 404, "未知面板：" + name);
             return;
         }
-        sendJson(ex, 200, payload);
+        sendJson(resp, 200, payload);
     }
 
     /** 面板数据构造；未知面板返回 null。 */
@@ -398,13 +370,13 @@ public final class HttpApiServer {
                 p.put("hasHome", s.home != null);
                 if (s.home != null) {
                     p.put("level", s.home.level());
-                    p.put("buildings", s.home.getBuildings().stream().map(b -> b.name()).toList());
+                    p.put("buildings", s.home.getBuildings().stream().map(b -> b.name()).collect(Collectors.toList()));
                     p.put("nearHome", s.nearHome());
                 }
             }
             case "recipe" -> {
                 if (s.crafting != null && s.recipeCache.isEmpty()) s.recipeCache = s.crafting.getKnownRecipes();
-                p.put("recipes", s.recipeCache.stream().map(r -> r.name()).toList());
+                p.put("recipes", s.recipeCache.stream().map(r -> r.name()).collect(Collectors.toList()));
             }
             case "settings" -> {
                 p.put("aiAvailable", s.ai.isAvailable());
@@ -412,7 +384,7 @@ public final class HttpApiServer {
                 p.put("stage", "P8");
             }
             case "map" -> {
-                // 开拓者式 50x50 地形网格：迷雾未探索 '?'，已探索取生态首字母；特征点另给标记列表
+                // 50x50 地形网格：迷雾未探索 '?'，已探索取生态首字母；特征点另给标记列表
                 int w = s.map.width(), h = s.map.height();
                 List<Object> rows = new ArrayList<>();
                 for (int y = 0; y < h; y++) {
@@ -446,7 +418,7 @@ public final class HttpApiServer {
                         ? "主世界·(" + s.player.worldPos().x() + "," + s.player.worldPos().y() + ")·"
                         : "主世界·")
                         + s.time.display());
-                            p.put("legend", "一格一场景：地形为名称首字（平/林/沙/苔/沼/山）；怪=怪物，人=NPC，采=采集点，建=建筑，门=副本入口，家=家园；你=玩家位置；留白=未探索");
+                p.put("legend", "一格一场景：地形为名称首字（平/林/沙/苔/沼/山）；怪=怪物，人=NPC，采=采集点，建=建筑，门=副本入口，家=家园；你=玩家位置；留白=未探索");
             }
             case "codex" -> {
                 List<Object> monsters = new ArrayList<>();
@@ -480,7 +452,7 @@ public final class HttpApiServer {
         return p;
     }
 
-    /** 生态 → 地图格子字母（前端再映射底色）。 */
+    /** 生态 → 地图格子字母（前端再映射为文字）。 */
     private static char biomeChar(BiomeType b) {
         return switch (b) {
             case PLAINS -> 'P';
@@ -493,22 +465,18 @@ public final class HttpApiServer {
     }
 
     /** 静态托管 frontend/dist；路径穿越防护 + 目录默认 index.html。 */
-    private void handleStatic(HttpExchange ex) throws IOException {
-        if (preflight(ex)) return;
-        if (!requireMethod(ex, "GET")) return;
-        String path = ex.getRequestURI().getPath();
+    private void handleStatic(MiniHttpServer.Req req, MiniHttpServer.Resp resp) throws IOException {
+        if (!requireMethod(req, resp, "GET")) return;
+        String path = req.path;
         if (path.equals("/")) path = "/index.html";
         Path file = staticDir.resolve(path.substring(1)).normalize();
         if (!file.startsWith(staticDir.normalize()) || !Files.isRegularFile(file)) {
-            sendError(ex, 404, "资源不存在：" + path);
+            sendError(resp, 404, "资源不存在：" + path);
             return;
         }
-        byte[] bytes = Files.readAllBytes(file);
-        ex.getResponseHeaders().add("Content-Type", mime(file.getFileName().toString()));
-        ex.sendResponseHeaders(200, bytes.length);
-        try (OutputStream os = ex.getResponseBody()) {
-            os.write(bytes);
-        }
+        resp.status = 200;
+        resp.contentType = mime(file.getFileName().toString());
+        resp.body = Files.readAllBytes(file);
     }
 
     private static String mime(String fileName) {
@@ -536,100 +504,82 @@ public final class HttpApiServer {
         return body;
     }
 
-    /** 查询参数解析（?k=v&k2=v2）。 */
-    private static Map<String, String> queryParams(HttpExchange ex) {
+    /** 查询参数解析（?k=v&k2=v2，值做 URL 解码）。 */
+    private static Map<String, String> queryParams(String query) {
         Map<String, String> out = new LinkedHashMap<>();
-        String query = ex.getRequestURI().getQuery();
         if (query != null) {
             for (String kv : query.split("&")) {
                 String[] p = kv.split("=", 2);
-                if (p.length == 2) out.put(p[0], p[1]);
+                if (p.length == 2) out.put(p[0], urlDecode(p[1]));
             }
         }
         return out;
     }
 
+    private static String urlDecode(String s) {
+        try {
+            return java.net.URLDecoder.decode(s, StandardCharsets.UTF_8);
+        } catch (RuntimeException e) {
+            return s;
+        }
+    }
+
     /** /api/save/{slot} 或 /api/load/{slot} 的尾段。 */
-    private static String pathTail(HttpExchange ex) {
-        String path = ex.getRequestURI().getPath();
+    private static String pathTail(String path) {
         int idx = path.lastIndexOf('/');
         return idx >= 0 ? path.substring(idx + 1) : "";
     }
 
     /** 解析槽位号；非法回 400 并返回 -1。 */
-    private int parseSlot(HttpExchange ex, String tail) throws IOException {
+    private int parseSlot(MiniHttpServer.Resp resp, String tail) {
         int slot;
         try {
             slot = Integer.parseInt(tail);
         } catch (NumberFormatException e) {
-            sendError(ex, 400, "槽位号非法：" + tail);
+            sendError(resp, 400, "槽位号非法：" + tail);
             return -1;
         }
         if (slot < 1 || slot > 10) {
-            sendError(ex, 400, "槽位范围为 1~10：" + slot);
+            sendError(resp, 400, "槽位范围为 1~10：" + slot);
             return -1;
         }
         return slot;
     }
 
-    private GameSession resolveSession(HttpExchange ex) throws IOException {
-        String sessionId = "";
-        String query = ex.getRequestURI().getQuery();
-        if (query != null) {
-            for (String kv : query.split("&")) {
-                String[] p = kv.split("=", 2);
-                if (p.length == 2 && p[0].equals("sessionId")) sessionId = p[1];
-            }
-        }
+    private GameSession resolveSession(MiniHttpServer.Req req, MiniHttpServer.Resp resp) {
+        String sessionId = queryParams(req.query).getOrDefault("sessionId", "");
         GameSession session = sessions.get(sessionId);
         if (session == null && sessionId.isEmpty() && sessions.size() == 1)
             session = sessions.values().iterator().next();
-        if (session == null) sendError(ex, 404, "会话不存在，请通过 ?sessionId= 指定");
+        if (session == null) sendError(resp, 404, "会话不存在，请通过 ?sessionId= 指定");
         return session;
     }
 
-    private static JsonValue readJson(HttpExchange ex) throws IOException {
-        byte[] bytes = ex.getRequestBody().readAllBytes();
-        if (bytes.length == 0) return null;
+    private static JsonValue readJson(MiniHttpServer.Req req) {
+        if (req.body.length == 0) return null;
         try {
-            return JsonReader.parse(new String(bytes, StandardCharsets.UTF_8));
+            return JsonReader.parse(new String(req.body, StandardCharsets.UTF_8));
         } catch (RuntimeException e) {
             return null;
         }
     }
 
-    private static boolean requireMethod(HttpExchange ex, String method) throws IOException {
-        if (ex.getRequestMethod().equalsIgnoreCase(method)) return true;
-        sendError(ex, 405, "仅支持 " + method);
+    private static boolean requireMethod(MiniHttpServer.Req req, MiniHttpServer.Resp resp, String method) {
+        if (req.method.equalsIgnoreCase(method)) return true;
+        sendError(resp, 405, "仅支持 " + method);
         return false;
     }
 
-    /** CORS 预检：P8 前端直连需要；同时放行所有来源（本地单机服务）。 */
-    private static boolean preflight(HttpExchange ex) throws IOException {
-        ex.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        ex.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        ex.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
-        if (ex.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
-            ex.sendResponseHeaders(204, -1);
-            ex.close();
-            return true;
-        }
-        return false;
+    private static void sendJson(MiniHttpServer.Resp resp, int code, Object payload) {
+        resp.status = code;
+        resp.contentType = "application/json; charset=utf-8";
+        resp.body = JsonWriter.write(payload).getBytes(StandardCharsets.UTF_8);
     }
 
-    private static void sendJson(HttpExchange ex, int code, Object payload) throws IOException {
-        byte[] bytes = JsonWriter.write(payload).getBytes(StandardCharsets.UTF_8);
-        ex.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
-        ex.sendResponseHeaders(code, bytes.length);
-        try (OutputStream os = ex.getResponseBody()) {
-            os.write(bytes);
-        }
-    }
-
-    private static void sendError(HttpExchange ex, int code, String message) throws IOException {
+    private static void sendError(MiniHttpServer.Resp resp, int code, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", message);
-        sendJson(ex, code, body);
+        sendJson(resp, code, body);
     }
 
     // ==================== 独立启动入口 ====================

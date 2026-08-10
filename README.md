@@ -7,7 +7,8 @@
 ## 特性
 
 - **四步页面流程**：开始界面 → 存档选择（3 存档位）→ 角色创建（血脉/道路/特质/难度点选）→ 游戏
-- **纯文字界面**：状态、叙事、行动、地图全部文字表达，选中态用加粗下划线
+- **纯文字界面**：状态、叙事、行动、地图全部文字表达，选中态用加粗下划线；允许少量语义色彩（战斗红/奖励金/交互蓝）
+- **移动端适配**：窄屏下按钮加大至 44px、覆盖层面板全屏、支持触屏按压反馈与减动效偏好
 - **全行动空间化**：行动按钮随玩家坐标动态变化——村庄里没有怪物与采集点，走出村庄才会遇到；攻击/采集/交谈/招募/布告板/家园/建造/制造/喝水都有位置门槛
 - **传闻引导**：不知道去哪时点「传闻」，播报最近目标的方向与距离
 - **图驱动成长**：12 种族进化图、8 职业转职图、30 任务图，创建时只列根种族（5）与基础职业（4）
@@ -27,11 +28,14 @@
 ## 目录结构
 
 ```
-├── canglan-backend/    # Java 17 零依赖后端（core/data/world/save/ai-client/api 六模块）
+├── canglan-backend/    # Java 17 零依赖后端（core/data/world/save/ai-client/api 六模块 + android-app 安卓壳）
 ├── frontend/           # Web 前端（src 为 TS 源码，dist 为产物+静态资源）
 ├── ai-service/         # Python LangGraph AI 服务（可选部署）
 ├── data/               # 全部 JSON 配置（种族/职业/任务/怪物/NPC/物品…）
 ├── build-all/          # javac 编译产物（classpath 根）
+├── build-android.ps1   # Android APK 纯命令行构建（javac+d8+aapt2+apksigner，需 Android SDK）
+├── build-pc.ps1        # PC 独立发行包构建（jar+jlink 精简 JRE）
+├── run-regress.js      # 七套回归一键运行器（node run-regress.js）
 ├── PROJECT_CORE.md     # 项目核心文档（给 agent 的系统速读）
 ├── MIGRATION_PLAN.md   # 跨技术栈迁移方案（P1~P9 全部完成）
 └── ACCEPTANCE.md       # P9 验收报告
@@ -52,7 +56,8 @@ node_modules\.bin\tsc.cmd -p frontend\tsconfig.json
 java "-Dfile.encoding=UTF-8" "-Dcanglan.ai.url=" -cp build-all com.canglan.api.HttpApiServer data saves-frontend 8792 frontend\dist
 # 浏览器打开 http://localhost:8792/
 
-# 4. 回归测试（七套共 228 断言，详见 ACCEPTANCE.md）
+# 4. 回归测试（七套共 228 断言，一键运行或单套执行，详见 ACCEPTANCE.md）
+node run-regress.js
 java "-Dcanglan.ai.url=" -cp build-all com.canglan.data.BootstrapSmokeTest data        # 14
 java "-Dcanglan.ai.url=" -cp build-all com.canglan.world.WorldSmokeTest data            # 33
 java "-Dcanglan.ai.url=" -cp build-all com.canglan.world.battle.BattleSmokeTest data    # 71
@@ -61,6 +66,21 @@ java "-Dcanglan.ai.url=" -cp build-all com.canglan.api.ApiSmokeTest data build-a
 java "-Dcanglan.ai.url=" -cp build-all com.canglan.ai.AiSmokeTest data                                # 12
 java "-Dcanglan.ai.url=" -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test         # 13
 ```
+
+## 发行版构建
+
+```powershell
+# PC 独立版（Windows x64，内置精简 JRE，双击启动.bat 即玩）
+.\build-pc.ps1          # 产物 dist/canglan-trpg-win-x64.zip（约 19 MB）
+
+# Android 单机 APK（内置后端，WebView 前端，需本机 Android SDK；minSdk 30 / Android 11+）
+.\build-android.ps1     # 产物 dist/canglan-trpg-android.apk
+```
+
+说明：
+- **传输层**：后端 HTTP 服务为自研 `MiniHttpServer`（ServerSocket 实现，`canglan-api` 模块），PC 与 Android 共用同一套代码；JDK 内置的 `com.sun.net.httpserver` 在 Android 上不存在，故不使用。
+- **Android 形态**：APK 启动时将 assets 中的 data/web 解压到应用内部存储，后台线程起本地 HTTP 服务（仅回环监听，随机端口），WebView 加载 127.0.0.1；存档存应用沙箱，卸载即清。debug 签名仅供侧载安装。
+- **构建路径**：Android 构建经 `C:\canglan-trpg` 目录联接（ASCII 路径）执行，规避 aapt2 不支持中文/# 路径的问题；无 Gradle/Maven，纯 javac + d8 + aapt2 + zipalign + apksigner。
 
 ## 本地 AI 服务（可选）
 

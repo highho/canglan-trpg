@@ -72,6 +72,8 @@
 ## 6. 遗留事项与后续清理
 
 - 验收通过后旧栈已清理：删除 src/、tests/、publish/、Test.sln、Directory.Build.props、.idea/.inscode/.atomcode/.vscode 及根目录临时产物（约 3.9 GB），data/ 保留继续供新栈使用；
-- 前端 UI 验收后按用户要求重构为「极简纵向流 + 完全文字化」（去色条/去符号/去图标，地图改为文字字符格）；
-- 沙箱环境无法杀旧服务，历史遗留监听端口 8787/8789/8791（均为旧代码）；
+- 前端 UI 验收后按用户要求重构为「极简纵向流 + 完全文字化」（去色条/去符号/去图标，地图改为文字字符格），后又经一轮优化：移动端适配（窄屏按钮 44px/面板全屏）、动效反馈、少量语义色彩；
+- 后端传输层由 JDK `com.sun.net.httpserver` 替换为自研 `MiniHttpServer`（ServerSocket，Android 兼容），替换后七套回归 228 断言复验全绿；
+- 双端发行版已产出：`build-pc.ps1` → dist/canglan-trpg-win-x64.zip（内置 jlink 精简 JRE，自测探活通过）；`build-android.ps1` → dist/canglan-trpg-android.apk（内置后端单机版，minSdk 30，apksigner 验证通过；无真机，运行时验证待用户侧载确认）；
+- 沙箱环境无法杀旧服务，历史遗留监听端口 8787~8793（均为旧代码）；
 - Python LangGraph AI 服务未在本机部署（以 `-Dcanglan.ai.url=` 空值验证降级路径，符合契约 #8 设计）。
