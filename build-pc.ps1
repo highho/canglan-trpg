@@ -29,20 +29,52 @@ Write-Host "[3/5] jlink 精简 JRE"
     ForEach-Object { if ($_ -match "Error") { Write-Host $_ } }
 if (-not (Test-Path "$stage\jre\bin\java.exe")) { throw "jlink 未产出 JRE" }
 
-Write-Host "[4/5] 启动脚本与说明"
-$bat = @"
-@echo off
-cd /d "%~dp0"
-start "" /b jre\bin\javaw -Dfile.encoding=UTF-8 -jar canglan.jar data saves 8080 web
-timeout /t 2 /nobreak >nul
-start "" http://127.0.0.1:8080/
-"@
-Set-Content -Path "$stage\启动.bat" -Value $bat -Encoding Default
+Write-Host "[4/5] 生成 exe 启动器与说明"
+# 用 Go 编译零依赖原生 exe（无黑窗、无需 .NET 运行时）
+$launcherDir = "$dist\launcher"
+if (Test-Path $launcherDir) { Remove-Item -Recurse -Force $launcherDir }
+New-Item -ItemType Directory $launcherDir | Out-Null
+@"
+package main
+
+import (
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
+	"time"
+)
+
+func main() {
+	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	java := filepath.Join(dir, "jre", "bin", "javaw.exe")
+	jar := filepath.Join(dir, "canglan.jar")
+	data := filepath.Join(dir, "data")
+	saves := filepath.Join(dir, "saves")
+	web := filepath.Join(dir, "web")
+
+	cmd := exec.Command(java, "-Dfile.encoding=UTF-8", "-jar", jar, data, saves, "8080", web)
+	cmd.Dir = dir
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	if err := cmd.Start(); err != nil {
+		exec.Command("cmd", "/c", "msg", "%username%", "启动失败："+err.Error()).Run()
+		return
+	}
+	time.Sleep(2 * time.Second)
+	exec.Command("rundll32", "url.dll,FileProtocolHandler", "http://127.0.0.1:8080/").Start()
+}
+"@ | Set-Content "$launcherDir\main.go" -Encoding utf8
+
+$env:CGO_ENABLED = "0"
+& go build -ldflags="-s -w -H=windowsgui" -o "$launcherDir\苍岚大陆.exe" "$launcherDir\main.go"
+if ($LASTEXITCODE -ne 0) { throw "go build 编译 exe 失败" }
+Copy-Item "$launcherDir\苍岚大陆.exe" "$stage\苍岚大陆.exe"
+
 $readme = @"
 苍岚大陆（Windows x64 独立版）
 
-运行：双击「启动.bat」，自动打开浏览器进入游戏（http://127.0.0.1:8080）。
-关闭游戏：在任务管理器结束 javaw 进程，或关闭命令行窗口（若以 java 前台方式运行）。
+运行：双击「苍岚大陆.exe」，自动在后台启动服务并打开浏览器进入游戏。
+关闭游戏：在任务管理器结束 javaw 进程。
 
 目录说明：
   jre\    内置精简 JRE（无需安装 Java）

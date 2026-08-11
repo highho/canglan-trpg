@@ -70,8 +70,8 @@ java -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test       
 ## 发行版构建
 
 ```powershell
-# PC 独立版（Windows x64，内置精简 JRE，双击启动.bat 即玩）
-.\build-pc.ps1          # 产物 dist/canglan-trpg-win-x64.zip（约 19 MB）
+# PC 独立版（Windows x64，内置精简 JRE，双击 苍岚大陆.exe 即玩）
+.\build-pc.ps1          # 产物 dist/canglan-trpg-win-x64.zip（约 19 MB，exe 为 Go 编译零依赖启动器）
 
 # Android 单机 APK（内置后端，WebView 前端，需本机 Android SDK；minSdk 30 / Android 11+）
 .\build-android.ps1     # 产物 dist/canglan-trpg-android.apk
