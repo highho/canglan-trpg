@@ -105,8 +105,16 @@ $readme = @"
 Set-Content -Path "$stage\README.txt" -Value $readme -Encoding Default
 
 Write-Host "[5/5] 冒烟自测（Go AI 服务 + 后端探活 + 对话）+ 打包 zip"
-$aiProc = Start-Process -FilePath "$stage\ai-service.exe" -ArgumentList "-port","8798","-saves","$stage\saves" -PassThru -WindowStyle Hidden
-$proc = Start-Process -FilePath "$stage\jre\bin\java.exe" -ArgumentList "-Dfile.encoding=UTF-8","-Dcanglan.ai.url=http://127.0.0.1:8798","-jar","$stage\canglan.jar","$stage\data","$stage\saves","8799","$stage\web" -PassThru -WindowStyle Hidden
+# Defender 可能瞬时锁住刚编译的 exe（首次启动报拒绝访问），重试 3 次
+function Start-TestProc {
+    param([string]$FilePath, [string[]]$ArgList, [string]$WorkDir)
+    for ($i = 0; $i -lt 3; $i++) {
+        try { return Start-Process -FilePath $FilePath -ArgumentList $ArgList -WorkingDirectory $WorkDir -PassThru -WindowStyle Hidden }
+        catch { if ($i -eq 2) { throw }; Start-Sleep -Seconds 3 }
+    }
+}
+$aiProc = Start-TestProc "$stage\ai-service.exe" @("-port","8798","-saves","$stage\saves") $stage
+$proc = Start-TestProc "$stage\jre\bin\java.exe" @("-Dfile.encoding=UTF-8","-Dcanglan.ai.url=http://127.0.0.1:8798","-jar","$stage\canglan.jar","$stage\data","$stage\saves","8799","$stage\web") $stage
 Start-Sleep -Seconds 5
 try {
     $health = Invoke-RestMethod -Uri "http://127.0.0.1:8799/api/health" -TimeoutSec 5
@@ -126,6 +134,8 @@ try {
     Stop-Process -Id $aiProc.Id -Force -ErrorAction SilentlyContinue
 }
 if (Test-Path "$dist\canglan-trpg-win-x64.zip") { Remove-Item "$dist\canglan-trpg-win-x64.zip" }
+# 自测产生的 AI 记忆/会话数据不入发行包（首次启动由 Go 服务/Java 运行时生成）
+Remove-Item "$stage\saves\memories.json","$stage\saves\ai-config.json","$stage\saves\save_*.json" -ErrorAction SilentlyContinue
 Compress-Archive -Path $stage -DestinationPath "$dist\canglan-trpg-win-x64.zip"
 $zip = Get-Item "$dist\canglan-trpg-win-x64.zip"
 Write-Host "完成：$($zip.FullName)（$([math]::Round($zip.Length/1MB, 2)) MB）"

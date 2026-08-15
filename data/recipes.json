@@ -43,7 +43,7 @@
   },
   "mithril_sword": {
     "name": "锻造秘银剑",
-    "materials": { "mithril_ingot": 4, "oak_tree": 1 },
+    "materials": { "mithril_ingot": 5, "oak_tree": 1 },
     "output": "mithril_sword", "outputCount": 1,
     "condition": "TierAtLeast(锻造,3)",
     "craftTime": 4

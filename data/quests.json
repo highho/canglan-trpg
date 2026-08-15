@@ -1,7 +1,7 @@
 {
   "first_hunt": {
     "name": "初次狩猎",
-    "description": "击杀哥布林，证明你的实力",
+    "description": "砍几头哥布林，证明你有两下子",
     "minLevel": 1,
     "cooldown": 0,
     "rewardTagIds": [],
@@ -81,7 +81,7 @@
     "cooldown": 0,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 60,
+      "gold": 50,
       "travel_rations": 3
     },
     "edges": [
@@ -93,7 +93,7 @@
   },
   "wolf_hunt": {
     "name": "猎狼行动",
-    "description": "清剿袭扰牧场的狼群，还森林边缘以安宁",
+    "description": "狼群老来牧场祸害牲口，去清个干净",
     "minLevel": 2,
     "cooldown": 0,
     "rewardTagIds": [
@@ -125,7 +125,7 @@
       "森林之友"
     ],
     "rewards": {
-      "gold": 100,
+      "gold": 150,
       "forest_cloak": 1
     },
     "edges": [
@@ -148,7 +148,7 @@
     "cooldown": 0,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 200,
+      "gold": 250,
       "antidote": 2
     },
     "edges": [
@@ -167,7 +167,7 @@
       "瘟疫克星"
     ],
     "rewards": {
-      "gold": 400,
+      "gold": 350,
       "elixir": 1
     },
     "edges": []
@@ -181,7 +181,7 @@
       "古城探索者"
     ],
     "rewards": {
-      "gold": 300,
+      "gold": 350,
       "ancient_coin": 2
     },
     "edges": [
@@ -233,7 +233,7 @@
       "矿脉守望者"
     ],
     "rewards": {
-      "gold": 300,
+      "gold": 350,
       "silver_ingot": 2
     },
     "edges": [
@@ -265,7 +265,7 @@
       "圣殿骑士"
     ],
     "rewards": {
-      "gold": 400,
+      "gold": 350,
       "temple_badge": 1
     },
     "edges": [
@@ -283,21 +283,21 @@
     "cooldown": 0,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 600,
+      "gold": 500,
       "knight_plate": 1
     },
     "edges": []
   },
   "shadow_contract": {
     "name": "暗影契约",
-    "description": "与盗贼影签下契约，完成一次只针对为富不仁者的行动",
+    "description": "跟盗贼影签个契约，专挑为富不仁的下手",
     "minLevel": 3,
     "cooldown": 0,
     "rewardTagIds": [
       "暗影行者"
     ],
     "rewards": {
-      "gold": 400,
+      "gold": 350,
       "shadow_ring": 1
     },
     "edges": []
@@ -311,7 +311,7 @@
       "渔王"
     ],
     "rewards": {
-      "gold": 200,
+      "gold": 250,
       "trophy_fish": 1
     },
     "edges": [
@@ -358,7 +358,7 @@
       "屠兽者"
     ],
     "rewards": {
-      "gold": 450,
+      "gold": 500,
       "guardian_shield": 1
     },
     "edges": []
@@ -370,7 +370,7 @@
     "cooldown": 8,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 180
+      "gold": 150
     },
     "edges": []
   },
@@ -381,7 +381,7 @@
     "cooldown": 6,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 80,
+      "gold": 50,
       "healing_potion": 1
     },
     "edges": []
@@ -393,7 +393,7 @@
     "cooldown": 10,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 100
+      "gold": 50
     },
     "edges": [
       {
@@ -410,7 +410,7 @@
     "cooldown": 12,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 220
+      "gold": 250
     },
     "edges": []
   },
@@ -421,7 +421,7 @@
     "cooldown": 0,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 800,
+      "gold": 1000,
       "dragon_scale": 1
     },
     "edges": []
@@ -474,7 +474,7 @@
       "光明誓约"
     ],
     "rewards": {
-      "gold": 200
+      "gold": 250
     },
     "edges": [
       {
@@ -493,7 +493,7 @@
       "堕落之印"
     ],
     "rewards": {
-      "gold": 300
+      "gold": 350
     },
     "edges": [
       {
@@ -510,7 +510,7 @@
     "cooldown": 20,
     "rewardTagIds": [],
     "rewards": {
-      "gold": 300,
+      "gold": 350,
       "enchanted_essence": 1
     },
     "edges": [
@@ -530,7 +530,7 @@
       "屠龙者"
     ],
     "rewards": {
-      "gold": 800,
+      "gold": 1000,
       "dragon_heart": 1
     },
     "edges": []

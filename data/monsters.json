@@ -20,7 +20,7 @@
     "drops": [
       {
         "itemId": "rat_tail",
-        "chance": 0.9,
+        "chance": 0.92,
         "min": 1,
         "max": 2
       }
@@ -47,7 +47,7 @@
     "drops": [
       {
         "itemId": "slime_gel",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 2
       }
@@ -76,18 +76,18 @@
     "drops": [
       {
         "itemId": "goblin_fang",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "healing_potion",
-        "chance": 0.1,
+        "chance": 0.12,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 20,
+    "expReward": 18,
     "combatRole": "MELEE"
   },
   "wild_boar": {
@@ -111,18 +111,18 @@
     "drops": [
       {
         "itemId": "boar_meat",
-        "chance": 0.9,
+        "chance": 0.92,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "leather",
-        "chance": 0.3,
+        "chance": 0.32,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 25,
+    "expReward": 22,
     "combatRole": "MELEE"
   },
   "wolf": {
@@ -146,13 +146,13 @@
     "drops": [
       {
         "itemId": "wolf_pelt",
-        "chance": 0.6,
+        "chance": 0.62,
         "min": 1,
         "max": 2
       },
       "cooked_meat"
     ],
-    "expReward": 30,
+    "expReward": 28,
     "combatRole": "MELEE"
   },
   "frost_wolf": {
@@ -179,18 +179,18 @@
     "drops": [
       {
         "itemId": "wolf_pelt",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 3
       },
       {
         "itemId": "ice_crystal",
-        "chance": 0.25,
+        "chance": 0.27,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 45,
+    "expReward": 42,
     "combatRole": "MELEE"
   },
   "forest_spider": {
@@ -215,7 +215,7 @@
     "drops": [
       {
         "itemId": "spider_silk",
-        "chance": 0.7,
+        "chance": 0.72,
         "min": 1,
         "max": 2
       }
@@ -244,7 +244,7 @@
     "drops": [
       {
         "itemId": "bat_wing",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 2
       }
@@ -273,18 +273,18 @@
     "drops": [
       {
         "itemId": "iron_sword",
-        "chance": 0.15,
+        "chance": 0.16,
         "min": 1,
         "max": 1
       },
       {
         "itemId": "travel_rations",
-        "chance": 0.5,
+        "chance": 0.52,
         "min": 1,
         "max": 2
       }
     ],
-    "expReward": 35,
+    "expReward": 33,
     "combatRole": "MELEE"
   },
   "skeleton_soldier": {
@@ -308,18 +308,18 @@
     "drops": [
       {
         "itemId": "bone_fragment",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "ancient_coin",
-        "chance": 0.2,
+        "chance": 0.22,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 30,
+    "expReward": 32,
     "combatRole": "MELEE"
   },
   "skeleton_mage": {
@@ -345,13 +345,13 @@
     "drops": [
       {
         "itemId": "magic_crystal",
-        "chance": 0.3,
+        "chance": 0.32,
         "min": 1,
         "max": 1
       },
       "stone"
     ],
-    "expReward": 50,
+    "expReward": 48,
     "combatRole": "RANGED",
     "specialSkills": {
       "fireball": 1,
@@ -379,18 +379,18 @@
     "drops": [
       {
         "itemId": "plague_sample",
-        "chance": 0.6,
+        "chance": 0.62,
         "min": 1,
         "max": 1
       },
       {
         "itemId": "bone_fragment",
-        "chance": 0.5,
+        "chance": 0.52,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 40,
+    "expReward": 38,
     "combatRole": "MELEE"
   },
   "dark_cultist": {
@@ -417,18 +417,18 @@
     "drops": [
       {
         "itemId": "cultist_robe",
-        "chance": 0.7,
+        "chance": 0.72,
         "min": 1,
         "max": 1
       },
       {
         "itemId": "magic_crystal",
-        "chance": 0.2,
+        "chance": 0.22,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 45,
+    "expReward": 42,
     "combatRole": "RANGED",
     "specialSkills": {
       "fireball": 1
@@ -455,18 +455,18 @@
     "drops": [
       {
         "itemId": "ogre_tooth",
-        "chance": 0.9,
+        "chance": 0.92,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "cooked_meat",
-        "chance": 0.6,
+        "chance": 0.62,
         "min": 1,
         "max": 2
       }
     ],
-    "expReward": 120,
+    "expReward": 110,
     "combatRole": "MELEE"
   },
   "stone_golem": {
@@ -490,7 +490,7 @@
     "drops": [
       {
         "itemId": "golem_core",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 1
       },
@@ -527,12 +527,12 @@
     "drops": [
       {
         "itemId": "ghost_essence",
-        "chance": 0.6,
+        "chance": 0.62,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 60,
+    "expReward": 55,
     "combatRole": "RANGED",
     "specialSkills": {
       "ice_arrow": 1
@@ -563,18 +563,18 @@
     "drops": [
       {
         "itemId": "dragon_scale",
-        "chance": 0.7,
+        "chance": 0.72,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "dragon_meat",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 2
       }
     ],
-    "expReward": 400,
+    "expReward": 350,
     "combatRole": "BOSS",
     "specialSkills": {
       "dragon_roar": 1
@@ -653,18 +653,18 @@
     "drops": [
       {
         "itemId": "magic_crystal",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "elixir",
-        "chance": 0.2,
+        "chance": 0.22,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 600,
+    "expReward": 550,
     "combatRole": "BOSS"
   },
   "elite_wolf": {
@@ -696,18 +696,18 @@
       },
       {
         "itemId": "raw_meat",
-        "chance": 0.8,
+        "chance": 0.82,
         "min": 2,
         "max": 4
       },
       {
         "itemId": "enchanted_essence",
-        "chance": 0.15,
+        "chance": 0.16,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 90,
+    "expReward": 85,
     "combatRole": "ELITE"
   },
   "elite_goblin_chief": {
@@ -737,18 +737,18 @@
       },
       {
         "itemId": "gold_ore",
-        "chance": 0.4,
+        "chance": 0.42,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "iron_sword",
-        "chance": 0.1,
+        "chance": 0.12,
         "min": 1,
         "max": 1
       }
     ],
-    "expReward": 80,
+    "expReward": 75,
     "combatRole": "ELITE"
   },
   "forest_titan": {
@@ -780,7 +780,7 @@
       },
       {
         "itemId": "magic_crystal",
-        "chance": 0.5,
+        "chance": 0.52,
         "min": 1,
         "max": 2
       },
@@ -791,7 +791,7 @@
         "max": 1
       }
     ],
-    "expReward": 260,
+    "expReward": 250,
     "combatRole": "BOSS"
   },
   "crimson_wraith": {
@@ -817,13 +817,13 @@
     "drops": [
       {
         "itemId": "ghost_essence",
-        "chance": 0.9,
+        "chance": 0.92,
         "min": 1,
         "max": 2
       },
       {
         "itemId": "shadow_essence",
-        "chance": 0.5,
+        "chance": 0.52,
         "min": 1,
         "max": 2
       },
@@ -834,7 +834,7 @@
         "max": 1
       }
     ],
-    "expReward": 320,
+    "expReward": 300,
     "combatRole": "BOSS"
   }
 }

@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <!-- ==================== 页面 1：开始界面 ==================== -->
+  <!-- ════════════ 页面 1：开始界面 ════════════ -->
   <section id="page-start" class="page">
     <div class="stack">
       <h1 class="title">苍岚大陆</h1>
@@ -22,7 +22,7 @@
     </div>
   </section>
 
-  <!-- ==================== 页面 2：存档位选择 ==================== -->
+  <!-- ════════════ 页面 2：存档位选择 ════════════ -->
   <section id="page-save-select" class="page">
     <div class="stack">
       <h1 id="save-page-title" class="title">选择存档位</h1>
@@ -31,7 +31,7 @@
     </div>
   </section>
 
-  <!-- ==================== 页面 3：创建角色 ==================== -->
+  <!-- ════════════ 页面 3：创建角色 ════════════ -->
   <section id="page-creation" class="page">
     <div class="stack stack-wide">
       <h1 class="title">创建角色</h1>
@@ -63,78 +63,116 @@
     </div>
   </section>
 
-  <!-- ==================== 页面 4：游戏主界面（纵向流：状态 + 叙事 + 行动 + 功能栏） ==================== -->
+  <!-- ════════════ 页面 4：游戏主界面（开拓者式：顶栏属性 + 主场景 + 底部菜单 + 全屏弹窗） ════════════ -->
   <section id="page-game" class="page game-page">
 
-    <header class="hud">
-      <div class="hud-line">
-        <span id="hud-time"></span>
-        <span id="hud-coord"></span>
-        <span>难度 <span id="hud-difficulty"></span></span>
-        <span id="hud-overload" hidden>超重</span>
-        <span class="hud-ops">
+    <!-- 顶栏属性：地图名 + 时间/难度 + 属性行 -->
+    <header class="head">
+      <div class="head-line">
+        <span id="hud-coord" class="map-name"></span>
+        <span id="hud-time" class="head-time"></span>
+        <span class="head-ops">
+          难度 <span id="hud-difficulty"></span>
+          <span id="hud-overload" hidden>超重</span>
+          <button id="btn-mini-map" class="link-btn">小地图</button>
           <button id="btn-status" class="link-btn">状态</button>
           <button id="btn-menu" class="link-btn">菜单</button>
         </span>
       </div>
-      <div class="hud-line" id="hud-vitals"></div>
-      <div class="hud-line" id="hud-combat"></div>
+      <div id="hud-vitals" class="attrs"></div>
     </header>
 
-    <div id="narration" class="narration"></div>
-
-    <div class="action-area">
-      <div class="group-title">移动</div>
-      <div id="move-buttons" class="btn-row"></div>
-
-      <div class="group-title">行动</div>
-      <div id="action-buttons" class="btn-row"></div>
-
-      <div id="nearby-block" hidden>
-        <div class="group-title">附近</div>
-        <div id="nearby-cards" class="btn-row"></div>
+    <!-- 主场景：地图元素过滤条 + 大网格地图 + 方向键盘 + 日志条 + 行动区（开拓者式） -->
+    <div class="body-div">
+      <div class="body-head-filter">
+        <input id="el-filter" type="text" placeholder="筛选格子文字（用逗号分隔）" />
+        <label><input type="checkbox" value="资源" checked />资源</label>
+        <label><input type="checkbox" value="怪物" checked />怪物</label>
+        <label><input type="checkbox" value="NPC" checked />NPC</label>
       </div>
 
-      <div id="dialog-block" hidden>
-        <div class="group-title">对话</div>
-        <div id="dialog-buttons" class="btn-row"></div>
+      <div class="map-view">
+        <div id="local-map" class="local-map"></div>
+        <div class="move-pad" title="方向键盘">
+          <div class="pad-cell"></div>
+          <button class="pad-btn" data-cmd="北" title="向北走">▲</button>
+          <div class="pad-cell"></div>
+          <button class="pad-btn" data-cmd="西" title="向西走">◀</button>
+          <button class="pad-btn pad-center" data-cmd="探索" title="探索此处">探</button>
+          <button class="pad-btn" data-cmd="东" title="向东走">▶</button>
+          <div class="pad-cell"></div>
+          <button class="pad-btn" data-cmd="南" title="向南走">▼</button>
+          <div class="pad-cell"></div>
+        </div>
       </div>
 
-      <div class="group-title">物品（点击使用）</div>
-      <div id="quick-slots" class="btn-row"></div>
+      <div id="log-bar" class="log-bar">
+        <div id="log-toggle" class="log-title">事件日志（点此展开）</div>
+        <div id="narration" class="narration"></div>
+      </div>
+
+      <div class="action-area">
+        <div id="nearby-block" class="action-row" hidden>
+          <span class="group-title">附近</span>
+          <div id="nearby-cards" class="btn-row"></div>
+        </div>
+        <div class="action-row">
+          <span class="group-title">行动</span>
+          <div id="action-buttons" class="btn-row"></div>
+        </div>
+        <div id="dialog-block" class="action-row" hidden>
+          <span class="group-title">对话</span>
+          <div id="dialog-buttons" class="btn-row"></div>
+        </div>
+        <div class="action-row">
+          <span class="group-title">物品</span>
+          <div id="quick-slots" class="btn-row"></div>
+        </div>
+      </div>
     </div>
 
-    <nav class="tab-bar">
-      <button class="tab-btn" data-panel="map">探索</button>
-      <button class="tab-btn" data-panel="bag">行囊</button>
-      <button class="tab-btn" data-panel="skill">技能</button>
-      <button class="tab-btn" data-panel="recipe">制造</button>
-      <button class="tab-btn" data-panel="quest">委托</button>
-      <button class="tab-btn" data-panel="home">家园</button>
-      <button class="tab-btn" data-panel="codex">图鉴</button>
-      <button class="tab-btn" data-panel="settings">设置</button>
+    <!-- 底部主菜单：8 个等分 -->
+    <nav class="menus">
+      <button class="menu" data-panel="map">探索</button>
+      <button class="menu" data-panel="bag">行囊</button>
+      <button class="menu" data-panel="skill">技能</button>
+      <button class="menu" data-panel="recipe">制造</button>
+      <button class="menu" data-panel="quest">委托</button>
+      <button class="menu" data-panel="home">家园</button>
+      <button class="menu" data-panel="codex">图鉴</button>
+      <button class="menu" data-panel="settings">设置</button>
     </nav>
 
-    <!-- 覆盖层：遮罩仅作视觉暗层（不拦截点击），面板居中 -->
-    <div id="overlay-mask" class="overlay-mask" hidden></div>
-    <div id="overlay-panel" class="overlay-panel" hidden>
-      <div class="overlay-head">
-        <h2 id="overlay-title" class="overlay-title"></h2>
-        <button id="overlay-close" class="menu-btn">关闭</button>
+    <!-- 面板弹窗：全屏 .win（遮罩仅视觉暗层，不拦截点击） -->
+    <div id="overlay-mask" class="win-mask" hidden></div>
+    <div id="overlay-panel" class="win" hidden>
+      <div class="win-close-title">
+        <h2 id="overlay-title" class="win-title"></h2>
+        <button id="overlay-close" class="win-close">关闭</button>
       </div>
-      <div id="overlay-body" class="overlay-body"></div>
+      <div id="overlay-body" class="win-body"></div>
     </div>
 
   </section>
 
-  <!-- ==================== AI 供应商设置（起始页与游戏内共用，body 级） ==================== -->
-  <div id="ai-mask" class="overlay-mask" hidden></div>
-  <div id="ai-panel" class="overlay-panel" hidden>
-    <div class="overlay-head">
-      <h2 class="overlay-title">AI 设置（供应商接入）</h2>
-      <button id="ai-settings-close" class="menu-btn">关闭</button>
+  <!-- ════════════ AI 供应商设置（起始页与游戏内共用，body 级） ════════════ -->
+  <div id="ai-mask" class="win-mask" hidden></div>
+  <div id="ai-panel" class="win" hidden>
+    <div class="win-close-title">
+      <h2 class="win-title">AI 设置（供应商接入）</h2>
+      <button id="ai-settings-close" class="win-close">关闭</button>
     </div>
-    <div id="ai-settings-body" class="overlay-body"></div>
+    <div id="ai-settings-body" class="win-body"></div>
+  </div>
+
+  <!-- ════════════ 小地图（缩略图弹窗，地图数据来自本地缓存） ════════════ -->
+  <div id="mini-mask" class="win-mask" hidden></div>
+  <div id="mini-panel" class="win" hidden>
+    <div class="win-close-title">
+      <h2 class="win-title">小地图</h2>
+      <button id="mini-close" class="win-close">关闭</button>
+    </div>
+    <div id="mini-map-body" class="win-body"></div>
   </div>
 
   <script type="module" src="main.js"></script>

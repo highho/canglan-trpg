@@ -1,9 +1,11 @@
 /**
  * ai-settings.ts — AI 供应商接入设置（起始页「AI 设置」与游戏内设置面板共用）。
- * 供应商统一为 OpenAI 兼容端点：本地模型服务（Ollama/llama.cpp）与云端模型（OpenAI/DeepSeek 等）同构，
+ * 供应商统一为 OpenAI 兼容端点：本地模型服务（Ollama/llama.cpp）与云端模型同构，
  * 差异仅在服务地址/密钥/模型名。保存立即生效并持久化（后端 saveDir/ai-config.json）。
+ * 表单 html 拼接渲染；预设/按钮静态绑定（每轮打开重建）。
  */
 import { api } from '../net/api.js';
+import { esc } from '../state/store.js';
 /** 供应商预设：前两项为本地模型服务，其余为云端模型。 */
 const PRESETS = {
     '本地 Ollama': { url: 'http://127.0.0.1:11434/v1', model: 'qwen2' },
@@ -36,69 +38,53 @@ export async function openAiSettings() {
     mask.removeAttribute('hidden');
     panel.removeAttribute('hidden');
     renderBody(body);
-    setStatus('加载中…', '');
+    setStatus('加载中……', '');
     try {
         const cfg = await api.aiConfig();
         fill(cfg);
         setStatus(cfg.enabled && cfg.baseUrl
-            ? '当前已启用供应商，修改后点「保存」立即生效。'
-            : '当前未启用 LLM 生成（内嵌记忆+规则兜底）。选择供应商并保存即可接入。', '');
+            ? '供应商开着呢，改完点「保存」立刻生效。'
+            : '没启用 LLM（内嵌记忆 + 规则兜底）。选个供应商保存就接上了。', '');
     }
     catch (err) {
-        setStatus(`读取配置失败：${err.message}`, 'err');
+        setStatus(`读配置失败：${err.message}`, 'err');
     }
 }
 function renderBody(body) {
-    body.innerHTML = '';
-    const hint = document.createElement('div');
-    hint.className = 'ov-muted';
-    hint.textContent = '供应商统一为 OpenAI 兼容端点：本地模型服务免密钥，云端模型需 API 密钥。不启用时走内嵌记忆+规则兜底，游戏不受影响。';
-    body.appendChild(hint);
-    const enabledRow = document.createElement('label');
-    enabledRow.className = 'form-row';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = 'ai-enabled';
-    enabledRow.appendChild(cb);
-    enabledRow.appendChild(document.createTextNode(' 启用 LLM 生成（关闭则仅用内嵌记忆与规则兜底）'));
-    body.appendChild(enabledRow);
-    const presets = document.createElement('div');
-    presets.id = 'ai-presets';
-    presets.className = 'btn-row';
+    let html = '';
+    html += '<div class="ov-muted">供应商统一走 OpenAI 兼容端点：本地模型服务免密钥，云端要 API 密钥。不启用就走内嵌记忆 + 规则兜底，游戏照玩。</div>';
+    html += `<label class="form-row"><input type="checkbox" id="ai-enabled" /> 启用 LLM 生成（关了只用内嵌记忆与规则兜底）</label>`;
+    html += '<div class="btn-row" id="ai-presets">';
     for (const name of [...Object.keys(PRESETS), '自定义']) {
-        const btn = document.createElement('button');
-        btn.textContent = name;
+        html += `<button data-preset="${esc(name)}">${esc(name)}</button>`;
+    }
+    html += '</div>';
+    html += `<label class="form-row-col"><span>服务地址（OpenAI 兼容，云端通常以 /v1 结尾）</span>` +
+        `<input type="text" id="ai-base-url" placeholder="http://127.0.0.1:11434/v1" /></label>`;
+    html += `<label class="form-row-col"><span>API 密钥（本地模型服务可留空）</span>` +
+        `<input type="text" id="ai-api-key" placeholder="sk-…" /></label>`;
+    html += `<label class="form-row-col"><span>模型名</span>` +
+        `<input type="text" id="ai-model" placeholder="qwen2" /></label>`;
+    html += '<div class="btn-row">' +
+        '<button id="ai-test-btn">测试连接</button>' +
+        '<button id="ai-save-btn">保存</button>' +
+        '<button id="ai-close-btn">关闭</button></div>';
+    html += '<p id="ai-settings-status" class="hint"></p>';
+    body.innerHTML = html;
+    // 静态绑定（每轮重建）
+    body.querySelectorAll('[data-preset]').forEach(btn => {
         btn.addEventListener('click', () => {
-            const p = PRESETS[name];
+            const p = PRESETS[btn.dataset.preset ?? ''];
             if (p) {
                 setVal('ai-base-url', p.url);
                 setVal('ai-model', p.model);
             }
-            presets.querySelectorAll('button').forEach(b => b.classList.toggle('selected', b === btn));
+            body.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('selected', b === btn));
         });
-        presets.appendChild(btn);
-    }
-    body.appendChild(presets);
-    body.appendChild(field('ai-base-url', '服务地址（OpenAI 兼容，云端通常以 /v1 结尾）', 'http://127.0.0.1:11434/v1'));
-    body.appendChild(field('ai-api-key', 'API 密钥（本地模型服务可留空）', 'sk-…'));
-    body.appendChild(field('ai-model', '模型名', 'qwen2'));
-    const ops = document.createElement('div');
-    ops.className = 'btn-row';
-    const testBtn = document.createElement('button');
-    testBtn.textContent = '测试连接';
-    testBtn.addEventListener('click', () => void onTest());
-    const saveBtn = document.createElement('button');
-    saveBtn.textContent = '保存';
-    saveBtn.addEventListener('click', () => void onSave());
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '关闭';
-    closeBtn.addEventListener('click', closeAiSettings);
-    ops.append(testBtn, saveBtn, closeBtn);
-    body.appendChild(ops);
-    const status = document.createElement('p');
-    status.id = 'ai-settings-status';
-    status.className = 'hint';
-    body.appendChild(status);
+    });
+    document.getElementById('ai-test-btn')?.addEventListener('click', () => void onTest());
+    document.getElementById('ai-save-btn')?.addEventListener('click', () => void onSave());
+    document.getElementById('ai-close-btn')?.addEventListener('click', closeAiSettings);
 }
 function fill(cfg) {
     setVal('ai-enabled', cfg.enabled);
@@ -113,8 +99,8 @@ function fill(cfg) {
             break;
         }
     }
-    document.querySelectorAll('#ai-presets button').forEach(btn => {
-        btn.classList.toggle('selected', btn.textContent === matched);
+    document.querySelectorAll('#ai-presets [data-preset]').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.preset === matched);
     });
 }
 function collect() {
@@ -128,48 +114,36 @@ function collect() {
 async function onTest() {
     const cfg = collect();
     if (!cfg.baseUrl) {
-        setStatus('请先填写服务地址。', 'err');
+        setStatus('先把服务地址填上。', 'err');
         return;
     }
-    setStatus('正在试连供应商…', '');
+    setStatus('正在试连供应商……', '');
     try {
         const r = await api.testAi(cfg);
         if (r.ok)
-            setStatus(`连接成功，模型回复：${r.reply ?? ''}`, 'ok');
+            setStatus(`连上了，模型回话：${r.reply ?? ''}`, 'ok');
         else
-            setStatus(`试连失败：${r.error ?? '未知错误'}`, 'err');
+            setStatus(`试连没成：${r.error ?? '不知道啥毛病'}`, 'err');
     }
     catch (err) {
-        setStatus(`试连失败：${err.message}`, 'err');
+        setStatus(`试连没成：${err.message}`, 'err');
     }
 }
 async function onSave() {
     const cfg = collect();
     if (cfg.enabled && !cfg.baseUrl) {
-        setStatus('启用前必须填写服务地址。', 'err');
+        setStatus('要启用就得先填服务地址。', 'err');
         return;
     }
     try {
         await api.saveAiConfig(cfg);
         setStatus(cfg.enabled
-            ? `已保存并启用（${cfg.baseUrl}）。自由对话即刻走所选供应商；失败自动回退规则兜底。`
-            : '已保存：关闭 LLM 生成，回到内嵌记忆+规则兜底。', 'ok');
+            ? `已保存并启用（${cfg.baseUrl}）。自由对话走这供应商；挂了自动回退规则兜底。`
+            : '已保存：关掉 LLM 生成，回到内嵌记忆 + 规则兜底。', 'ok');
     }
     catch (err) {
         setStatus(`保存失败：${err.message}`, 'err');
     }
-}
-function field(id, label, placeholder) {
-    const row = document.createElement('label');
-    row.className = 'form-row-col';
-    const span = document.createElement('span');
-    span.textContent = label;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.id = id;
-    input.placeholder = placeholder;
-    row.append(span, input);
-    return row;
 }
 function setVal(id, v) {
     const el = document.getElementById(id);

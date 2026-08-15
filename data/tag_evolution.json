@@ -1,42 +1,42 @@
 {
   "龙战士": {
     "name": "龙战士",
-    "description": "龙裔血脉与战斗技艺的完美结合",
+    "description": "龙血加刀剑，血统和手艺一个不落",
     "requiredTags": ["近战", "龙裔"]
   },
   "炎术士": {
     "name": "炎术士",
-    "description": "将魔能与火焰融为一体的施法者",
+    "description": "魔能点火，烧得比谁都欢",
     "requiredTags": ["魔能", "火焰"]
   },
   "圣殿守卫": {
     "name": "圣殿守卫",
-    "description": "以圣光之力加固防御的圣骑士",
+    "description": "圣光糊脸，皮糙肉厚",
     "requiredTags": ["盾防", "圣光术"]
   },
   "影刃": {
     "name": "影刃",
-    "description": "潜行于暗影之中的刺杀者",
+    "description": "藏在影子里，专捅要害",
     "requiredTags": ["暗杀", "潜行"]
   },
   "风行者": {
     "name": "风行者",
-    "description": "将自然之力注入箭矢的游侠",
+    "description": "箭上带风，林子里没人跑得过你",
     "requiredTags": ["弓术", "自然"]
   },
   "山丘锻王": {
     "name": "山丘锻王",
-    "description": "矮人血脉觉醒的锻造大师",
+    "description": "矮人血统觉醒，锤子抡得比谁都响",
     "requiredTags": ["矮人", "锻造"]
   },
   "圣光龙裔": {
     "name": "圣光龙裔",
-    "description": "被圣光祝福的龙族后裔",
+    "description": "龙的后代，还得了圣光加护",
     "requiredTags": ["龙裔", "圣光"]
   },
   "暗黑骑士": {
     "name": "暗黑骑士",
-    "description": "拥抱黑暗之力的近战者",
+    "description": "一头扎进黑暗里，刀刀见血",
     "requiredTags": ["近战", "黑暗"]
   }
 }

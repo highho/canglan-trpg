@@ -1,5 +1,5 @@
 /**
- * api.ts — REST 客户端（对齐 HttpApiServer 端点全集；P8 补 creation/options 与 game/start）。
+ * api.ts — 后端 REST 客户端（契约与 HttpApiServer 端点一一对应，零改动）。
  */
 
 export interface NarrationLine {
@@ -119,7 +119,7 @@ export const api = {
     return get<CreationOptions>('/api/creation/options' + (qs ? `?${qs}` : ''));
   },
 
-  /** 一步建档（对齐原 Avalonia「开始冒险」按钮）。 */
+  /** 一步建档（对齐「开始冒险」按钮）。 */
   startGame: (req: { name: string; race: string; clazz: string; trait: string; difficulty: string }) =>
     post<CommandResponse>('/api/game/start', req),
 

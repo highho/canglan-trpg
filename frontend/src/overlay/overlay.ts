@@ -1,19 +1,19 @@
 /**
- * overlay.ts — 覆盖层面板（对齐 MainView.axaml：遮罩 + 居中弹窗）。
+ * overlay.ts — 全屏弹窗面板（开拓者式：.win 结构 + renderXxx() 字符串拼接整块重绘）。
  * 面板：char/bag/skill/recipe/quest/home/codex/settings + map（探索）。
+ * 面板内指令按钮统一 data-cmd，由 game.ts 的页面级委托发送（弹窗内点击先关窗）。
  */
 
 import { api } from '../net/api.js';
-import { getState, esc, setPage, setState } from '../state/store.js';
+import { getState, esc } from '../state/store.js';
 import { BIOME_NAME, DIFF_CN } from '../state/narration.js';
-import { openAiSettings } from '../pages/ai-settings.js';
 
 const TITLES: Record<string, string> = {
   char: '角色状态', bag: '行囊', skill: '技能', recipe: '制造',
   quest: '委托', home: '家园', codex: '图鉴', settings: '系统设置', map: '世界地图',
 };
 
-/** 地图标记文字（对应原图例：怪/人/采/建/门/家）。 */
+/** 地图标记文字（怪/人/采/建/门/家）。 */
 const MARK_TEXT: Record<string, string> = {
   MONSTER_SPAWN: '怪', NPC_SPAWN: '人', GATHER_POINT: '采',
   BUILDING: '建', DUNGEON_ENTRANCE: '门', HOME: '家',
@@ -26,15 +26,26 @@ const BIOME_BY_CHAR: Record<string, string> = {
 let saveHandler: () => void = () => undefined;
 let inited = false;
 
+/* 图鉴局部状态（分类切换/关键词过滤用模块级变量，重绘走 drawCodex） */
+let codexData: Record<string, unknown> | null = null;
+let codexCat = 'monsters';
+let codexFilter = '';
+
 export function initOverlay(onSave: () => void): void {
   saveHandler = onSave;
   if (inited) return;
   inited = true;
   document.getElementById('overlay-close')?.addEventListener('click', closeOverlay);
-  // 遮罩仅作视觉暗层（pointer-events:none），不拦截点击——对齐原 Avalonia：
-  // 覆盖层打开时页面其余区域（含底部 Tab）仍可操作，点其他 Tab 直接切换面板。
   document.addEventListener('keydown', ev => {
     if (ev.key === 'Escape') closeOverlay();
+  });
+  // 图鉴分类切换（本地重绘，不发指令）
+  document.addEventListener('click', ev => {
+    const btn = (ev.target as HTMLElement).closest('[data-cx-cat]') as HTMLElement | null;
+    if (btn?.dataset.cxCat) {
+      codexCat = btn.dataset.cxCat;
+      drawCodex();
+    }
   });
 }
 
@@ -43,7 +54,7 @@ export function closeOverlay(): void {
   document.getElementById('overlay-panel')?.setAttribute('hidden', '');
 }
 
-/** 打开面板：拉数据 → 按类型渲染。 */
+/** 打开面板：拉数据 → 按类型整块重绘。 */
 export function openOverlay(name: string): void {
   const mask = document.getElementById('overlay-mask');
   const panel = document.getElementById('overlay-panel');
@@ -51,251 +62,229 @@ export function openOverlay(name: string): void {
   const body = document.getElementById('overlay-body');
   if (!mask || !panel || !title || !body) return;
   title.textContent = TITLES[name] ?? name;
-  body.innerHTML = '<div class="ov-muted">加载中…</div>';
+  body.innerHTML = '<div class="ov-muted">正在翻找……</div>';
   mask.removeAttribute('hidden');
   panel.removeAttribute('hidden');
   void (async () => {
     try {
       const data = await api.panel(getState().sessionId, name);
-      body.innerHTML = '';
-      renderPanel(name, data, body);
+      body.innerHTML = renderPanel(name, data);
+      // 图鉴输入框绑定（每次重绘后重建）
+      const filterBox = document.getElementById('codex-filter') as HTMLInputElement | null;
+      if (filterBox) {
+        filterBox.value = codexFilter;
+        filterBox.addEventListener('input', () => {
+          codexFilter = filterBox.value.trim();
+          drawCodex();
+        });
+      }
     } catch (err) {
-      body.innerHTML = `<div class="ov-muted">面板加载失败：${esc((err as Error).message)}</div>`;
+      body.innerHTML = `<div class="ov-muted">面板打不开：${esc((err as Error).message)}</div>`;
     }
   })();
 }
 
-function cmdBtn(label: string, cmd: string): HTMLButtonElement {
-  const btn = document.createElement('button');
-  btn.textContent = label;
-  btn.dataset.cmd = cmd;
-  btn.addEventListener('click', () => { closeOverlay(); void sendAndRefresh(cmd); });
-  return btn;
+/** 指令按钮（点击后由 game.ts 委托发送；面板内先关窗）。 */
+function cmdBtn(label: string, cmd: string): string {
+  return `<button data-cmd="${esc(cmd)}">${esc(label)}</button>`;
 }
 
-/** 面板指令：经游戏页 send 注入叙事流（通过全局事件避免循环依赖）。 */
-async function sendAndRefresh(cmd: string): Promise<void> {
-  window.dispatchEvent(new CustomEvent('canglan-cmd', { detail: cmd }));
+function row(label: string, value: string): string {
+  return `<div class="ov-row"><span class="ov-label">${esc(label)}</span><span class="ov-value">${esc(value)}</span></div>`;
 }
 
-function row(label: string, value: string): HTMLDivElement {
-  const div = document.createElement('div');
-  div.className = 'ov-row';
-  div.innerHTML = `<span class="ov-label">${esc(label)}</span><span class="ov-value">${esc(value)}</span>`;
-  return div;
+function title(text: string): string {
+  return `<div class="ov-title">${esc(text)}</div>`;
 }
 
-function title(text: string): HTMLDivElement {
-  const div = document.createElement('div');
-  div.className = 'ov-title';
-  div.textContent = text;
-  return div;
+function info(text: string): string {
+  return `<div class="ov-muted">${esc(text)}</div>`;
 }
 
-function renderPanel(name: string, data: Record<string, unknown>, body: HTMLElement): void {
+function renderPanel(name: string, data: Record<string, unknown>): string {
   switch (name) {
-    case 'char': renderChar(data, body); break;
-    case 'bag': renderBag(data, body); break;
-    case 'skill': renderList(data, body, 'unlocked', '已学技能', ['技能', '解锁技能']); break;
-    case 'recipe': renderRecipe(data, body); break;
-    case 'quest': renderQuest(data, body); break;
-    case 'home': renderHome(data, body); break;
-    case 'codex': renderCodex(data, body); break;
-    case 'settings': renderSettings(data, body); break;
-    case 'map': renderMap(data, body); break;
-    default: body.innerHTML = `<div class="ov-muted">未知面板：${esc(name)}</div>`;
+    case 'char': return renderChar(data);
+    case 'bag': return renderBag(data);
+    case 'skill': return renderList(data, 'unlocked', '已学技能', ['技能', '解锁技能']);
+    case 'recipe': return renderRecipe(data);
+    case 'quest': return renderQuest(data);
+    case 'home': return renderHome(data);
+    case 'codex': return renderCodex(data);
+    case 'settings': return renderSettings(data);
+    case 'map': return renderMap(data);
+    default: return info(`没这个面板：${name}`);
   }
 }
 
 /* ═══ 角色状态 ═══ */
-function renderChar(d: Record<string, unknown>, body: HTMLElement): void {
+function renderChar(d: Record<string, unknown>): string {
   const hp = Number(d['hp'] ?? 0), maxHp = Number(d['maxHp'] ?? 1);
-  body.appendChild(info(`${String(d['name'] ?? '旅人')}，等级 ${String(d['level'] ?? 1)}，${String(d['race'] ?? '')} / ${String(d['clazz'] ?? '')}`));
-  body.appendChild(title('生命'));
-  body.appendChild(info(`${hp}/${maxHp}`));
-  body.appendChild(title('属性'));
-  body.appendChild(row('攻击', String(d['atk'] ?? '')));
-  body.appendChild(row('防御', String(d['def'] ?? '')));
-  body.appendChild(row('速度', String(d['spd'] ?? '')));
-  body.appendChild(row('经验', String(d['exp'] ?? '')));
-  body.appendChild(title('生存'));
-  body.appendChild(row('饱食', String(d['hunger'] ?? '')));
-  body.appendChild(row('水分', String(d['thirst'] ?? '')));
-  body.appendChild(row('体温', String(d['temperature'] ?? '')));
-  body.appendChild(title('标签'));
+  let html = '';
+  html += info(`${String(d['name'] ?? '旅人')}，等级 ${String(d['level'] ?? 1)}，${String(d['race'] ?? '')} / ${String(d['clazz'] ?? '')}`);
+  html += title('生命');
+  html += info(`${hp}/${maxHp}`);
+  html += title('属性');
+  html += row('攻击', String(d['atk'] ?? ''));
+  html += row('防御', String(d['def'] ?? ''));
+  html += row('速度', String(d['spd'] ?? ''));
+  html += row('经验', String(d['exp'] ?? ''));
+  html += title('生存');
+  html += row('饱食', String(d['hunger'] ?? ''));
+  html += row('水分', String(d['thirst'] ?? ''));
+  html += row('体温', String(d['temperature'] ?? ''));
+  html += title('标签');
   const tags = (d['tags'] as string[] | undefined) ?? [];
-  body.appendChild(info(tags.length ? tags.join('、') : '（无）'));
+  html += info(tags.length ? tags.join('、') : '（一个标签都没有）');
   const equips = (d['equipped'] as { slot: string; name: string; durability: string }[] | undefined) ?? [];
   if (equips.length) {
-    body.appendChild(title('当前装备'));
-    for (const e of equips) body.appendChild(info(`${e.slot}：${e.name}（耐久 ${e.durability}）`));
+    html += title('当前装备');
+    for (const e of equips) html += info(`${e.slot}：${e.name}（耐久 ${e.durability}）`);
   }
-  const ops = document.createElement('div');
-  ops.className = 'btn-row';
-  ops.appendChild(cmdBtn('完整状态', '状态'));
-  const saveBtn = document.createElement('button');
-  saveBtn.textContent = '存档';
-  saveBtn.addEventListener('click', () => { closeOverlay(); saveHandler(); });
-  ops.appendChild(saveBtn);
-  const menuBtn = document.createElement('button');
-  menuBtn.textContent = '返回菜单';
-  menuBtn.addEventListener('click', () => {
-    closeOverlay();
-    saveHandler();
-    setState({ sessionId: '', hud: null });
-    setPage('start');
-  });
-  ops.appendChild(menuBtn);
-  body.appendChild(ops);
+  html += '<div class="btn-row">';
+  html += cmdBtn('完整状态', '状态');
+  html += cmdBtn('存档', '存档');
+  html += cmdBtn('返回菜单', '__return_menu');
+  html += '</div>';
+  return html;
 }
 
 /* ═══ 行囊 ═══ */
-function renderBag(d: Record<string, unknown>, body: HTMLElement): void {
-  body.appendChild(info(`金币 ${String(d['gold'] ?? 0)}`));
-  body.appendChild(title('物品（点击行快捷使用）'));
+function renderBag(d: Record<string, unknown>): string {
+  let html = '';
+  html += info(`金币 ${String(d['gold'] ?? 0)}`);
+  html += title('物品（点击行快捷使用）');
   const items = (d['items'] as { name: string; count: number }[] | undefined) ?? [];
-  if (!items.length) body.appendChild(info('（背包空空如也）'));
+  if (!items.length) html += info('（兜里一个子儿都没有）');
   for (const it of items) {
-    const div = document.createElement('div');
-    div.className = 'item-row';
-    div.innerHTML = `<b>${esc(it.name)}</b> <span class="ov-label">数量 ${it.count}</span>`;
-    div.title = '点击发送「吃 ' + it.name + '」';
-    div.addEventListener('click', () => { closeOverlay(); void sendAndRefresh(`吃 ${it.name}`); });
-    body.appendChild(div);
+    html += `<div class="item-row" data-cmd="${esc(`吃 ${it.name}`)}" title="点击发送「吃 ${esc(it.name)}」">` +
+      `<b>${esc(it.name)}</b> <span class="ov-label">数量 ${it.count}</span></div>`;
   }
+  return html;
 }
 
 /* ═══ 技能（通用列表） ═══ */
-function renderList(d: Record<string, unknown>, body: HTMLElement, key: string,
-                    head: string, cmds: string[]): void {
-  body.appendChild(title(head));
+function renderList(d: Record<string, unknown>, key: string, head: string, cmds: string[]): string {
+  let html = '';
+  html += title(head);
   const names = (d[key] as string[] | undefined) ?? [];
-  body.appendChild(info(names.length ? names.join('、') : '（暂无）'));
-  const ops = document.createElement('div');
-  ops.className = 'btn-row';
-  for (const c of cmds) ops.appendChild(cmdBtn(c, c));
-  body.appendChild(ops);
+  html += info(names.length ? names.join('、') : '（还没学到一招半式）');
+  html += '<div class="btn-row">';
+  for (const c of cmds) html += cmdBtn(c, c);
+  html += '</div>';
+  return html;
 }
 
 /* ═══ 制造 ═══ */
-function renderRecipe(d: Record<string, unknown>, body: HTMLElement): void {
-  body.appendChild(title('已知配方（点击制造）'));
+function renderRecipe(d: Record<string, unknown>): string {
+  let html = '';
+  html += title('已知配方（点击制造）');
   const recipes = (d['recipes'] as string[] | undefined) ?? [];
-  if (!recipes.length) body.appendChild(info('（还不知道任何配方）'));
-  const ops = document.createElement('div');
-  ops.className = 'btn-row';
-  for (const r of recipes) ops.appendChild(cmdBtn(r, `制造 ${r}`));
-  body.appendChild(ops);
-  body.appendChild(cmdBtn('配方列表', '配方'));
+  if (!recipes.length) html += info('（脑子里一片空白，还不知道任何配方）');
+  html += '<div class="btn-row">';
+  for (const r of recipes) html += cmdBtn(r, `制造 ${r}`);
+  html += '</div>';
+  html += '<div class="btn-row">' + cmdBtn('配方列表', '配方') + '</div>';
+  return html;
 }
 
 /* ═══ 委托 ═══ */
-function renderQuest(d: Record<string, unknown>, body: HTMLElement): void {
-  body.appendChild(title('可接委托'));
+function renderQuest(d: Record<string, unknown>): string {
+  let html = '';
+  html += title('可接委托');
   const quests = (d['quests'] as { name: string; description: string; minLevel: number }[] | undefined) ?? [];
-  if (!quests.length) body.appendChild(info('（布告板空空如也——输入「任务」刷新）'));
-  const ops = document.createElement('div');
-  ops.className = 'btn-row';
+  if (!quests.length) html += info('（布告板空空如也——输入「任务」刷新）');
+  html += '<div class="btn-row">';
   for (const q of quests) {
-    const btn = cmdBtn(`${q.name}（需要等级 ${q.minLevel}）`, `完成 ${q.name}`);
-    btn.title = q.description;
-    ops.appendChild(btn);
+    html += `<button data-cmd="${esc(`完成 ${q.name}`)}" title="${esc(q.description)}">` +
+      `${esc(q.name)}（需要等级 ${q.minLevel}）</button>`;
   }
-  body.appendChild(ops);
-  body.appendChild(cmdBtn('布告板', '任务'));
-  if (d['hint']) body.appendChild(info(String(d['hint'])));
+  html += '</div>';
+  html += '<div class="btn-row">' + cmdBtn('布告板', '任务') + '</div>';
+  if (d['hint']) html += info(String(d['hint']));
+  return html;
 }
 
 /* ═══ 家园 ═══ */
-function renderHome(d: Record<string, unknown>, body: HTMLElement): void {
-  if (!d['hasHome']) {
-    body.appendChild(info('还没有家园。'));
-    return;
-  }
-  body.appendChild(info(`家园等级 ${String(d['level'] ?? 1)}${d['nearHome'] ? '（就在附近）' : '（离家较远）'}`));
-  body.appendChild(title('建筑'));
+function renderHome(d: Record<string, unknown>): string {
+  if (!d['hasHome']) return info('连个窝都没有，先攒点家底吧。');
+  let html = '';
+  html += info(`家园等级 ${String(d['level'] ?? 1)}${d['nearHome'] ? '（就在跟前）' : '（离家还远）'}`);
+  html += title('建筑');
   const buildings = (d['buildings'] as string[] | undefined) ?? [];
-  body.appendChild(info(buildings.length ? buildings.join('、') : '（空置——回村后「建造」放置第一栋）'));
-  const ops = document.createElement('div');
-  ops.className = 'btn-row';
-  ops.appendChild(cmdBtn('建造', '建造'));
-  ops.appendChild(cmdBtn('扩建家园', '家园升级'));
-  body.appendChild(ops);
+  html += info(buildings.length ? buildings.join('、') : '（空荡荡——回村后「建造」放第一栋）');
+  html += '<div class="btn-row">';
+  html += cmdBtn('建造', '建造');
+  html += cmdBtn('扩建家园', '家园升级');
+  html += '</div>';
+  return html;
 }
 
 /* ═══ 图鉴（分类 + 关键词过滤） ═══ */
-function renderCodex(d: Record<string, unknown>, body: HTMLElement): void {
+function renderCodex(d: Record<string, unknown>): string {
+  codexData = d;
   const cats: { key: string; label: string }[] = [
     { key: 'monsters', label: '怪物' }, { key: 'items', label: '物品' }, { key: 'recipes', label: '配方' },
   ];
-  let current = 'monsters';
-  let filter = '';
+  let html = '';
+  html += '<div class="btn-row" id="codex-nav">';
+  for (const c of cats) {
+    html += `<button data-cx-cat="${c.key}" class="${c.key === codexCat ? 'selected' : ''}">${c.label}</button>`;
+  }
+  html += '</div>';
+  html += `<input id="codex-filter" type="text" placeholder="关键词过滤…" style="width:150px;margin:6px 0" />`;
+  html += '<div id="codex-list"></div>';
+  drawCodex();
+  return html;
+}
 
-  const nav = document.createElement('div');
-  nav.className = 'btn-row';
-  const filterBox = document.createElement('input');
-  filterBox.type = 'text';
-  filterBox.placeholder = '关键词过滤…';
-  filterBox.style.width = '150px';
-  filterBox.addEventListener('input', () => { filter = filterBox.value.trim(); draw(); });
-  const list = document.createElement('div');
-  body.appendChild(nav);
-  body.appendChild(filterBox);
-  body.appendChild(list);
-
-  function draw(): void {
+/** 图鉴列表重绘（分类/过滤变化时调用）。 */
+function drawCodex(): void {
+  const list = document.getElementById('codex-list');
+  const nav = document.getElementById('codex-nav');
+  if (!list || !codexData) return;
+  if (nav) {
     nav.innerHTML = '';
+    const cats: { key: string; label: string }[] = [
+      { key: 'monsters', label: '怪物' }, { key: 'items', label: '物品' }, { key: 'recipes', label: '配方' },
+    ];
     for (const c of cats) {
-      const btn = document.createElement('button');
-      btn.className = c.key === current ? 'selected' : '';
-      btn.textContent = c.label;
-      btn.addEventListener('click', () => { current = c.key; draw(); });
-      nav.appendChild(btn);
-    }
-    list.innerHTML = '';
-    const rows = (d[current] as { name: string; detail: string }[] | undefined) ?? [];
-    const shown = rows.filter(r => !filter || r.name.includes(filter) || r.detail.includes(filter));
-    if (!shown.length) list.innerHTML = '<div class="ov-muted">（无匹配条目）</div>';
-    for (const r of shown) {
-      const div = document.createElement('div');
-      div.className = 'codex-row';
-      div.innerHTML = `<div class="cx-name">${esc(r.name)}</div><div class="cx-detail">${esc(r.detail)}</div>`;
-      list.appendChild(div);
+      nav.insertAdjacentHTML('beforeend',
+        `<button data-cx-cat="${c.key}" class="${c.key === codexCat ? 'selected' : ''}">${c.label}</button>`);
     }
   }
-  draw();
+  const rows = (codexData[codexCat] as { name: string; detail: string }[] | undefined) ?? [];
+  const shown = rows.filter(r => !codexFilter || r.name.includes(codexFilter) || r.detail.includes(codexFilter));
+  let html = '';
+  if (!shown.length) {
+    html = '<div class="ov-muted">（一条对上的都没有）</div>';
+  } else {
+    for (const r of shown) {
+      html += `<div class="codex-row"><div class="cx-name">${esc(r.name)}</div>` +
+        `<div class="cx-detail">${esc(r.detail)}</div></div>`;
+    }
+  }
+  list.innerHTML = html;
 }
 
 /* ═══ 设置 ═══ */
-function renderSettings(d: Record<string, unknown>, body: HTMLElement): void {
-  body.appendChild(title('系统'));
-  body.appendChild(row('本地 AI', d['aiAvailable'] ? '已连接' : '未连接（规则兜底）'));
-  body.appendChild(row('难度', DIFF_CN[String(d['difficulty'] ?? '')] ?? String(d['difficulty'] ?? '')));
-  body.appendChild(row('阶段', String(d['stage'] ?? '')));
-  const ops = document.createElement('div');
-  ops.className = 'btn-row';
-  const aiBtn = document.createElement('button');
-  aiBtn.textContent = 'AI 设置';
-  aiBtn.addEventListener('click', () => { closeOverlay(); void openAiSettings(); });
-  ops.appendChild(aiBtn);
-  const saveBtn = document.createElement('button');
-  saveBtn.textContent = '保存游戏';
-  saveBtn.addEventListener('click', () => { closeOverlay(); saveHandler(); });
-  ops.appendChild(saveBtn);
-  body.appendChild(ops);
+function renderSettings(d: Record<string, unknown>): string {
+  let html = '';
+  html += title('系统');
+  html += row('本地 AI', d['aiAvailable'] ? '已连接' : '没连上（规则兜底）');
+  html += row('难度', DIFF_CN[String(d['difficulty'] ?? '')] ?? String(d['difficulty'] ?? ''));
+  html += row('阶段', String(d['stage'] ?? ''));
+  html += '<div class="btn-row">';
+  html += cmdBtn('AI 设置', '__ai_settings');
+  html += cmdBtn('保存游戏', '存档');
+  html += '</div>';
+  return html;
 }
 
-/* ═══ 地图（50x50 文字字符格，无底色：地形首字/标记字/玩家「你」） ═══ */
-function renderMap(d: Record<string, unknown>, body: HTMLElement): void {
-  const head = document.createElement('div');
-  head.className = 'map-header';
-  head.textContent = String(d['header'] ?? '');
-  body.appendChild(head);
-
-  const scroll = document.createElement('div');
-  scroll.className = 'map-scroll';
-  const grid = document.createElement('div');
-  grid.className = 'map-grid';
+/* ═══ 地图（50x50 文字字符格：地形首字/标记字/玩家「你」） ═══ */
+function renderMap(d: Record<string, unknown>): string {
+  let html = '';
+  html += `<div class="map-header">${esc(String(d['header'] ?? ''))}</div>`;
+  html += '<div class="map-scroll"><div class="map-grid">';
   const cells = (d['cells'] as string[] | undefined) ?? [];
   const px = Number(d['px'] ?? -1), py = Number(d['py'] ?? -1);
   const markMap = new Map<string, string>();
@@ -305,39 +294,33 @@ function renderMap(d: Record<string, unknown>, body: HTMLElement): void {
   for (let y = 0; y < cells.length; y++) {
     for (let x = 0; x < cells[y].length; x++) {
       const ch = cells[y][x];
-      const cell = document.createElement('span');
-      cell.className = 'map-cell';
+      let cls = 'map-cell', text = '';
       if (x === px && y === py) {
-        cell.classList.add('player');
-        cell.textContent = '你';
+        cls += ' player';
+        text = '你';
       } else if (ch === '?') {
         // 未探索迷雾：留白
+        cls += ' unexplored';
       } else {
-        cell.classList.add('explored');
+        cls += ' explored';
         const mark = markMap.get(`${x},${y}`);
         if (mark && MARK_TEXT[mark]) {
-          cell.textContent = MARK_TEXT[mark];
+          text = MARK_TEXT[mark];
         } else {
           const biome = BIOME_BY_CHAR[ch];
           const name = biome ? BIOME_NAME[biome] : '';
-          cell.textContent = name ? name[0] : ch;
+          text = name ? name[0] : ch;
         }
       }
-      grid.appendChild(cell);
+      html += `<span class="${cls}">${esc(text)}</span>`;
     }
   }
-  scroll.appendChild(grid);
-  body.appendChild(scroll);
-
-  const legend = document.createElement('div');
-  legend.className = 'map-legend';
-  legend.textContent = String(d['legend'] ?? '');
-  body.appendChild(legend);
+  html += '</div></div>';
+  html += `<div class="map-legend">${esc(String(d['legend'] ?? ''))}</div>`;
+  return html;
 }
 
-function info(text: string): HTMLDivElement {
-  const div = document.createElement('div');
-  div.className = 'ov-muted';
-  div.textContent = text;
-  return div;
+/** 导出给 game.ts 特殊指令用（返回菜单前保存）。 */
+export function getSaveHandler(): () => void {
+  return saveHandler;
 }

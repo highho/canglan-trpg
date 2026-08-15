@@ -4,12 +4,12 @@
     "bonuses": {
       "2": {
         "name": "暗影之力",
-        "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 10 } ]
+        "effects": [ { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 12 } ]
       },
       "3": {
         "name": "暗影主宰",
         "effects": [
-          { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 10 },
+          { "type": "STAT_MOD", "target": "ATK", "operator": "ADD", "value": 12 },
           { "type": "DAMAGE_MOD", "operator": "MULTIPLY", "value": 1.25 }
         ]
       }
@@ -20,13 +20,13 @@
     "bonuses": {
       "2": {
         "name": "圣光庇佑",
-        "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 8 } ]
+        "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 9 } ]
       },
       "3": {
         "name": "圣殿守护者",
         "effects": [
-          { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 10 },
-          { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 30 }
+          { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 12 },
+          { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 35 }
         ]
       }
     }

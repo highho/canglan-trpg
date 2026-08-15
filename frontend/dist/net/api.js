@@ -1,5 +1,5 @@
 /**
- * api.ts — REST 客户端（对齐 HttpApiServer 端点全集；P8 补 creation/options 与 game/start）。
+ * api.ts — 后端 REST 客户端（契约与 HttpApiServer 端点一一对应，零改动）。
  */
 async function post(path, payload) {
     const resp = await fetch(path, {
@@ -34,7 +34,7 @@ export const api = {
         const qs = q.toString();
         return get('/api/creation/options' + (qs ? `?${qs}` : ''));
     },
-    /** 一步建档（对齐原 Avalonia「开始冒险」按钮）。 */
+    /** 一步建档（对齐「开始冒险」按钮）。 */
     startGame: (req) => post('/api/game/start', req),
     command: (sessionId, line) => post('/api/game/command', { sessionId, line }),
     state: (sessionId) => get(`/api/game/state?sessionId=${encodeURIComponent(sessionId)}`),

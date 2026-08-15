@@ -49,7 +49,7 @@
   },
   "dark_plate": {
     "name": "黑暗铠甲", "slot": "ARMOR", "tier": 3,
-    "baseStats": { "DEF": 18, "HP": 30 },
+    "baseStats": { "DEF": 18, "HP": 35 },
     "effects": [],
     "equipCondition": "HasTag(黑暗)",
     "maxDurability": 70,
@@ -57,7 +57,7 @@
   },
   "knight_plate": {
     "name": "骑士铠甲", "slot": "ARMOR", "tier": 3,
-    "baseStats": { "DEF": 20, "HP": 25 },
+    "baseStats": { "DEF": 22, "HP": 28 },
     "effects": [],
     "equipCondition": "HasTag(盾防)",
     "maxDurability": 80,
@@ -177,7 +177,7 @@
   },
   "dwarven_plate": {
     "name": "矮人锻甲", "slot": "ARMOR", "tier": 3,
-    "baseStats": { "DEF": 18, "HP": 20 },
+    "baseStats": { "DEF": 18, "HP": 28 },
     "effects": [ { "type": "STAT_MOD", "target": "DEF", "operator": "ADD", "value": 4 } ],
     "equipCondition": "HasTag(矮人)",
     "maxDurability": 100,
@@ -186,7 +186,7 @@
 
   "amulet_of_nature": {
     "name": "自然护符", "slot": "ACCESSORY", "tier": 3,
-    "baseStats": { "HP": 20, "MATK": 5 },
+    "baseStats": { "HP": 25, "MATK": 5 },
     "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ],
     "maxDurability": 60,
     "tagIds": ["自然"]
@@ -230,7 +230,7 @@
   },
   "holy_ring": {
     "name": "圣光之戒", "slot": "RING1", "tier": 3,
-    "baseStats": { "HP": 20, "MATK": 6 },
+    "baseStats": { "HP": 25, "MATK": 6 },
     "effects": [ { "type": "STAT_MOD", "target": "HP", "operator": "ADD", "value": 10 } ],
     "equipCondition": "HasTag(圣光术)",
     "maxDurability": 80,

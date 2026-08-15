@@ -4,12 +4,12 @@
     "description": "无所畏惧的冒险者"
   },
   "greedy": {
-    "name": "贪婪", "tagIds": ["贪婪"], "startingGold": 200,
+    "name": "贪婪", "tagIds": ["贪婪"], "startingGold": 150,
     "description": "带着一笔不义之财开始冒险"
   },
   "lucky": {
     "name": "幸运儿", "tagIds": ["幸运"], "startingGold": 0,
-    "description": "掉落概率提升50%"
+    "description": "掉落概率涨 50%，玄学也是实力"
   },
   "noble": {
     "name": "贵族血统", "tagIds": ["贵族"], "startingGold": 500,
@@ -28,7 +28,7 @@
     "description": "能够采集稀有资源"
   },
   "fisherman": {
-    "name": "渔家子弟", "tagIds": ["渔夫", "钓鱼"], "startingGold": 30,
+    "name": "渔家子弟", "tagIds": ["渔夫", "钓鱼"], "startingGold": 20,
     "description": "在水边长大，垂钓技艺娴熟"
   },
   "hunter_origin": {
@@ -44,7 +44,7 @@
     "description": "自幼在神殿长大，蒙圣光眷顾"
   },
   "food_lover": {
-    "name": "美食爱好者", "tagIds": ["厨师", "烹饪"], "startingGold": 60,
+    "name": "美食爱好者", "tagIds": ["厨师", "烹饪"], "startingGold": 50,
     "description": "走南闯北只为一口好饭，厨艺不俗"
   },
   "tamer_origin": {
@@ -52,7 +52,7 @@
     "description": "家族世代与野兽打交道"
   },
   "archaeologist": {
-    "name": "考古学徒", "tagIds": ["学者", "考古"], "startingGold": 80,
+    "name": "考古学徒", "tagIds": ["学者", "考古"], "startingGold": 50,
     "description": "师从著名学者，通晓古王国文字"
   }
 }

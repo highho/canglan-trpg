@@ -1,12 +1,12 @@
 {
   "slash": {
     "name": "斩击", "type": "ACTIVE", "cooldown": 0, "targetPattern": "SINGLE",
-    "range": 1, "baseDamage": 15, "damageType": "PHYSICAL",
+    "range": 1, "baseDamage": 16, "damageType": "PHYSICAL",
     "effects": []
   },
   "shield_bash": {
     "name": "盾击", "type": "ACTIVE", "cooldown": 2, "targetPattern": "SINGLE",
-    "range": 1, "baseDamage": 10, "damageType": "PHYSICAL",
+    "range": 1, "baseDamage": 11, "damageType": "PHYSICAL",
     "effects": [ { "type": "TRIGGER", "on": "SKILL_USED", "action": "GAIN_BUFF", "params": { "buffId": "shield", "duration": 2 } } ]
   },
   "berserk": {
@@ -16,47 +16,47 @@
   },
   "dragon_slash": {
     "name": "屠龙斩", "type": "ULTIMATE", "cooldown": 5, "targetPattern": "SINGLE",
-    "range": 1, "baseDamage": 60, "damageType": "PHYSICAL",
+    "range": 1, "baseDamage": 55, "damageType": "PHYSICAL",
     "effects": [ { "type": "DAMAGE_MOD", "againstTag": "龙裔", "operator": "MULTIPLY", "value": 1.5 } ]
   },
   "fireball": {
     "name": "火球术", "type": "ACTIVE", "cooldown": 1, "targetPattern": "SINGLE",
-    "range": 3, "baseDamage": 20, "damageType": "MAGICAL",
-    "effects": [ { "type": "TRIGGER", "on": "DAMAGE_DEALT", "chance": 0.3, "action": "GAIN_BUFF", "params": { "buffId": "burn", "duration": 3 } } ]
+    "range": 3, "baseDamage": 22, "damageType": "MAGICAL",
+    "effects": [ { "type": "TRIGGER", "on": "DAMAGE_DEALT", "chance": 0.32, "action": "GAIN_BUFF", "params": { "buffId": "burn", "duration": 3 } } ]
   },
   "ice_arrow": {
     "name": "冰箭术", "type": "ACTIVE", "cooldown": 1, "targetPattern": "SINGLE",
-    "range": 3, "baseDamage": 16, "damageType": "MAGICAL",
+    "range": 3, "baseDamage": 15, "damageType": "MAGICAL",
     "effects": []
   },
   "heal": {
     "name": "治疗术", "type": "ACTIVE", "cooldown": 2, "targetPattern": "SINGLE",
     "range": 2, "baseDamage": 0, "damageType": "MAGICAL",
-    "effects": [ { "type": "TRIGGER", "on": "SKILL_USED", "action": "HEAL", "params": { "amount": 30 } } ]
+    "effects": [ { "type": "TRIGGER", "on": "SKILL_USED", "action": "HEAL", "params": { "amount": 28 } } ]
   },
   "shadow_strike": {
     "name": "影袭", "type": "ACTIVE", "cooldown": 2, "targetPattern": "SINGLE",
-    "range": 1, "baseDamage": 25, "damageType": "PHYSICAL",
+    "range": 1, "baseDamage": 24, "damageType": "PHYSICAL",
     "effects": []
   },
   "poison_blade": {
     "name": "淬毒之刃", "type": "ACTIVE", "cooldown": 3, "targetPattern": "SINGLE",
-    "range": 1, "baseDamage": 12, "damageType": "PHYSICAL",
+    "range": 1, "baseDamage": 13, "damageType": "PHYSICAL",
     "effects": [ { "type": "TRIGGER", "on": "DAMAGE_DEALT", "action": "GAIN_BUFF", "params": { "buffId": "poison", "duration": 3 } } ]
   },
   "dragon_roar": {
     "name": "龙吼", "type": "ULTIMATE", "cooldown": 4, "targetPattern": "ALL",
-    "range": 9, "baseDamage": 35, "damageType": "MAGICAL",
+    "range": 9, "baseDamage": 34, "damageType": "MAGICAL",
     "effects": []
   },
   "combo_strike": {
     "name": "羁绊·魔武连击", "type": "ACTIVE", "cooldown": 3, "targetPattern": "SINGLE",
-    "range": 1, "baseDamage": 40, "damageType": "PHYSICAL",
+    "range": 1, "baseDamage": 38, "damageType": "PHYSICAL",
     "effects": []
   },
   "shadow_combo": {
     "name": "羁绊·双影突袭", "type": "ACTIVE", "cooldown": 3, "targetPattern": "ROW",
-    "range": 2, "baseDamage": 30, "damageType": "PHYSICAL",
+    "range": 2, "baseDamage": 28, "damageType": "PHYSICAL",
     "effects": []
   },
   "sword_mastery": {
@@ -71,17 +71,17 @@
   },
   "precise_shot": {
     "name": "精准射击", "type": "ACTIVE", "cooldown": 1, "targetPattern": "SINGLE",
-    "range": 4, "baseDamage": 22, "damageType": "PHYSICAL",
+    "range": 4, "baseDamage": 21, "damageType": "PHYSICAL",
     "effects": []
   },
   "arrow_rain": {
     "name": "箭雨", "type": "ULTIMATE", "cooldown": 5, "targetPattern": "ROW",
-    "range": 4, "baseDamage": 30, "damageType": "PHYSICAL",
+    "range": 4, "baseDamage": 28, "damageType": "PHYSICAL",
     "effects": []
   },
   "net_throw": {
     "name": "投网", "type": "ACTIVE", "cooldown": 3, "targetPattern": "SINGLE",
-    "range": 3, "baseDamage": 8, "damageType": "PHYSICAL",
+    "range": 3, "baseDamage": 9, "damageType": "PHYSICAL",
     "effects": [ { "type": "TRIGGER", "on": "DAMAGE_DEALT", "action": "GAIN_BUFF", "params": { "buffId": "poison", "duration": 1 } } ]
   },
   "hunter_instinct": {
@@ -91,13 +91,13 @@
   },
   "holy_light": {
     "name": "圣光弹", "type": "ACTIVE", "cooldown": 1, "targetPattern": "SINGLE",
-    "range": 3, "baseDamage": 18, "damageType": "MAGICAL",
+    "range": 3, "baseDamage": 17, "damageType": "MAGICAL",
     "effects": [ { "type": "DAMAGE_MOD", "againstTag": "亡灵", "operator": "MULTIPLY", "value": 1.5 } ]
   },
   "sanctuary": {
     "name": "庇护所", "type": "ULTIMATE", "cooldown": 5, "targetPattern": "ALL",
     "range": 9, "baseDamage": 0, "damageType": "MAGICAL",
-    "effects": [ { "type": "TRIGGER", "on": "SKILL_USED", "action": "HEAL", "params": { "amount": 25 } } ]
+    "effects": [ { "type": "TRIGGER", "on": "SKILL_USED", "action": "HEAL", "params": { "amount": 26 } } ]
   },
   "light_blessing": {
     "name": "圣光祝福", "type": "PASSIVE", "cooldown": 0, "targetPattern": "SELF",
@@ -111,7 +111,7 @@
   },
   "war_charge": {
     "name": "冲锋", "type": "ACTIVE", "cooldown": 2, "targetPattern": "SINGLE",
-    "range": 2, "baseDamage": 18, "damageType": "PHYSICAL",
+    "range": 2, "baseDamage": 19, "damageType": "PHYSICAL",
     "effects": []
   },
   "iron_will": {

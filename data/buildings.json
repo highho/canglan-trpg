@@ -17,12 +17,12 @@
   },
   "storage": {
     "name": "仓库", "category": "STORAGE",
-    "materials": { "wood": 6, "stone": 4 },
+    "materials": { "wood": 6, "stone": 5 },
     "effect": { "type": "STORAGE_BONUS", "params": { "slots": 10 } }
   },
   "defense_wall": {
     "name": "防御墙", "category": "DEFENSE",
-    "materials": { "stone": 10 },
+    "materials": { "stone": 12 },
     "effect": { "type": "DEFENSE_BONUS", "params": { "value": 20 } }
   },
   "guest_house": {
@@ -33,7 +33,7 @@
   },
   "kitchen": {
     "name": "厨房", "category": "CRAFTING",
-    "materials": { "wood": 8, "stone": 4 },
+    "materials": { "wood": 8, "stone": 5 },
     "condition": "HasTag(烹饪)",
     "effect": { "type": "CRAFT_UNLOCK", "params": { "recipe": "hearty_stew" } }
   },
