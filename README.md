@@ -30,14 +30,15 @@
 ```
 ├── canglan-backend/    # Java 17 零依赖后端（core/data/world/save/ai-client/api 六模块 + android-app 安卓壳）
 ├── frontend/           # Web 前端（src 为 TS 源码，dist 为产物+静态资源）
-├── ai-service/         # Python LangGraph AI 服务（可选部署）
+├── ai-service/         # Python LangGraph AI 服务（可选部署，开发期联调用）
+├── ai-service-go/      # Go AI 服务（PC 发行版内置，零依赖 exe，与 Java 内嵌管线文件互通）
+├── dist/launcher/      # Go 启动器源码（先启 ai-service.exe 再启 Java 后端并传参）
 ├── data/               # 全部 JSON 配置（种族/职业/任务/怪物/NPC/物品…）
 ├── build-all/          # javac 编译产物（classpath 根）
 ├── build-android.ps1   # Android APK 纯命令行构建（javac+d8+aapt2+apksigner，需 Android SDK）
-├── build-pc.ps1        # PC 独立发行包构建（jar+jlink 精简 JRE）
+├── build-pc.ps1        # PC 独立发行包构建（jar+jlink 精简 JRE + Go 组件编译）
 ├── run-regress.js      # 七套回归一键运行器（node run-regress.js）
 ├── PROJECT_CORE.md     # 项目核心文档（给 agent 的系统速读）
-├── MIGRATION_PLAN.md   # 跨技术栈迁移方案（P1~P9 全部完成）
 └── ACCEPTANCE.md       # P9 验收报告
 ```
 
@@ -70,8 +71,8 @@ java -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test       
 ## 发行版构建
 
 ```powershell
-# PC 独立版（Windows x64，内置精简 JRE，双击 苍岚大陆.exe 即玩）
-.\build-pc.ps1          # 产物 dist/canglan-trpg-win-x64.zip（约 19 MB，exe 为 Go 编译零依赖启动器）
+# PC 独立版（Windows x64，内置精简 JRE + Go AI 服务，双击 苍岚大陆.exe 即玩）
+.\build-pc.ps1          # 产物 dist/canglan-trpg-win-x64.zip（约 22 MB：苍岚大陆.exe 启动器 + ai-service.exe + jre + jar）
 
 # Android 单机 APK（内置后端，WebView 前端，需本机 Android SDK；minSdk 30 / Android 11+）
 .\build-android.ps1     # 产物 dist/canglan-trpg-android.apk
@@ -86,9 +87,11 @@ java -cp build-all com.canglan.api.FullFlowSmokeTest data build-flow-test       
 
 NPC 自由对话由 `canglan-ai-client` 内嵌管线驱动（Python `ai-service/main.py` 的 Java 移植，Android 兼容）：召回记忆 → 构建 prompt → LLM 生成（可选）→ 安全过滤 → 写入记忆；记忆以 `saveDir/memories.json` 持久化（个体 npcId + 群体 group:village/guild，上限 500 条）。接入优先级：
 
-1. **外部 AI 服务**（可选）：`-Dcanglan.ai.url=http://localhost:8000` 指向 `ai-service/main.py`（Python LangGraph 版），探活失败自动降级内嵌管线；`-Dcanglan.ai.url=off` 显式完全禁用；
+1. **外部 AI 服务**（可选）：`-Dcanglan.ai.url=http://localhost:8000` 指向外部服务，探活失败自动降级内嵌管线；`-Dcanglan.ai.url=off` 显式完全禁用；
 2. **LLM 供应商接入**（设置页配置）：起始页「AI 设置」（游戏内设置面板亦可）选择供应商——本地模型服务（Ollama/llama.cpp，免密钥）或云端模型（DeepSeek/OpenAI/Kimi/GLM/通义千问等，需 API 密钥），统一为 OpenAI 兼容端点（地址/密钥/模型名）；支持「测试连接」试连，保存立即生效并持久化于 `saveDir/ai-config.json`（后端 `/api/ai/config`、`/api/ai/test` 端点）；失败自动降级规则回复（含熔断）；
 3. **默认形态**：无外部服务、未配置供应商时，内嵌规则引擎 + 记忆召回兜底。
+
+**PC 发行版架构（Go AI 服务）**：`build-pc.ps1` 用 Go 1.21 编译 `ai-service.exe`（零依赖，约 5.5 MB，源码 `ai-service-go/`），实现与 Java `LangGraphHttpClient` 完全兼容的契约（`GET /health`、`POST /api/ai/chat`，`/api/ai/chat` 请求/响应结构一致）——Java 后端零改动。发行包内 `苍岚大陆.exe`（Go 启动器，源码 `dist/launcher/`）先启 `ai-service.exe -port 8081 -saves saves`，再以 `-Dcanglan.ai.url=http://127.0.0.1:8081` 启动 Java 后端并把**同一 saves 目录**传入，记忆/供应商配置与 Java 内嵌管线完全互通（Go 侧按 mtime 动态重读 `ai-config.json`，设置页保存即时生效）。Go 服务启动失败不阻塞游戏——Java 自动降级内嵌管线；LLM 请求走供应商配置，8s 超时 + 熔断（连续 3 次失败停 30s）。Android 单机版保留 Java 内嵌管线（无外部进程）。
 
 铁律：任何 AI 调用失败不得阻塞游戏主流程（AiSmokeTest 22 断言 + ApiSmokeTest 配置端点 5 断言覆盖全部降级路径）。
 

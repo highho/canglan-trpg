@@ -5,7 +5,12 @@ publish/
 build-all/
 build-*-test/
 build-android/
-dist/
+# 发行包构建产物（dist/launcher 源码保留入库）
+dist/win-x64/
+dist/launcher/*.exe
+dist/*.zip
+dist/*.apk
+dist/*.idsig
 *.keystore
 
 # 依赖
@@ -37,6 +42,9 @@ test_result.txt
 ui_smoke.txt
 smoke_out.txt
 0[0-9]-*.png
+
+# Go AI 服务构建产物（源码在 ai-service-go/，编译产物不入库）
+ai-service-go/ai-service.exe
 
 # 本地 AI 模型文件（体积大，不入库，见 README）
 *.gguf

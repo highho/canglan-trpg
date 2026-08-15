@@ -80,4 +80,5 @@
 - 沙箱环境无法杀旧服务，历史遗留监听端口 8787~8793（均为旧代码）；
 - AI 已 Java 化内嵌：Python `ai-service/main.py` 管线移植为 `canglan-ai-client` 的 `EmbeddedAiClient`（默认形态，Android APK 单机版同样可用）；`ai-service/main.py` 保留作为可选外部服务（未在本机部署，回归 243 断言全绿）；
 - AI 供应商接入模式：起始页「AI 设置」（游戏内设置面板同入口）可配置本地模型服务（Ollama/llama.cpp）或云端模型（DeepSeek/OpenAI/Kimi/GLM/通义千问等），统一 OpenAI 兼容端点，配置持久化 `saveDir/ai-config.json`，保存立即生效；浏览器冒烟 7/7（预设填充/保存/试连失败/刷新持久化，console 零错误）；
+- **AI 底层 Go 化（PC 发行版）**：新增 `ai-service-go/`（Go 1.21 零依赖，`ai-service.exe` 约 5.5 MB），契约与 Java `LangGraphHttpClient` 完全兼容（`GET /health`、`POST /api/ai/chat`），Java 后端零改动；`dist/launcher/` Go 启动器先启 ai-service（8081）再启 javaw 并传 `-Dcanglan.ai.url`，与 Java 共享同一 saves 目录（记忆/配置互通，Go 侧 mtime 动态重读 ai-config.json）；端到端验证通过：发行包解压运行 exe 双进程拉起、`aiAvailable:true`、自由对话回复经 Go（source=rule）、`memories.json` 由 Go 写入且与 Java 格式一致；Android 保留 Java 内嵌管线；Java 回归 243/243 全绿；
 - 真模型生成待接入：本机有 C:\GameModels\qwen2-7b-q4.gguf 与 Ollama（仅 bge-m3），可用 llama.cpp server / ollama pull qwen2 后在「AI 设置」中填入端点启用。

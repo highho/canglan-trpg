@@ -1,6 +1,6 @@
 # build-pc.ps1 — 苍岚大陆 PC（Windows x64）独立发行包构建。
-# 产物 dist/canglan-trpg-win-x64.zip：内置精简 JRE（jlink），双击 启动.bat 即玩。
-# 模块说明：java.base（核心）+ java.logging（JDK 内部依赖）+ java.net.http（AI 客户端 HttpClient）。
+# 产物 dist/canglan-trpg-win-x64.zip：内置精简 JRE（jlink）+ Go 启动器 + Go AI 服务，双击 苍岚大陆.exe 即玩。
+# Go 组件：苍岚大陆.exe（启动器，先启 ai-service 再启 Java 后端并指向之）、ai-service.exe（AI 服务：二层记忆+规则兜底+供应商 LLM）。
 $ErrorActionPreference = "Stop"
 $root = "e:\studyprogram\sikiedu\Unity\C#\CSharp编程第七季\CSharp编程第七季代码\Test"
 $dist = "$root\dist"
@@ -29,7 +29,7 @@ Write-Host "[3/5] jlink 精简 JRE"
     ForEach-Object { if ($_ -match "Error") { Write-Host $_ } }
 if (-not (Test-Path "$stage\jre\bin\java.exe")) { throw "jlink 未产出 JRE" }
 
-Write-Host "[4/5] 生成 exe 启动器与说明"
+Write-Host "[4/5] 编译 Go 组件（启动器 + AI 服务）与说明"
 # 用 Go 编译零依赖原生 exe（无黑窗、无需 .NET 运行时）
 $launcherDir = "$dist\launcher"
 if (Test-Path $launcherDir) { Remove-Item -Recurse -Force $launcherDir }
@@ -53,7 +53,14 @@ func main() {
 	saves := filepath.Join(dir, "saves")
 	web := filepath.Join(dir, "web")
 
-	cmd := exec.Command(java, "-Dfile.encoding=UTF-8", "-jar", jar, data, saves, "8080", web)
+	// 1. 启动 Go AI 服务（零依赖，与 Java 后端共享同一 saves 目录：记忆/配置互通）
+	aiCmd := exec.Command(filepath.Join(dir, "ai-service.exe"), "-port", "8081", "-saves", saves)
+	aiCmd.Dir = dir
+	aiCmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	_ = aiCmd.Start() // 启动失败不阻塞：Java 后端自动降级内嵌管线
+
+	// 2. 启动 Java 后端，AI 对话指向 Go 服务（探活失败自动降级内嵌管线）
+	cmd := exec.Command(java, "-Dfile.encoding=UTF-8", "-Dcanglan.ai.url=http://127.0.0.1:8081", "-jar", jar, data, saves, "8080", web)
 	cmd.Dir = dir
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	if err := cmd.Start(); err != nil {
@@ -70,32 +77,53 @@ $env:CGO_ENABLED = "0"
 if ($LASTEXITCODE -ne 0) { throw "go build 编译 exe 失败" }
 Copy-Item "$launcherDir\苍岚大陆.exe" "$stage\苍岚大陆.exe"
 
+# 编译 Go AI 服务（零依赖，替代 Python/内嵌 AI 管线；与 Java 后端共享 saves 目录）
+$aiGoDir = "$root\ai-service-go"
+if (-not (Test-Path "$aiGoDir\go.mod")) { throw "ai-service-go 目录缺失" }
+Push-Location $aiGoDir
+& go build -ldflags="-s -w" -o ai-service.exe .
+Pop-Location
+if ($LASTEXITCODE -ne 0) { throw "go build 编译 ai-service 失败" }
+if (-not (Test-Path "$aiGoDir\ai-service.exe")) { throw "ai-service.exe 未产出" }
+Copy-Item "$aiGoDir\ai-service.exe" "$stage\ai-service.exe"
+
 $readme = @"
 苍岚大陆（Windows x64 独立版）
 
-运行：双击「苍岚大陆.exe」，自动在后台启动服务并打开浏览器进入游戏。
-关闭游戏：在任务管理器结束 javaw 进程。
+运行：双击「苍岚大陆.exe」，自动在后台启动 Go AI 服务与游戏服务，并打开浏览器进入游戏。
+关闭游戏：在任务管理器结束 javaw 与 ai-service 进程。
 
 目录说明：
-  jre\    内置精简 JRE（无需安装 Java）
-  data\   游戏数据（21 个 JSON）
-  web\    纯文字前端
-  saves\  存档（运行时生成，save_1.json ~ save_10.json）
+  jre\          内置精简 JRE（无需安装 Java）
+  ai-service.exe Go 实现的 AI 服务（二层记忆 + 规则兜底 + 供应商 LLM 接入，零依赖）
+  data\         游戏数据（21 个 JSON）
+  web\          纯文字前端
+  saves\        存档与 AI 记忆（运行时生成，save_1.json ~ save_10.json / memories.json / ai-config.json）
 
 命令行方式：jre\bin\java -Dfile.encoding=UTF-8 -jar canglan.jar data saves 8080 web
 "@
 Set-Content -Path "$stage\README.txt" -Value $readme -Encoding Default
 
-Write-Host "[5/5] 冒烟自测（启动 5 秒探活后关闭）+ 打包 zip"
-$proc = Start-Process -FilePath "$stage\jre\bin\java.exe" -ArgumentList "-Dfile.encoding=UTF-8","-jar","$stage\canglan.jar","$stage\data","$stage\saves","8799","$stage\web" -PassThru -WindowStyle Hidden
+Write-Host "[5/5] 冒烟自测（Go AI 服务 + 后端探活 + 对话）+ 打包 zip"
+$aiProc = Start-Process -FilePath "$stage\ai-service.exe" -ArgumentList "-port","8798","-saves","$stage\saves" -PassThru -WindowStyle Hidden
+$proc = Start-Process -FilePath "$stage\jre\bin\java.exe" -ArgumentList "-Dfile.encoding=UTF-8","-Dcanglan.ai.url=http://127.0.0.1:8798","-jar","$stage\canglan.jar","$stage\data","$stage\saves","8799","$stage\web" -PassThru -WindowStyle Hidden
 Start-Sleep -Seconds 5
 try {
     $health = Invoke-RestMethod -Uri "http://127.0.0.1:8799/api/health" -TimeoutSec 5
-    Write-Host "  探活成功：status=$($health.status) sessions=$($health.sessions)"
+    Write-Host "  后端探活：status=$($health.status) sessions=$($health.sessions)"
+    if ($health.status -ne "ok") { throw "后端 status=$($health.status)" }
+    $goHealth = Invoke-RestMethod -Uri "http://127.0.0.1:8798/health" -TimeoutSec 5
+    Write-Host "  Go AI 服务探活：status=$($goHealth.status) llm=$($goHealth.llm)"
+    if ($goHealth.status -ne "ok") { throw "Go AI 服务不可用" }
+    $chatBody = '{"npcId":"npc_village_chief","npcName":"村长","playerName":"旅人","utterance":"你好，村长！","tags":[],"memory":[]}'
+    $chat = Invoke-RestMethod -Uri "http://127.0.0.1:8798/api/ai/chat" -Method Post -ContentType "application/json; charset=utf-8" -Body $chatBody -TimeoutSec 5
+    Write-Host "  Go AI 对话：source=$($chat.source) reply=$($chat.reply.Substring(0, [Math]::Min(20, $chat.reply.Length)))…"
+    if ([string]::IsNullOrWhiteSpace($chat.reply)) { throw "Go AI 对话返回空回复" }
 } catch {
-    throw "发行包自测失败：/api/health 无响应"
+    throw "发行包自测失败：$($_.Exception.Message)"
 } finally {
     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+    Stop-Process -Id $aiProc.Id -Force -ErrorAction SilentlyContinue
 }
 if (Test-Path "$dist\canglan-trpg-win-x64.zip") { Remove-Item "$dist\canglan-trpg-win-x64.zip" }
 Compress-Archive -Path $stage -DestinationPath "$dist\canglan-trpg-win-x64.zip"
